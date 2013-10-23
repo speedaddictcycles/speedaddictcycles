@@ -1,0 +1,14 @@
+html, body {
+	height:100%;
+}
+
+body {
+	background: url(images/back_top.png) center top repeat-x, url(images/back_bottom.png) center 280px repeat;
+}
+
+#appView {
+	width: 960px;
+	margin: 0px auto;
+	background: white;
+	
+}

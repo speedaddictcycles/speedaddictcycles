@@ -45,6 +45,7 @@ css files should be included before any .js file to ensure they are downloaded i
 -->
 <link rel="stylesheet" type="text/css" href="app-quickstart.css" />
 <link rel="stylesheet" type="text/css" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/ui-lightness/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="_sac_styles.css" />
 
 
 <!-- ** 201338 -> jquery and jquery ui are pivotal to the functionality of the app. load them first -->
@@ -70,7 +71,11 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 <div id='appPreView'>
 <table>
 <tr>
-	<td><!-- put logo here --></td>
+	<td>
+	
+	<img src="images/logo.png" />
+	
+	</td>
 	<td>
 
 	<div id="loader">
@@ -94,19 +99,28 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 
 <div id='appView' class='displayNone'>
 
-	
-<div id='globalMessaging' class='appMessaging'></div><!-- DO NOT REMOVE - used for some high level error handling (usually appears below breadcrumb nav or top bar) -->
 
-<!-- These add specific functionality for the app. In most cases, you want to leave them alone. -->
-<div id='appNav'>
-	<button class='displayNone prodDetailNextItemButton' data-app-role='prodDetailNextItemButton'>Next</button>
-	<button class='displayNone prodDetailPrevItemButton' data-app-role='prodDetailPrevItemButton'>Previous</button>
-</div>
+	<div id="header">
+		
+	</div>
 
-<div id='mainContentArea'></div><!-- DO NOT REMOVE - this is where the specific page (ex: homepage, product, category) content is going to go -->
+	<div id="mainBody">
+		<div id='globalMessaging' class='appMessaging'></div><!-- DO NOT REMOVE - used for some high level error handling (usually appears below breadcrumb nav or top bar) -->
 
-<!-- ... your html ends -->
-<!-- /VIEW CONTENT -->
+		<!-- These add specific functionality for the app. In most cases, you want to leave them alone. -->
+		<div id='appNav'>
+			<button class='displayNone prodDetailNextItemButton' data-app-role='prodDetailNextItemButton'>Next</button>
+			<button class='displayNone prodDetailPrevItemButton' data-app-role='prodDetailPrevItemButton'>Previous</button>
+		</div>
+
+		<div id='mainContentArea'></div><!-- DO NOT REMOVE - this is where the specific page (ex: homepage, product, category) content is going to go -->
+	</div>	
+
+
+	<div id="footer">
+		
+	</div>
+
 </div>
 
 
