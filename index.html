@@ -129,12 +129,28 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 				</div>
 			</div>
 			
-			<div id="searchBar">
+			<div id="searchBar" class="sourceSans">
 				<form>
 					<span id="searchBtn" class="alignCenter">SEARCH</span>
 					<input name="search" id="searchBarInput" type="text"/>
 					<span id="deptSearchBtn" class="alignCenter">DEPARTMENT SEARCH</span>
 				</form>
+			</div>
+		</div>
+		
+		<div id="nav" class="clear sourceSans">
+			<div class="floatLeft navOption">
+				<a href="#category?navcat=.shop_by_type.cruiser" >CRUISER</a>
+			</div>
+			<div class="floatLeft navOption">
+				<a href="#category?navcat=.shop_by_type.dirt" >DIRT</a>
+			</div>
+			<div class="floatLeft navOption">
+				<a href="#category?navcat=.shop_by_type.street" >STREET</a>
+			</div>
+			
+			<div id="allDepts" class="floatRight">
+				<a href="#category?navcat=.shop_by_type">ALL DEPARTMENTS</a>
 			</div>
 		</div>
 	</div>
