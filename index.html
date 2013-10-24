@@ -48,6 +48,9 @@ css files should be included before any .js file to ensure they are downloaded i
 <link rel="stylesheet" type="text/css" href="_sac_styles.css" />
 
 
+<!-- FONTS -->
+<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+
 <!-- ** 201338 -> jquery and jquery ui are pivotal to the functionality of the app. load them first -->
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
@@ -127,7 +130,11 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 			</div>
 			
 			<div id="searchBar">
-			
+				<form>
+					<span id="searchBtn" class="alignCenter">SEARCH</span>
+					<input name="search" id="searchBarInput" type="text"/>
+					<span id="deptSearchBtn" class="alignCenter">DEPARTMENT SEARCH</span>
+				</form>
 			</div>
 		</div>
 	</div>

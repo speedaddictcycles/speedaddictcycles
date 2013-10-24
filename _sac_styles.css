@@ -59,7 +59,8 @@ body {
 	top: 12px;
 	z-index: 2;
 }
-
+#header #headerBanners,
+#header #searchBar { width: 673px;}
 #header #headerBanners {height: 85px;}
 #header #headerBanners #questions {width: 260px; height: 100%;}
 #header #headerBanners #return90days {width: 153px; height: 100%;}
@@ -76,4 +77,27 @@ body {
 #header #searchBar {
 	height: 32px;
 	background: #ffe2b0;
+	color: #cc4300;
+	font-family: 'Source Sans Pro', sans-serif;
+	line-height: 30px;
+}
+
+#header #searchBar #searchBarInput{
+	width: 450px;
+	height: 22px;
+	background: white;
+	border: none;
+	border-radius: 2px;
+}
+
+#header #searchBar #searchBtn {
+	width: 90px;
+	font-weight: bold;
+	font-size: .8em;
+	display: inline-block;
+}
+#header #searchBar #deptSearchBtn {
+	font-size: .65em;
+	width: 113px;
+	display: inline-block;
 }
