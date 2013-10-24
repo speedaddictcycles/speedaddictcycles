@@ -119,3 +119,17 @@ body {
 	text-decoration: none;
 }
 #header #nav #allDepts a{ font-size: .8em; }
+
+
+#footer {
+	height: 168px;
+	background: #f2f2f2; 
+	padding: 20px 34px 0px 34px;
+	margin-bottom: 30px;
+}
+
+#footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}
+
+#footer #socialAndBadges > div {
+	margin-bottom: 10px;
+}
