@@ -23,10 +23,7 @@ body {
 }
 
 
-#appView {
-	width: 960px;
-	margin: 0px auto;
-}
+#appView {margin: 0px auto;}
 
 #freeship {
 	margin-bottom: 18px;
