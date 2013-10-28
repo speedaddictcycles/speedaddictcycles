@@ -1,3 +1,11 @@
 #appView {
 	width: 768px;
 }
+
+#header .tread {
+	width: 786px;
+	height: 29px;
+	background: url(images/tread_786.png);
+	top: -10px;
+	left: -12px;
+}

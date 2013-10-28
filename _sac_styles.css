@@ -41,8 +41,6 @@ body {
 
 #header .tread {
 	position: absolute;
-	top: -10px;
-	left: -8px;
 	z-index: 1;
 }
 
