@@ -2,6 +2,12 @@
 	width: 960px;
 }
 
+#freeship {
+	background: url(images/freeship_banner_675x30.jpg) no-repeat center top;
+	height: 30px;
+	margin-bottom:18px;
+}
+
 #header .tread {
 	width: 973px;
 	height: 29px;
