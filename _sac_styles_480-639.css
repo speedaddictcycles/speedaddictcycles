@@ -10,6 +10,8 @@
 	margin-bottom:10px;
 }
 
+#header {height:180px;}
+
 #header .tread {
 	width: 512px;
 	height: 28px;
@@ -18,9 +20,13 @@
 	left: -18px;
 }
 
+#header .headerMarginRight{
+	margin-right: 1px;
+}
+
 #header .logoContainer {
 	height: 76px;
-	width: 182px;
+	width: 186px;
 }
 #header .logoContainer .logo{
 	display: block;
@@ -28,3 +34,11 @@
 	width:100%;
 	height:100%;
 }
+
+#header #headerBanners{ width: 293px; height: 76px;}
+#header #headerBanners #returnExchangeCombo {width: 168px; height: 100%;}
+#header #headerBanners #returnExchangeCombo #returnInCombo {height: 37px; margin-bottom: 1px;}
+#header #headerBanners #returnExchangeCombo #exchangeInCombo {height: 38px;}
+#header #headerBanners #minicart {width: 124px; height: 100%;}
+
+#header #searchBar {width: 277px;}
