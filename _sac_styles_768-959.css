@@ -19,7 +19,7 @@
 }
 
 #header .headerMarginRight{
-	margin-right: 1px;
+	margin-right: 2px;
 }
 
 #header .logoContainer {
@@ -35,9 +35,9 @@
 
 #header #headerBanners{ width: 584px; height: 76px;}
 #header #headerBanners #questions {width: 230px; height: 100%;}
-#header #headerBanners #return90days {width: 141px; height: 100%;}
+#header #headerBanners #return90days {width: 140px; height: 100%;}
 #header #headerBanners #freeExchange {width: 99px; height: 100%;}
 #header #headerBanners #minicart {width: 109px; height: 100%;}
 
 
-#header #searchBar {width: 100%;}
+#header #searchBar {width: 565px;}

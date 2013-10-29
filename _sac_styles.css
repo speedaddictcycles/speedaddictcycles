@@ -39,7 +39,7 @@ body {
 	z-index: 2;
 }
 
-#header #headerBanners div {position:relative; z-index: 0;}
+#header #headerBanners div {position:relative;}
 #header #headerBanners img {position:absolute; z-index:2; top: 50%; left: 50%;}
 #header #headerBanners #questions img{margin-top: -22px; margin-left: -103px;}
 #header #headerBanners #return90days img{margin-top: -16px; margin-left: -60px;}
@@ -53,12 +53,18 @@ body {
 	height: 32px;
 	background: #ffe2b0;
 	color: #cc4300;
-	
+	padding-left: 90px;
+	padding-right: 113px;
 	line-height: 30px;
 }
 
 #header #searchBar #searchBarInput{
-	width: 450px;
+	position:relative;
+	padding: 0px;
+	margin: 0px;
+	float:left;
+	width: 100%;
+	margin-top:5px;
 	height: 22px;
 	background: white;
 	border: none;
@@ -66,15 +72,20 @@ body {
 }
 
 #header #searchBar #searchBtn {
+	position:relative;
+	float:left;
+	margin-right:-90px;
+	right:90px;
 	width: 90px;
 	font-weight: bold;
 	font-size: .8em;
-	display: inline-block;
 }
 #header #searchBar #deptSearchBtn {
+	position:relative;
+	float:left;
+	margin-right: -113px;
 	font-size: .65em;
 	width: 113px;
-	display: inline-block;
 }
 
 #header #nav {
