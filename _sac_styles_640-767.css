@@ -1,3 +1,5 @@
+.displayNone_640{display:none;}
+
 #appView {
 	width: 640px;
 }
@@ -8,10 +10,28 @@
 	margin-bottom:18px;
 }
 
+#header {height: 146px;}
+
 #header .tread {
 	width: 662px;
 	height: 28px;
 	background: url(images/tread_662.png);
 	top: -10px;
 	left: -13px;
+}
+
+
+#header .headerMarginRight{
+	margin-right: 2px;
+}
+
+#header .logoContainer {
+	height: 76px;
+	width: 182px;
+}
+#header .logoContainer .logo{
+	display: block;
+	background:url(images/logo_154x73.png) center center no-repeat;
+	width:100%;
+	height:100%;
 }
