@@ -8,6 +8,8 @@
 	margin-bottom:18px;
 }
 
+#header {height: 146px;}
+
 #header .tread {
 	width: 786px;
 	height: 29px;
@@ -15,3 +17,27 @@
 	top: -10px;
 	left: -12px;
 }
+
+#header .headerMarginRight{
+	margin-right: 1px;
+}
+
+#header .logoContainer {
+	height: 76px;
+	width: 182px;
+}
+#header .logoContainer .logo{
+	display: block;
+	background:url(images/logo_154x73.png) center center no-repeat;
+	width:100%;
+	height:100%;
+}
+
+#header #headerBanners{ width: 584px; height: 76px;}
+#header #headerBanners #questions {width: 230px; height: 100%;}
+#header #headerBanners #return90days {width: 141px; height: 100%;}
+#header #headerBanners #freeExchange {width: 99px; height: 100%;}
+#header #headerBanners #minicart {width: 109px; height: 100%;}
+
+
+#header #searchBar {width: 100%;}

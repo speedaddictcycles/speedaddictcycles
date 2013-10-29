@@ -1,3 +1,17 @@
 #appView {
 	width: 480px;
 }
+
+#freeship {
+	background: url(images/freeship_banner_480x27.jpg) no-repeat center top;
+	height: 27px;
+	margin-bottom:10px;
+}
+
+#header .tread {
+	width: 512px;
+	height: 28px;
+	background: url(images/tread_512.png);
+	top: -12px;
+	left: -18px;
+}
