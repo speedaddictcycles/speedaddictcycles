@@ -40,14 +40,19 @@ body {
 	z-index: 2;
 }
 
-#header #headerBanners div {position:relative;}
-#header #headerBanners img {position:absolute; z-index:2; top: 50%; left: 50%;}
+#header #headerBanners div,
+#header #smallHeaderBanners div {position:relative;}
+#header #headerBanners img,
+#header #smallHeaderBanners img {position:absolute; z-index:2; top: 50%; left: 50%;}
 #header #headerBanners #questions img{margin-top: -22px; margin-left: -103px;}
 #header #headerBanners #return90days img{margin-top: -16px; margin-left: -60px;}
 #header #headerBanners #freeExchange img{margin-top: -15px; margin-left: -36px;}
 #header #headerBanners #returnExchangeCombo #returnInCombo img{margin-top: -6px; margin-left: -66px;}
 #header #headerBanners #returnExchangeCombo #exchangeInCombo img{margin-top: -10px; margin-left: -67px;}
 #header #headerBanners #minicart img{margin-top: -26px; margin-left: -40px;}
+#header #smallHeaderBanners #returnSmall img{margin-top: -18px; margin-left: -55px;}
+#header #smallHeaderBanners #exchangeSmall img{margin-top: -17px; margin-left: -33px;}
+#header #smallHeaderBanners #minicartSmall img{margin-top: -19px; margin-left: -48px;}
 
 
 
