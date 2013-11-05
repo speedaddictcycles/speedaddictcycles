@@ -1,4 +1,13 @@
 .displayNone_640{display:none;}
+.floatLeft_640{float:left;}
+.floatRight_640{float:right;}
+.clearLeft_640{clear:left;}
+.clearRight_640{clear:right;}
+
+.alignLeft_640{text-align:left;}
+.alignRight_640{text-align:right;}
+.alignCenter_640{text-align:center;}
+.alignJustify_640{text-align:justify;}
 
 #appView {
 	width: 640px;
@@ -45,3 +54,11 @@
 
 
 #header #searchBar {width: 437px;}
+
+#footer {
+	height: 168px;
+	padding: 20px 10px 0px 10px;
+}
+
+#footer .linkList {font-size: .95em; margin-right: 10px;}
+#footer #footerSocial {margin-top: 30px; margin-bottom: 20px;}

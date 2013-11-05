@@ -1,4 +1,13 @@
 .displayNone_960{display:none;}
+.floatLeft_960{float:left;}
+.floatRight_960{float:right;}
+.clearLeft_960{clear:left;}
+.clearRight_960{clear:right;}
+
+.alignLeft_960{text-align:left;}
+.alignRight_960{text-align:right;}
+.alignCenter_960{text-align:center;}
+.alignJustify_960{text-align:justify;}
 
 #appView {
 	width: 960px;
@@ -44,3 +53,10 @@
 #header #headerBanners #return90days {width: 153px; height: 100%;}
 #header #headerBanners #freeExchange {width: 125px; height: 100%;}
 #header #headerBanners #minicart {width: 126px; height: 100%;}
+
+#footer {
+	height: 168px;
+	padding: 20px 34px 0px 34px;
+}
+
+#footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}

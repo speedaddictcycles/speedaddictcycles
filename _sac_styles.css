@@ -10,6 +10,7 @@ body {
 
 .sourceSans { font-family: 'Source Sans Pro', sans-serif; }
 .clear { clear: both; }
+.clearRight { clear: right; }
 
 .highlightBG{background:#ffe2b0}
 .headerGradientBG {
@@ -100,7 +101,7 @@ body {
 	height: 36px;
 	background: #cc4300;
 }
-#header #nav > div {height: 100%; line-height: 36px;}
+#header #nav > div {height: 36px; line-height: 36px;}
 #header #nav .navOption {border-right: 1px solid #ffe2b0;}
 #header #nav a{
 	color: #ffe2b0;
@@ -112,14 +113,9 @@ body {
 
 
 #footer {
-	height: 168px;
 	background: #f2f2f2; 
-	padding: 20px 34px 0px 34px;
 	margin-bottom: 30px;
 }
 
-#footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}
-
-#footer #socialAndBadges > div {
-	margin-bottom: 10px;
-}
+#footer #footerSocial {margin-bottom: 10px;}
+#footer #footerPaymentDecals {margin-bottom: 10px;}

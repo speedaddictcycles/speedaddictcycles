@@ -1,4 +1,13 @@
 .displayNone_768{display:none;}
+.floatLeft_768{float:left;}
+.floatRight_768{float:right;}
+.clearLeft_768{clear:left;}
+.clearRight_768{clear:right;}
+
+.alignLeft_768{text-align:left;}
+.alignRight_768{text-align:right;}
+.alignCenter_768{text-align:center;}
+.alignJustify_768{text-align:justify;}
 
 #appView {
 	width: 768px;
@@ -43,3 +52,10 @@
 
 
 #header #searchBar {width: 565px;}
+
+#footer {
+	height: 168px;
+	padding: 20px 34px 0px 34px;
+}
+
+#footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}

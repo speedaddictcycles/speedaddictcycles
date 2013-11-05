@@ -1,4 +1,13 @@
 .displayNone_480{display:none;}
+.floatLeft_480{float:left;}
+.floatRight_480{float:right;}
+.clearLeft_480{clear:left;}
+.clearRight_480{clear:right;}
+
+.alignLeft_480{text-align:left;}
+.alignRight_480{text-align:right;}
+.alignCenter_480{text-align:center;}
+.alignJustify_480{text-align:justify;}
 
 #appView {
 	width: 480px;
@@ -10,7 +19,7 @@
 	margin-bottom:10px;
 }
 
-#header {height:180px;}
+#header {height:164px;}
 
 #header .tread {
 	width: 512px;
