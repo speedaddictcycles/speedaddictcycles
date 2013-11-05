@@ -1,4 +1,6 @@
 .displayNone_480{display:none;}
+.displayInlineBlock_480{display:inline-block;}
+
 .floatLeft_480{float:left;}
 .floatRight_480{float:right;}
 .clearLeft_480{clear:left;}
@@ -51,3 +53,9 @@
 #header #headerBanners #minicart {width: 124px; height: 100%;}
 
 #header #searchBar {width: 277px;}
+
+#footer {
+	padding: 10px 0px;
+}
+
+#footer .linkList {margin: 20px 10px; vertical-align: top;}
