@@ -51,7 +51,16 @@
 #header #smallHeaderBanners #exchangeSmall {width: 86px; height: 100%;}
 #header #smallHeaderBanners #minicartSmall {width: 112px; height: 100%;}
 
+#header #searchBar{ padding-right: 0px; width: 230px;}
+#header #searchBar #searchBarInput{ width: 220px;}
+
 #header #nav {height: 72px;}
 #header #nav .navOption {border: none; width: 159px; text-align:center;}
 #header #nav .navOptionBorderRight_320 {border-right: 1px solid #ffe2b0;}
 #header #nav .navOptionBorderBottom_320 {border-bottom: 1px solid #ffe2b0;}
+
+#footer {
+	padding: 18px 0px;
+}
+
+#footer .linkList {margin: 24px 0px;}
