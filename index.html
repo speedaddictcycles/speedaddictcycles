@@ -119,44 +119,64 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 		<div class="tread"></div>
 		
 		<div class="logoContainer headerGradientBG alignCenter headerMarginRight floatLeft">
-			<a href="#homepage" class="logo"></a>
+			<a href="#!homepage" data-onClick="appLink" class="logo"></a>
 		</div>
 		
 			<div id="headerBanners" class="floatLeft displayNone_320">
 				<div id="questions" class="headerGradientBG headerMarginRight floatLeft displayNone_480">
-					<img src="images/questions.png" />
+					<a data-onClick="appLink" href="#!company?show=contact">
+						<img src="images/questions.png" />
+					</a>
 				</div>
 				<div id="return90days" class="headerGradientBG headerMarginRight floatLeft displayNone_640 displayNone_480">
-					<img src="images/90days_120x41.png" />
+					<a data-onClick="appLink" href="#!company?show=return">
+						<img src="images/90days_120x41.png" />
+					</a>
 				</div>
 				<div id="freeExchange" class="headerGradientBG headerMarginRight floatLeft displayNone_640 displayNone_480">
-					<img src="images/freeExchange_73x38.png" />
+					<a data-onClick="appLink" href="#!company?show=return">
+						<img src="images/freeExchange_73x38.png" />
+					</a>
 				</div>
 				<div id="returnExchangeCombo" class="headerMarginRight floatLeft displayNone_960 displayNone_768 ">
 					<div id="returnInCombo" class="highlightBG">
-						<img src="images/90days_133x22.png"/>
+						<a data-onClick="appLink" href="#!company?show=return">
+							<img src="images/90days_133x22.png"/>
+						</a>
 					</div>
 					<div id="exchangeInCombo" class="headerGradientBG">
-						<img src="images/freeExchange_134x20.png"/>
+						<a data-onClick="appLink" href="#!company?show=return">
+							<img src="images/freeExchange_134x20.png"/>
+						</a>
 					</div>
 				</div>
 				<div id="minicart" class="headerGradientBG floatLeft">
-					<img src="images/cart_81x60.png" />
+					<a data-onClick="appLink" href="#!cart">
+						<img src="images/cart_81x60.png" />
+					</a>
 				</div>
 			</div>
 			<div id="smallHeaderBanners" class="displayNone_960 displayNone_768 displayNone_640 displayNone_480">
 				<div id="returnSmall" class="headerMarginRight headerGradientBG floatLeft">
-					<img src="images/90days_110x36.png"/>
+					<a data-onClick="appLink" href="#!company?show=return">
+						<img src="images/90days_110x36.png"/>
+					</a>
 				</div>
 				<div id="exchangeSmall" class="headerMarginRight headerGradientBG floatLeft">
-					<img src="images/freeExchange_66x34.png"/>
+					<a data-onClick="appLink" href="#!company?show=return">
+						<img src="images/freeExchange_66x34.png"/>
+					</a>
 				</div>
 				<div id="minicartSmall" class="headerGradientBG floatLeft">
-					<img src="images/cart_96x38.png" />
+					<a data-onClick="appLink" href="#!cart">
+						<img src="images/cart_96x38.png" />
+					</a>
 				</div>
 			</div>
 			<div id="questionsBar" class="alignCenter displayNone_960 displayNone_768 displayNone_640 displayNone_320">
-				<img src="images/questions_bar_434x13.png" />
+				<a data-onClick="appLink" href="#!company?show=contact">
+					<img src="images/questions_bar_434x13.png" />
+				</a>
 			</div>
 			<div id="searchBar" class="sourceSans floatLeft">
 				<div id="searchBtn" class="alignCenter">SEARCH</div>
@@ -165,17 +185,17 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 			</div>
 		<div id="nav" class="clear sourceSans">
 			<div class="floatLeft navOption navOptionBorderRight_320 navOptionBorderBottom_320">
-				<a href="#category?navcat=.shop_by_type.cruiser" >CRUISER</a>
+				<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" >CRUISER</a>
 			</div>
 			<div class="floatLeft navOption navOptionBorderBottom_320">
-				<a href="#category?navcat=.shop_by_type.dirt" >DIRT</a>
+				<a href="#!category?navcat=.shop_by_type.dirt" data-onClick="appLink" >DIRT</a>
 			</div>
 			<div class="floatLeft navOption navOptionBorderRight_320">
-				<a href="#category?navcat=.shop_by_type.street" >STREET</a>
+				<a href="#!category?navcat=.shop_by_type.street" data-onClick="appLink">STREET</a>
 			</div>
 			
 			<div id="allDepts" class="floatRight">
-				<a href="#category?navcat=.shop_by_type">ALL DEPARTMENTS</a>
+				<a href="#!category?navcat=.shop_by_type">ALL DEPARTMENTS</a>
 			</div>
 		</div>
 	</div>
@@ -202,58 +222,82 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 		<div class="linkList floatLeft_960 floatLeft_768 floatLeft_640 displayInlineBlock_480 alignLeft_480 sourceSans">
 			<h4>CUSTOMER SERVICE</h4>
 			<div>
-				&gt; Contact Us
+				<a href="#!company?show=contact" data-onClick="appLink">
+					&gt; Contact Us
+				</a>
 			</div>
 			<div>
 				&gt; Live Help
 			</div>
 			<div>
-				&gt; Shipping &amp; Tracking
+				<a href="#!company?show=shipping" data-onClick="appLink">
+					&gt; Shipping &amp; Tracking
+				</a>
 			</div>
 			<div>
-				&gt; Returns
+				<a href="#!company?show=returns" data-onClick="appLink">
+					&gt; Returns
+				</a>
 			</div>
 			<div>
 				&gt; Lowest Price Guarantee
 			</div>
 			<div>
-				&gt; FAQ
+				<a href="#!company?show=faq" data-onClick="appLink">
+					&gt; FAQ
+				</a>
 			</div>
 			<div>
-				&gt; Payment Options
+				<a href="#!company?show=payment" data-onClick="appLink">
+					&gt; Payment Options
+				</a>
 			</div>
 		</div>
 		<div class="linkList floatLeft_960 floatLeft_768 floatLeft_640 displayInlineBlock_480 alignLeft_480 sourceSans">
 			<h4>ORDERS</h4>
 			<div>
-				&gt; Order Status
+				<a href="#!customer?show=order" data-onClick="appLink">
+					&gt; Order Status
+				</a>
 			</div>
 			<div>
-				&gt; Your Account
+				<a href="#!customer?show=myaccount" data-onClick="appLink">
+					&gt; Your Account
+				</a>
 			</div>
 			<div>
-				&gt; Shopping Cart
+				<a href="#!cart" data-onClick="appLink">
+					&gt; Shopping Cart
+				</a>
 			</div>
 			<div>
 				&gt; Gift Cards
 			</div>
 			<div>
-				&gt; Free Shipping
+				<a href="#!company?show=shipping" data-onClick="appLink">
+					&gt; Free Shipping
+				</a>
 			</div>
 			<div>
-				&gt; Legal & Privacy
+				<a href="#!company?show=privacy" data-onClick="appLink">
+					&gt; Legal & Privacy
+				</a>
 			</div>
 		</div>
 		<div class="linkList floatLeft_960 floatLeft_768 floatLeft_640 displayInlineBlock_480 alignLeft_480 sourceSans">
 			<h4>COMPANY</h4>
 			<div>
-				&gt; About Us
+				<a href="#!company?show=about" data-onClick="appLink">
+					&gt; About Us
+				</a>
 			</div>
 			<div>
 				&gt; BizRate
 			</div>
 			<div>
-				&gt; Contact Us
+				<a href="#!company?show=contact" data-onClick="appLink">
+					&gt; Contact Us
+				</a>
 			</div>
 		</div>
 		

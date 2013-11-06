@@ -1672,7 +1672,13 @@ if(ps.indexOf('?') >= 1)	{
 				var url = URL; //leave original intact.
 				var hashObj;
 				if(url.indexOf('#') > -1)	{
-					var tmp = url.split("#");
+					var tmp;
+					if(url.indexOf('#!') > -1){
+						tmp = url.split("#!");
+						}
+					else {
+						tmp = url.split("#");
+						}
 					url = tmp[0]; //strip off everything after hash (#)
 					hashObj = this.getPageInfoFromHash(tmp[1]); //will be an object if the hash was a valid pageInfo anchor. otherwise false.
 					}
@@ -1830,7 +1836,9 @@ if(ps.indexOf('?') >= 1)	{
 				
 				//Try to parse URI information
 				try {
-					infoObj = app.u.kvp2Array(splits[1]); //will set infoObj.show=something or infoObj.pid=PID
+					if(splits.length > 1){
+						infoObj = app.u.kvp2Array(splits[1]); //will set infoObj.show=something or infoObj.pid=PID
+					}
 //					app.u.dump(" -> infoObj: "); app.u.dump(infoObj);
 					infoObj.pageType = splits[0];
 					

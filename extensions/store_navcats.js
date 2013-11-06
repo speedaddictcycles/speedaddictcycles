@@ -419,7 +419,7 @@ templateID - the template id used (from app.templates)
 							app.u.dump("WARNING! invalid value for 'detail' in categoryList renderFunction");
 							}
 						for(var i = 0; i < L; i += 1)	{
-							if(data.value[i].pretty[0] != '!')	{
+							if(!data.value[i].pretty || data.value[i].pretty[0] != '!')	{
 // ** 201336+ appNavcatDetail id param changed to path -mc
 // *** 201338 Missed a few references to id here -mc
 								var parentID = data.value[i].path+"_catgid+"+(app.u.guidGenerator().substring(10));

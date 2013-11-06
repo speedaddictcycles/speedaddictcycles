@@ -116,3 +116,4 @@ body {
 	background: #f2f2f2; 
 	margin-bottom: 30px;
 }
+#footer .linkList a{text-decoration: none; color: black;}
