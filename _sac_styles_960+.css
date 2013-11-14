@@ -81,6 +81,9 @@ HOMEPAGE STYLES
 #homepageFeaturesTitle{height: 55px; background: url(images/homepage_features_title_836x36.png) center center no-repeat;}
 
 #homepageFeatures360s { height: 238px; width: 928px; margin-bottom: 16px;}
+#homepageFeatures360s .imajizeContainer { width: 216px; height: 100%; padding: 0px 8px;}
+#homepageFeatures360s .imajizeContainer .title{ height:39px; line-height:39px;}
+#homepageFeatures360s .imajizeContainer iframe { width: 216px; height: 161px; }
 
 #homepageFeaturesCarousel{height: 238px;}
 

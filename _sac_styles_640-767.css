@@ -80,6 +80,11 @@ HOMEPAGE STYLES
 #homepageFeaturesTitle{height:38px; background:url(images/homepage_features_title_560x27.png) center center no-repeat;}
 
 #homepageFeatures360s { height: 158px; width: 620px; margin-bottom:10px;}
+#homepageFeatures360s .imajizeContainer { width: 144px; height: 100%; padding: 0px 5px;}
+#homepageFeatures360s .imajizeContainer .title{ height:25px; line-height:25px;}
+#homepageFeatures360s .imajizeContainer .title,
+#homepageFeatures360s .imajizeContainer .price{ font-size: .8em; }
+#homepageFeatures360s .imajizeContainer iframe { width: 144px; height: 108px; }
 
 #homepageFeaturesCarousel{height: 160px;}
 
