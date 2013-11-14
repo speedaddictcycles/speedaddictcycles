@@ -1,4 +1,9 @@
 .displayNone_320{display:none;}
+.displayOnly_960{display:none;}
+.displayOnly_768{display:none;}
+.displayOnly_640{display:none;}
+.displayOnly_480{display:none;}
+
 .floatLeft_320{float:left;}
 .floatRight_320{float:right;}
 .clearLeft_960{clear:left;}
@@ -19,7 +24,7 @@
 	margin-bottom:10px;
 }
 
-#header {height:245px;}
+#header {height:251px;}
 
 #header .tread {
 	width: 334px;
@@ -54,7 +59,7 @@
 #header #searchBar{ padding-right: 0px; width: 230px;}
 #header #searchBar #searchBarInput{ width: 220px;}
 
-#header #nav {height: 72px;}
+#header #nav {height: 73px;}
 #header #nav .navOption {border: none; width: 159px; text-align:center;}
 #header #nav .navOptionBorderRight_320 {border-right: 1px solid #ffe2b0;}
 #header #nav .navOptionBorderBottom_320 {border-bottom: 1px solid #ffe2b0;}
@@ -64,3 +69,23 @@
 }
 
 #footer .linkList {margin: 24px 0px;}
+
+/*********************************************************
+
+HOMEPAGE STYLES
+
+*********************************************************/
+#slideshow_320 { height: 132px; background: black; }
+
+#homepageFeatures {height: 603px; background:url(images/homepage_features_background_320x603.jpg);}
+
+#homepageFeaturesTitle{height:66px; background:url(images/homepage_features_title_303x48.png) center center no-repeat;}
+
+#homepageFeatures360s { height: 171px; margin-bottom: 8px;}
+
+#homepageFeaturesCarousel{height: 160px;}
+
+#homepageFeaturesCarouselBody {width: 100%;}
+
+#homepageFeaturesVideo {padding: 0px 3px; margin-bottom: 8px;}
+#homepageFeaturesVideo > div {width: 308px; height: 173px;}

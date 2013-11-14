@@ -117,3 +117,24 @@ body {
 	margin-bottom: 30px;
 }
 #footer .linkList a{text-decoration: none; color: black;}
+
+
+/*********************************************************
+
+HOMEPAGE STYLES
+
+*********************************************************/
+
+#homepageSlideshow div {overflow:hidden;}
+
+#homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4); }
+
+#homepageFeaturesCarouselPrev,
+#homepageFeaturesCarouselNext { background: #cc4300;}
+#homepageFeaturesCarouselBody{ background:#ffe2b0;}
+
+#homepageFeaturesVideo > div {box-shadow:0px 3px 5px rgba(0,0,0,.4); background: white; border-radius: 3px; padding: 3px;}
+
+#homepageFeaturesCarouselPrev,
+#homepageFeaturesCarouselNext,
+#homepageFeaturesCarouselBody {height:100%; float: left;}

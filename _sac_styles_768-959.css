@@ -1,4 +1,9 @@
 .displayNone_768{display:none;}
+.displayOnly_960{display:none;}
+.displayOnly_640{display:none;}
+.displayOnly_480{display:none;}
+.displayOnly_320{display:none;}
+
 .floatLeft_768{float:left;}
 .floatRight_768{float:right;}
 .clearLeft_768{clear:left;}
@@ -19,7 +24,7 @@
 	margin-bottom:18px;
 }
 
-#header {height: 146px;}
+#header {height: 144px;}
 
 #header .tread {
 	width: 786px;
@@ -54,10 +59,35 @@
 #header #searchBar {width: 565px;}
 
 #footer {
-	height: 168px;
+	height: 182px;
 	padding: 20px 34px 0px 34px;
 }
 
 #footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}
 #footer #footerSocial {margin-bottom: 10px;}
 #footer #footerPaymentDecals {margin-bottom: 10px;}
+/*********************************************************
+
+HOMEPAGE STYLES
+
+*********************************************************/
+#slideshow_768 { height: 321px; background: red; }
+
+#homepageFeatures {height: 453px; background:url(images/homepage_features_background_768x453.jpg); padding: 0px 13px;}
+
+#homepageFeaturesTitle{height:45px; background:url(images/homepage_features_title_671x30.png) center center no-repeat;}
+
+#homepageFeatures360s { height: 190px; width: 742px;  margin-bottom: 13px;}
+
+#homepageFeaturesCarousel{height: 190px;}
+
+#homepageFeaturesCarouselPrev,
+#homepageFeaturesCarouselNext {width: 12px;}
+
+#homepageFeaturesCarouselPrev {border-top-left-radius: 8px;border-bottom-left-radius: 8px;}
+#homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
+
+#homepageFeaturesCarouselBody {width: 400px; margin: 0px 2px;}
+
+#homepageFeaturesVideo {padding-top: 8px; margin-left: 12px;}
+#homepageFeaturesVideo > div {width: 296px; height: 167px;}

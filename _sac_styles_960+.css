@@ -1,4 +1,9 @@
 .displayNone_960{display:none;}
+.displayOnly_768{display:none;}
+.displayOnly_640{display:none;}
+.displayOnly_480{display:none;}
+.displayOnly_320{display:none;}
+
 .floatLeft_960{float:left;}
 .floatRight_960{float:right;}
 .clearLeft_960{clear:left;}
@@ -55,10 +60,37 @@
 #header #headerBanners #minicart {width: 126px; height: 100%;}
 
 #footer {
-	height: 168px;
+	height: 182px;
 	padding: 20px 34px 0px 34px;
 }
 
 #footer .linkList {height: 100%; font-size: .95em; margin-right: 20px;}
 #footer #footerSocial {margin-bottom: 10px;}
 #footer #footerPaymentDecals {margin-bottom: 10px;}
+
+
+/*********************************************************
+
+HOMEPAGE STYLES
+
+*********************************************************/
+#slideshow_960 { height: 403px; background: black; }
+
+#homepageFeatures {height: 567px; background:url(images/homepage_features_background_960x567.jpg); padding: 0px 16px;}
+
+#homepageFeaturesTitle{height: 55px; background: url(images/homepage_features_title_836x36.png) center center no-repeat;}
+
+#homepageFeatures360s { height: 238px; width: 928px; margin-bottom: 16px;}
+
+#homepageFeaturesCarousel{height: 238px;}
+
+#homepageFeaturesCarouselPrev,
+#homepageFeaturesCarouselNext {width: 15px;}
+
+#homepageFeaturesCarouselPrev {border-top-left-radius: 10px;border-bottom-left-radius: 10px;}
+#homepageFeaturesCarouselNext {border-top-right-radius: 10px;border-bottom-right-radius: 10px;}
+
+#homepageFeaturesCarouselBody {width: 500px; margin: 0px 2px;}
+
+#homepageFeaturesVideo {padding-top: 12px; margin-left: 18px;}
+#homepageFeaturesVideo > div {width: 370px; height: 208px;}

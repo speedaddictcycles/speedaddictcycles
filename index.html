@@ -200,14 +200,15 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 		</div>
 	</div>
 
-	<div id="mainBody">
+	<div id="mainBody" class="clear">
 		<div id='globalMessaging' class='appMessaging'></div><!-- DO NOT REMOVE - used for some high level error handling (usually appears below breadcrumb nav or top bar) -->
 
-		<!-- These add specific functionality for the app. In most cases, you want to leave them alone. -->
+		<!-- These add specific functionality for the app. In most cases, you want to leave them alone. 
 		<div id='appNav'>
 			<button class='displayNone prodDetailNextItemButton' data-app-role='prodDetailNextItemButton'>Next</button>
 			<button class='displayNone prodDetailPrevItemButton' data-app-role='prodDetailPrevItemButton'>Previous</button>
 		</div>
+		-->
 
 		<div id='mainContentArea'></div><!-- DO NOT REMOVE - this is where the specific page (ex: homepage, product, category) content is going to go -->
 	
@@ -350,11 +351,54 @@ the homepageTemplate template is loaded into mainContentArea by default when the
 -->
 <div id='homepageTemplate' class='homeTemplate'>
 	
+	<div id="homepageSlideshow">
+		<div id="slideshow_960" class="displayOnly_960"></div>
+		<div id="slideshow_768" class="displayOnly_768"></div>
+		<div id="slideshow_640" class="displayOnly_640"></div>
+		<div id="slideshow_480" class="displayOnly_480"></div>
+		<div id="slideshow_320" class="displayOnly_320"></div>
+	</div>
+	
+	<div id="homepageFeatures">
+		<div id="homepageFeaturesTitle" class="alignCenter"></div>
+		
+		<div id="homepageFeatures360s"></div>
+		
+		<div id="homepageFeaturesVideo" class="floatRight_960 floatRight_768 floatRight_640 floatRight_480">
+			<div class="displayOnly_960">
+				<iframe width="370" height="208" src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<div class="displayOnly_768">
+				<iframe width="296" height="167" src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<div class="displayOnly_640">
+				<iframe width="246" height="138" src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<div class="displayOnly_480">
+				<iframe width="188" height="106" src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			</div>
+			<div class="displayOnly_320">
+				<iframe width="308" height="173" src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			</div>
+		</div>
+		<div id="homepageFeaturesCarousel" class="floatRight_960 floatRight_768 floatRight_640 floatRight_480">
+			<div id="homepageFeaturesCarouselPrev" class="displayNone_320"></div>
+			<div id="homepageFeaturesCarouselBody"></div>
+			<div id="homepageFeaturesCarouselNext" class="displayNone_320"></div>
+		</div>
+	</div>
+	
+	<div id="homepageTestimonials" class="displayNone_320">
+		
+	</div>
+	
+<!--
+default contents	
 	<ul data-bind="var: category(@subcategoryDetail); format: categoryList; extension: store_navcats; loadsTemplate: categoryListTemplate; detail:max;" class='listStyleNone fluidList clearfix noPadOrMargin categoryList'></ul>
 
 	<ul data-bind="var: category(@products); format: productList; editor: finder; extension: store_prodlist; loadsTemplate: productListTemplate; hide_summary:1; before:<h2>Featured Items</h2>; withReviews:1;" class='listStyleNone fluidList clearfix noPadOrMargin productList'></ul>
 	<p data-bind="var: category(%page.description); format:wiki; wikiFormats:myRIA; editor: textarea;"></p>
-
+-->
 <!-- a sample of how to format an elastic native search in a data-bind -->
 <!--
 	<ul id='homeProdSearchBestSellers' data-bind='var: elastic-native({"size":"4","mode":"elastic-native","filter":{"term":{"tags":"IS_BESTSELLER"}}}); format: productSearch; extension: myRIA; loadsTemplate: productListTemplateResultsNoPreview; before:<h2>Best Sellers</h2>;' class='listStyleNone fluidList clearfix noPadOrMargin productList'></ul>

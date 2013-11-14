@@ -1,4 +1,9 @@
 .displayNone_480{display:none;}
+.displayOnly_960{display:none;}
+.displayOnly_768{display:none;}
+.displayOnly_640{display:none;}
+.displayOnly_320{display:none;}
+
 .displayInlineBlock_480{display:inline-block;}
 
 .floatLeft_480{float:left;}
@@ -59,3 +64,29 @@
 }
 
 #footer .linkList {margin: 20px 10px; vertical-align: top;}
+
+/*********************************************************
+
+HOMEPAGE STYLES
+
+*********************************************************/
+#slideshow_480 { height: 200px; background: red; }
+
+#homepageFeatures {height: 346px; background:url(images/homepage_features_background_480x346.jpg);}
+
+#homepageFeaturesTitle{height:38px; background:url(images/homepage_features_title_464x24.png) center center no-repeat;}
+
+#homepageFeatures360s { height: 163px; margin-bottom: 11px;}
+
+#homepageFeaturesCarousel{height: 122px;}
+
+#homepageFeaturesCarouselPrev,
+#homepageFeaturesCarouselNext {width: 8px;}
+
+#homepageFeaturesCarouselPrev {border-top-left-radius: 5px;border-bottom-left-radius: 5px;}
+#homepageFeaturesCarouselNext {border-top-right-radius: 5px;border-bottom-right-radius: 5px;}
+
+#homepageFeaturesCarouselBody {width: 254px; margin: 0px 1px;}
+
+#homepageFeaturesVideo {padding-top: 5px; margin-left: 3px; margin-right:5px;}
+#homepageFeaturesVideo > div {width: 188px; height: 106px;}
