@@ -88,6 +88,9 @@ HOMEPAGE STYLES
 
 #homepageFeaturesCarousel{height: 160px;}
 
+#homepageFeaturesCarouselNext { background: url(images/arrow_right_7x29.png) center center no-repeat, #cc4300;}
+#homepageFeaturesCarouselPrev { background: url(images/arrow_left_7x29.png) center center no-repeat, #cc4300;}
+
 #homepageFeaturesCarouselPrev,
 #homepageFeaturesCarouselNext {width: 12px;}
 
@@ -95,6 +98,8 @@ HOMEPAGE STYLES
 #homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
 
 #homepageFeaturesCarouselBody {width: 332px; margin: 0px 2px;}
+
+#homepageFeaturesCarouselBody ul{width: 100%; height: 200px;}
 
 #homepageFeaturesVideo {padding-top: 8px; margin-left: 8px;}
 #homepageFeaturesVideo > div {width: 246px; height: 138px;}

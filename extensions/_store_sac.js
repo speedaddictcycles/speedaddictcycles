@@ -31,6 +31,23 @@ var store_sac = function() {
 			onSuccess : function()	{
 				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
 				
+				app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
+				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
+					var $context = $(app.u.jqSelector('#',infoObj.parentID));
+					var $carousel = $('[data-sac=carousel]',$context);
+					if($carousel.hasClass('carouselRendered')){
+						//already rendered
+						}
+					else {
+						$carousel.addClass('carouselRendered').carouFredSel({
+							"responsive":true,
+							"width":"auto",
+							"height":"auto"
+							});
+						}
+					
+					}]);
+				
 				$('body').on('click','a[data-onClick], area[data-onClick]', function(e){
 					switch($(this).attr('data-onClick')){
 						case 'appLink':

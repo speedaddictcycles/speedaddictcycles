@@ -92,5 +92,7 @@ HOMEPAGE STYLES
 
 #homepageFeaturesCarouselBody {width: 100%;}
 
+#homepageFeaturesCarouselBody ul{width: 100%; height: 200px;}
+
 #homepageFeaturesVideo {padding: 0px 3px; margin-bottom: 8px;}
 #homepageFeaturesVideo > div {width: 308px; height: 173px;}
