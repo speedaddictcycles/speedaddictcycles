@@ -95,8 +95,11 @@ HOMEPAGE STYLES
 #homepageFeaturesCarouselNext {border-top-right-radius: 5px;border-bottom-right-radius: 5px;}
 
 #homepageFeaturesCarouselBody {width: 254px; margin: 0px 1px;}
-
-#homepageFeaturesCarouselBody ul{width: 100%; height: 200px;}
+#homepageFeaturesCarouselBody ul{width: 100%;}
+#homepageFeaturesCarouselBody .carouselHeader{ letter-spacing: 5px; font-size: .9em;}
+li.prodListItemCarousel { margin: 3px; }
+.prodListItemCarousel .prodThumbContainer {width:67px; height:67px; margin-bottom: 3px;margin-left: auto; margin-right: auto;}
+.prodListItemCarousel .price {font-size: .8em;}
 
 #homepageFeaturesVideo {padding-top: 5px; margin-left: 3px; margin-right:5px;}
 #homepageFeaturesVideo > div {width: 188px; height: 106px;}

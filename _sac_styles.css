@@ -135,6 +135,11 @@ HOMEPAGE STYLES
 #homepageFeaturesCarouselPrev,
 #homepageFeaturesCarouselNext { background: #cc4300;}
 #homepageFeaturesCarouselBody{ background:#ffe2b0;}
+#homepageFeaturesCarouselBody .carouselHeader{ color:#cc4300;}
+
+.prodListItemCarousel .prodThumbContainer {border: 1px solid #cc4300;}
+.prodListItemCarousel .name{ color: #565656; }
+.prodListItemCarousel .price{ color: #cc4300; }
 
 #homepageFeaturesVideo > div {box-shadow:0px 3px 5px rgba(0,0,0,.4); background: white; border-radius: 3px; padding: 3px;}
 

@@ -39,11 +39,18 @@ var store_sac = function() {
 						//already rendered
 						}
 					else {
-						$carousel.addClass('carouselRendered').carouFredSel({
-							"responsive":true,
-							"width":"auto",
-							"height":"auto"
-							});
+						$carousel.addClass('carouselRendered')
+						setTimeout(function(){
+							$carousel.carouFredSel({
+								"responsive":true,
+								"width":200,
+								"height":"auto",
+								"auto" : { "play" : false },
+								"items" : { "visible" : 3},
+								"prev" : { "button" : $('#homepageFeaturesCarouselPrev') },
+								"next" : { "button" : $('#homepageFeaturesCarouselNext') }
+								},{"debug" : true});
+							},1000);
 						}
 					
 					}]);
