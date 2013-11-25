@@ -105,3 +105,20 @@ li.prodListItemCarousel { margin-top: 3px; }
 
 #homepageFeaturesVideo {padding-top: 12px; margin-left: 18px;}
 #homepageFeaturesVideo > div {width: 370px; height: 208px;}
+
+/*********************************************************
+
+CATEGORY PAGE STYLES
+
+*********************************************************/
+
+/*********************************************************
+
+PRODUCT PAGE STYLES
+
+*********************************************************/
+.productPage { padding:10px;}
+.prodSideBar { width: 235px;}
+.prodViewerContainer { width: 700px;}
+.prodImageContainer {width: 462px;}
+.prodSummaryContainer{width: 238px;

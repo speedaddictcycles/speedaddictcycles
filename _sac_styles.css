@@ -2,6 +2,7 @@ html, body {
 	height:100%;
 	margin: 0px;
 	padding: 0px;
+	font-family: 'Source Sans Pro', sans-serif;
 }
 
 body {
@@ -11,8 +12,13 @@ body {
 .sourceSans { font-family: 'Source Sans Pro', sans-serif; }
 .clear { clear: both; }
 .clearRight { clear: right; }
+.clearLeft{ clear: left; }
 
 .highlightBG{background:#ffe2b0}
+.lowlightText{color:#706757;}
+.highlightText{color:#d05626;}
+.extraHighlightText{color:#ed194b;}
+
 .headerGradientBG {
 	background: #ffe2b0; /* Old browsers */
 	background: -moz-linear-gradient(bottom,  #ffffff 10px, #ffe2b0 30px); /* FF3.6+ */
