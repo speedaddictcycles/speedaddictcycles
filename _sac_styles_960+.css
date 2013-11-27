@@ -122,4 +122,12 @@ PRODUCT PAGE STYLES
 .prodSideBar { width: 235px;}
 .prodViewerContainer { width: 700px;}
 .prodImageContainer {width: 462px;}
-.prodSummaryContainer{width: 238px;
+.prodSummaryContainer{width: 238px;}
+
+/*********************************************************
+
+COMPANY PAGE STYLES
+
+*********************************************************/
+.companyPage { padding: 20px 20px 20px 80px;}
+.companyPage .article iframe{width:645px; height: 363px;}

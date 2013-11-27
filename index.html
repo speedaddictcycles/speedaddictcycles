@@ -943,18 +943,19 @@ if you change these, you should move them above this comment so that when you (o
 
 
 <!-- loadingBG needed on this for app init (content may take a moment to load) -->
-<div id='companyTemplate' class='clearfix loadingBG'>
-
+<div id='companyTemplate' class='companyPage clearfix loadingBG fixedGradientBG'>
+	<div class='showMenuBtn displayNone_960 displayNone_768 pointer' onClick="$('.companyPage .sideline').addClass('responsiveShow');"></div>
 	<div class='sideline' >
-		<nav id='companyNav'>
-			<ul class='listStyleNone noPadOrMargin'>
-				<li><a href='#company?show=about'>About Us</a></li>
-				<li><a href='#company?show=contact'>Contact Information</a></li>
-				<li><a href='#company?show=faq'>FAQ</a></li>
-				<li><a href='#company?show=payment'>Payment Policy</a></li>
-				<li><a href='#company?show=privacy'>Privacy Statement</a></li>
-				<li><a href='#company?show=return'>Return Policy</a></li>
-				<li><a href='#company?show=shipping'>Shipping Information</a></li>
+		<button onClick="$('.companyPage .sideline').removeClass('responsiveShow'); return false;" class="displayNone_960 displayNone_768 ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button>
+		<nav id='companyNav' >
+			<ul class='listStyleNone noPadOrMargin' onClick="$('.companyPage .sideline').removeClass('responsiveShow'); return false;">
+				<li><a data-onClick="appLink" href='#!company?show=about'>About Us</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=contact'>Contact Information</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=faq'>FAQ</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=payment'>Payment Policy</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=privacy'>Privacy Statement</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=return'>Return Policy</a></li>
+				<li><a data-onClick="appLink" href='#!company?show=shipping'>Shipping Information</a></li>
 			</ul>
 		</nav>
 	</div>
@@ -962,8 +963,30 @@ if you change these, you should move them above this comment so that when you (o
 	<div class='mainColumn'>
 <!-- .textContentArea is used as a selector in quickstart.js because article tag type isn't ie8 friendly -->
 		<div id='aboutArticle' class='textContentArea article'>
-			<h1>About Us</h1>
-			<div data-bind='var: profile(zoovy:about); format:wiki; wikiFormats:myRIA;' id='aboutUsContent'></div>
+			<h1 class="highlightText">About Us</h1>
+			<iframe src="https://www.youtube.com/embed/zQu3YoSz6b4" frameborder="0" allowfullscreen></iframe>
+			<div class="content">
+				<h3>Bacon Ipsum</h3>
+				<p>
+					Bacon ipsum dolor sit amet ham hock turkey pancetta flank fatback. Hamburger pork belly corned beef cow, leberkas sirloin meatloaf salami rump. Pancetta filet mignon pastrami tongue biltong shankle hamburger. Pork chop rump fatback venison, swine salami jerky sirloin brisket kevin chuck ground round drumstick. Pig doner pastrami ham hock, boudin brisket chuck bacon. Rump spare ribs filet mignon jerky.
+				</p>
+				<h3>Bacon Ipsum</h3>
+				<p>
+					Pork loin salami turducken chuck. Filet mignon sausage pork belly beef ribs tenderloin jerky bacon biltong leberkas. Tri-tip corned beef filet mignon, spare ribs brisket meatloaf beef ball tip frankfurter. Rump pork belly bresaola short ribs strip steak hamburger.
+				</p>
+				<h3>Bacon Ipsum</h3>
+				<p>
+					Capicola jowl ball tip meatloaf pig shankle chuck ham hock ground round boudin turducken drumstick frankfurter. Meatloaf turducken ribeye sausage. Ball tip sirloin bacon pastrami pork loin. Meatball tongue ground round short loin tail shank doner. Capicola leberkas bresaola, pig pork belly jerky meatball. Filet mignon brisket spare ribs shankle hamburger boudin, capicola chicken strip steak rump meatball pork belly pork chop. Drumstick short loin bresaola, biltong pork chop pig venison meatball tenderloin.
+				</p>
+				<h3>Bacon Ipsum</h3>
+				<p>
+					Pork loin pork chop t-bone, jowl leberkas short ribs ham hock chicken filet mignon meatball sausage boudin chuck ribeye tri-tip. Leberkas brisket venison, bacon chicken prosciutto meatloaf pork belly ribeye. Chicken kevin salami pork chop. Shank jerky capicola kevin frankfurter, pancetta ham hock hamburger shoulder beef drumstick tail kielbasa doner beef ribs. Fatback tail biltong shoulder, drumstick shank cow kielbasa meatball ham brisket.
+				</p>
+				<h3>Bacon Ipsum</h3>
+				<p>
+					Shoulder pastrami andouille spare ribs turducken pork belly pork. Fatback turkey pastrami spare ribs beef biltong pancetta short ribs. Pancetta tail salami ground round spare ribs venison pork loin pastrami shoulder leberkas kielbasa pork drumstick t-bone. Swine meatball meatloaf pork chop, doner pork frankfurter drumstick tenderloin turkey strip steak kevin chuck. Tongue salami turkey corned beef ham hock tail beef ribs pork ribeye turducken.
+				</p>	
+			</div>
 		</div>
 
 

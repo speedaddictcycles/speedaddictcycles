@@ -101,3 +101,59 @@ li.prodListItemCarousel { margin: 3px; }
 #homepageFeaturesVideo {padding: 0px 3px; margin-bottom: 8px;}
 #homepageFeaturesVideo > div {width: 308px; height: 173px;}
 #homepageFeaturesVideo > div  > iframe{width: 308px; height: 173px;}
+
+/*********************************************************
+
+CATEGORY PAGE STYLES
+
+*********************************************************/
+
+/*********************************************************
+
+PRODUCT PAGE STYLES
+
+*********************************************************/
+
+/*********************************************************
+
+COMPANY PAGE STYLES
+
+*********************************************************/
+.companyPage { padding: 20px 10px; position: relative;}
+.companyPage .article iframe{width:300px; height: 169px;}
+.companyPage .sideline { 
+	width: 0px;
+	position: absolute;
+	right: 0px;
+	overflow: hidden;
+}
+.companyPage .sideline button {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	width: 20px;
+	height: 20px;
+}
+.companyPage .sideline.responsiveShow{
+	background: #ffe2b0; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffe2b0 10px, #ffffff 300px); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left top, color-stop(10px,#ffe2b0), color-stop(300px,#ffffff)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,#ffe2b0 10px,  #ffffff 300px); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #ffe2b0 10px,  #ffffff 300px); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #ffe2b0 10px,  #ffffff 300px); /* IE10+ */
+	background: linear-gradient(to bottom,#ffe2b0 10px, #ffffff 300px); /* W3C */
+	
+	width: 200px;
+	border: 1px solid #d05626;
+	padding: 15px;
+}
+.companyPage .showMenuBtn{
+	width: 20px;
+	height: 35px;
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+	position: absolute;
+	right: 0px;
+	background: #d05626;
+}
+.companyPage .mainColumn { width: 100%; }

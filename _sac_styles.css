@@ -29,6 +29,16 @@ body {
 	background: linear-gradient(to top,#ffffff 10px, #ffe2b0 30px); /* W3C */
 }
 
+.fixedGradientBG {
+	background: #ffe2b0; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffe2b0 10px, #ffffff 300px); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left top, color-stop(10px,#ffe2b0), color-stop(300px,#ffffff)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,#ffe2b0 10px,  #ffffff 300px); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, #ffe2b0 10px,  #ffffff 300px); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, #ffe2b0 10px,  #ffffff 300px); /* IE10+ */
+	background: linear-gradient(to bottom,#ffe2b0 10px, #ffffff 300px); /* W3C */
+}
+
 
 #appView {margin: 0px auto;}
 
@@ -152,3 +162,10 @@ HOMEPAGE STYLES
 #homepageFeaturesCarouselPrev,
 #homepageFeaturesCarouselNext,
 #homepageFeaturesCarouselBody {height:100%; float: left;}
+
+/*********************************************************
+
+COMPANY PAGE STYLES
+
+*********************************************************/
+.sideline a {color:#d05626; font-weight: bold;}

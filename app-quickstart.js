@@ -2273,7 +2273,7 @@ effects the display of the nav buttons only. should be run just after the handle
 					var $content = app.renderFunctions.createTemplateInstance(infoObj.templateID,parentID);
 					$content.addClass("displayNone");
 					$('#mainContentArea').append($content);
-					app.ext.myRIA.u.bindNav('#sideline a');
+					//app.ext.myRIA.u.bindNav('#sideline a');
 					app.calls.appProfileInfo.init({'profile':app.vars.profile},{'callback':'showCompany','extension':'myRIA','infoObj':infoObj,'parentID':parentID},'mutable');
 					app.model.dispatchThis();
 					}
