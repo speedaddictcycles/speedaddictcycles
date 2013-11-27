@@ -88,11 +88,40 @@ var store_sac = function() {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		renderFormats : {
-
+			prodChildOption: function($tag, data){
+				$tag.val(data.value.pid);
+				if(data.value['%attribs']['amz:grp_varvalue']){
+					$tag.text(data.value['%attribs']['amz:grp_varvalue']);
+					}
+				else{
+					$tag.text(data.value['%attribs']['zoovy:prod_name']);
+					}
+				}
 			}, //renderFormats
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
+			addItemToCart : function($form,obj){
+				var $childSelect = $('.prodChildren.active select', $form);
+				if($childSelect.length > 0){
+					if($childSelect.val()){
+						app.calls.cartItemAppend.init({"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()},{},'immutable');
+						app.model.destroy('cartDetail');
+						app.calls.cartDetail.init({'callback':function(rd){
+							if(obj.action === "modal"){
+								showContent('cart',obj);
+								}
+							}},'immutable');
+						app.model.dispatchThis('immutable');
+						}
+					else {
+						$form.anymessage(app.u.errMsgObject("You must select an option"));
+						}
+					}
+				else {
+					app.ext.myRIA.u.addItemToCart($form, obj);
+					}
+				}
 			}, //u [utilities]
 
 		e : {
