@@ -105,6 +105,7 @@ li.prodListItemCarousel { margin-top: 3px; }
 
 #homepageFeaturesVideo {padding-top: 12px; margin-left: 18px;}
 #homepageFeaturesVideo > div {width: 370px; height: 208px;}
+#homepageFeaturesVideo > div > iframe{width: 370px; height: 208px;}
 
 /*********************************************************
 
