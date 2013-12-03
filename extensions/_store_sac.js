@@ -33,6 +33,20 @@ var store_sac = function() {
 				
 				app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
+					var $slideshow = $('#homepageSlideshow');
+					if($slideshow.hasClass('slideshowRendered')){
+						//already rendered, do nothing.
+						}
+					else {
+						$slideshow.addClass('slideshowRendered').cycle({
+							"slides" : "> a",
+							"timeout" : "5000",
+							"pager" : "> .pager",
+							"pagerTemplate" : "<span class='pointer pagerSpan'><img src='{{children.0.src}}' alt='{{slideNum}}' height='60'/></span>"
+							});
+						}
+					}]);
+				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
 					var $context = $(app.u.jqSelector('#',infoObj.parentID));
 					var $carousel = $('[data-sac=carousel]',$context);
 					if($carousel.hasClass('carouselRendered')){

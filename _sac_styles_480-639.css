@@ -70,7 +70,8 @@
 HOMEPAGE STYLES
 
 *********************************************************/
-#slideshow_480 { height: 200px; background: red; }
+#homepageSlideshow { height: 200px; background: black; }
+#homepageSlideshowa a img{ height: 200px; width:100%; }
 
 #homepageFeatures {height: 346px; background:url(images/homepage_features_background_480x346.jpg);}
 

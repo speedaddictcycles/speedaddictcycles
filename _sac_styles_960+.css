@@ -74,7 +74,8 @@
 HOMEPAGE STYLES
 
 *********************************************************/
-#slideshow_960 { height: 403px; background: black; }
+#homepageSlideshow { height: 403px; background: black; }
+#homepageSlideshow a img{ height: 403px; width:100%; }
 
 #homepageFeatures {height: 567px; background:url(images/homepage_features_background_960x567.jpg); padding: 0px 16px;}
 
