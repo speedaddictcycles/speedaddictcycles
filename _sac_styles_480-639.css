@@ -71,7 +71,9 @@ HOMEPAGE STYLES
 
 *********************************************************/
 #homepageSlideshow { height: 200px; background: black; }
-#homepageSlideshowa a img{ height: 200px; width:100%; }
+#homepageSlideshow a img{ height: 200px; width:100%; }
+#homepageSlideshow .pager{bottom: 5px; left:5px;}
+#homepageSlideshow .pagerSpan{ width: 25px; height:25px; margin: 5px;}
 
 #homepageFeatures {height: 346px; background:url(images/homepage_features_background_480x346.jpg);}
 
