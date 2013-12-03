@@ -1,0 +1,31 @@
+{
+	"slides" : [
+		{
+			"src":"banner/leovince_gp_corsa_banner.jpg",
+			"alt":"",
+			"title":"",
+			"searchLink":{
+				"KEYWORDS":"gp corsa"
+			}
+		},
+		{
+			"src":"banner/air_aviator_banner.jpg",
+			"alt":"",
+			"title":"",
+			"catLink":".shop_by_brand.airoh-helmets"
+		},
+		{
+			"src":"banner/free_progrip_goggle_mrjump.jpg",
+			"alt":"",
+			"title":"",
+			"catLink":".shop_by_brand.suomy-mr-jump-mx-helmets"
+		},
+		
+	],
+	"cycleOptions" : {
+		"slides" : "> a",
+		"timeout" : "5000",
+		"pager" : "> .pager",
+		"pagerTemplate" : "<span class='pointer pagerSpan'><img src='{{children.0.src}}' alt='{{slideNum}}' height='60'/></span>"
+	}
+}

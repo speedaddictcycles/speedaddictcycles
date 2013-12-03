@@ -115,6 +115,38 @@ var store_sac = function() {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
+			makeBanner : function(bannerJSON, w, h, b){
+				var $img = $(app.u.makeImage({
+					tag : true,
+					w : w,
+					h : h,
+					b : b,
+					name : bannerJSON.src,
+					alt : bannerJSON.alt,
+					title : bannerJSON.title
+					}));
+				if(bannerJSON.prodLink){
+					$img.addClass('pointer').data('pid', bannerJSON.prodLink).click(function(){
+						showContent('product',{'pid':$(this).data('pid')});
+						});
+					}
+				else if(bannerJSON.catLink){
+					$img.addClass('pointer').data('navcat', bannerJSON.catLink).click(function(){
+						showContent('category',{'navcat':$(this).data('navcat')});
+						});
+					}
+				else if(bannerJSON.searchLink){
+					$img.addClass('pointer').data('elasticsearch', bannerJSON.searchLink).click(function(){
+						app.u.dump($(this).data('elasticsearch'));
+						showContent('search',$(this).data('elasticsearch'));
+						});
+					}
+				else {
+					//just a banner!
+					}
+				return $img;
+				},
+				
 			addItemToCart : function($form,obj){
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
