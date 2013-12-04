@@ -1,31 +1,55 @@
 {
-	"slides" : [
+	"slides": [
 		{
-			"src":"banner/leovince_gp_corsa_banner.jpg",
-			"alt":"",
-			"title":"",
-			"searchLink":{
-				"KEYWORDS":"gp corsa"
-			}
+			"src": "banner/leovince_gp_corsa_banner.jpg",
+			"alt": "",
+			"title": "",
+			"searchLink": "gp corsa"
 		},
 		{
-			"src":"banner/slideshow_test900x400.jpg",
-			"alt":"",
-			"title":"",
-			"catLink":".shop_by_brand.airoh-helmets"
+			"src": "banner/air_aviator_banner.jpg",
+			"alt": "",
+			"title": "",
+			"catLink": ".shop_by_brand.airoh-helmets"
 		},
 		{
-			"src":"banner/free_progrip_goggle_mrjump.jpg",
-			"alt":"",
-			"title":"",
-			"catLink":".shop_by_brand.suomy-mr-jump-mx-helmets"
-		},
-		
+			"src": "banner/free_progrip_goggle_mrjump.jpg",
+			"alt": "",
+			"title": "",
+			"catLink": ".shop_by_brand.suomy-mr-jump-mx-helmets"
+		}
 	],
-	"cycleOptions" : {
-		"slides" : "> a",
-		"timeout" : "5000",
-		"pager" : "> .pager",
-		"pagerTemplate" : "<span class='pointer pagerSpan'><img src='{{children.0.src}}' alt='{{slideNum}}' height='60'/></span>"
+	"dims": [
+		{
+			"param": "479w",
+			"w": "320",
+			"h": "132"
+		},
+		{
+			"param": "639w",
+			"w": "480",
+			"h": "200"
+		},
+		{
+			"param": "767w",
+			"w": "640",
+			"h": "267"
+		},
+		{
+			"param": "959w",
+			"w": "768",
+			"h": "321"
+		},
+		{
+			"w": "960",
+			"h": "403"
+		}
+	],
+	"pagerHTML": "<div class='pager'></div>",
+	"cycleOptions": {
+		"slides": "> a",
+		"timeout": "5000",
+		"pager": "> .pager",
+		"pagerTemplate": "<span class='pointer pagerSpan'><img src='{{children.0.src}}' alt='{{slideNum}}' height='60'/></span>"
 	}
 }

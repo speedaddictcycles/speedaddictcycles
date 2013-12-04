@@ -25,7 +25,7 @@ var app = {vars:{
 	"_clientid":"1pc", //zmvc for store app, 1pc for one page checkout.
 	"baseURL":"", //used in non-local mode.
 	"checkoutAuthMode" : "active",//can be passive, active or required
-	"testURL":"http://www.speedaddictcycles.com/" //used ONLY if protocol is file: (for testing)
+	"testURL":"http://app.speedaddictcycles.com/" //used ONLY if protocol is file: (for testing)
 	},u:{},rq:[]};
 
 //set base url so images, css, js, etc all load from appropriate location once deployed.
@@ -356,6 +356,7 @@ the homepageTemplate template is loaded into mainContentArea by default when the
 <div id='homepageTemplate' class='homeTemplate'>
 	
 	<div id="homepageSlideshow">
+		<!-- 
 		<a href="#!search?KEYWORDS=gp+corsa" data-onClick="appLink">
 			<img src="http://app.speedaddictcycles.com/media/img/speedaddictcycles/B000000/banner/leovince_gp_corsa_banner.jpg"/>
 		</a>
@@ -365,7 +366,8 @@ the homepageTemplate template is loaded into mainContentArea by default when the
 		<a href="#!category?navcat=.shop_by_brand.suomy-mr-jump-mx-helmets" data-onClick="appLink">
 			<img src="http://app.speedaddictcycles.com/media/img/speedaddictcycles/B000000/banner/free_progrip_goggle_mrjump.jpg"/>
 		</a>
-		<div class="pager"></div>
+		<div class="pager"></div> 
+		-->
 	</div>
 	
 	<div id="homepageFeatures">

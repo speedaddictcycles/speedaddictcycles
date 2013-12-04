@@ -18,6 +18,7 @@ app.rq.push(['extension',0,'myRIA','app-quickstart.js','startMyProgram']);
 app.rq.push(['extension',0,'entomologist','extensions/entomologist/extension.js']);
 app.rq.push(['extension',0,'store_sac','extensions/_store_sac.js']);
 app.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.js']); 
+app.rq.push(['script',0,'srcset-polyfill/srcset-polyfill-master/build/srcset.min.js']); 
 app.rq.push(['extension',0,'tools_animation','extensions/tools_animation.js']);
 
 //app.rq.push(['extension',1,'google_analytics','extensions/partner_google_analytics.js','startExtension']);

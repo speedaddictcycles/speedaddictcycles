@@ -21,30 +21,21 @@ var store_sac = function() {
 	var theseTemplates = new Array('');
 	var r = {
 
-
+	vars : {},
+	
 ////////////////////////////////////   CALLBACKS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
+	
 
 
 	callbacks : {
 		init : {
 			onSuccess : function()	{
-				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
 				
+				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
+				app.ext.store_sac.u.loadBanners();
 				app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
-					var $slideshow = $('#homepageSlideshow');
-					if($slideshow.hasClass('slideshowRendered')){
-						//already rendered, do nothing.
-						}
-					else {
-						$slideshow.addClass('slideshowRendered').cycle({
-							"slides" : "> a",
-							"timeout" : "5000",
-							"pager" : "> .pager",
-							"pagerTemplate" : "<span class='pointer pagerSpan'><img src='{{children.0.src}}' alt='{{slideNum}}' height='60'/></span>"
-							});
-						}
+					app.ext.store_sac.u.startHomepageSlideshow();
 					}]);
 				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
 					var $context = $(app.u.jqSelector('#',infoObj.parentID));
@@ -115,36 +106,77 @@ var store_sac = function() {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
-			makeBanner : function(bannerJSON, w, h, b){
-				var $img = $(app.u.makeImage({
-					tag : true,
-					w : w,
-					h : h,
-					b : b,
-					name : bannerJSON.src,
-					alt : bannerJSON.alt,
-					title : bannerJSON.title
-					}));
-				if(bannerJSON.prodLink){
-					$img.addClass('pointer').data('pid', bannerJSON.prodLink).click(function(){
-						showContent('product',{'pid':$(this).data('pid')});
+			startHomepageSlideshow : function(attempts){
+				attempts = attempts || 0;
+				if(app.ext.store_sac.vars.bannerJSON){
+					var $slideshow = $('#homepageSlideshow');
+					if($slideshow.hasClass('slideshowRendered')){
+						//already rendered, do nothing.
+						}
+					else {
+						for(var i=0; i < app.ext.store_sac.vars.bannerJSON.slides.length; i++){
+							var $banner = app.ext.store_sac.u.makeBanner(app.ext.store_sac.vars.bannerJSON.slides[i], app.ext.store_sac.vars.bannerJSON.dims, "000000");
+							$slideshow.append($banner);
+							}
+						$slideshow.append($(app.ext.store_sac.vars.bannerJSON.pagerHTML));
+						$slideshow.addClass('slideshowRendered').cycle(app.ext.store_sac.vars.bannerJSON.cycleOptions);
+						}
+					}
+				else {
+					setTimeout(function(){app.ext.store_sac.u.startHomepageSlideshow();}, 250);
+					}
+				},
+			loadBanners : function(){
+				app.u.dump("loadbanners");
+				$.getJSON("_banners.json?_v="+(new Date()).getTime(), function(json){
+					app.ext.store_sac.vars.bannerJSON = json;
+					}).fail(function(a,b,c){
+						app.ext.store_sac.vars.bannerJSON = {};
+						app.u.dump("BANNERS FAILED TO LOAD");
+						app.u.dump(a);
+						app.u.dump(b);
+						app.u.dump(c);
 						});
+				},
+			makeBanner : function(bannerJSON, dims, b){
+				var $banner = $('<a></a>');
+				
+				var $img = $('<img />');
+				var srcset = "";
+				for(var i=0; i < dims.length; i++){
+					var src = app.u.makeImage({
+						w : dims[i].w,
+						h : dims[i].h,
+						b : b,
+						name : bannerJSON.src,
+						alt : bannerJSON.alt,
+						title : bannerJSON.title
+						});
+					if(i==0){
+						$img.attr('src',src);
+						}
+					
+					srcset += src;
+					if(i!= dims.length-1){
+						srcset +=" "+dims[i].param+",";
+						}
+					}
+				$img.attr('srcset', srcset);
+				$banner.append($img);
+				
+				if(bannerJSON.prodLink){
+					$banner.data("onClick", "appLink").attr("href","#!product?pid="+bannerJSON.prodLink);
 					}
 				else if(bannerJSON.catLink){
-					$img.addClass('pointer').data('navcat', bannerJSON.catLink).click(function(){
-						showContent('category',{'navcat':$(this).data('navcat')});
-						});
+					$banner.data("onClick", "appLink").attr("href","#!category?navcat="+bannerJSON.catLink);
 					}
 				else if(bannerJSON.searchLink){
-					$img.addClass('pointer').data('elasticsearch', bannerJSON.searchLink).click(function(){
-						app.u.dump($(this).data('elasticsearch'));
-						showContent('search',$(this).data('elasticsearch'));
-						});
+					$banner.data("onClick", "appLink").attr("href","#!category?KEYWORDS="+bannerJSON.searchLink);
 					}
 				else {
 					//just a banner!
 					}
-				return $img;
+				return $banner;
 				},
 				
 			addItemToCart : function($form,obj){
