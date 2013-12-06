@@ -101,6 +101,34 @@ var store_sac = function() {
 				else{
 					$tag.text(data.value['%attribs']['zoovy:prod_name']);
 					}
+				},
+			imageSrcset : function($tag, data){
+				app.u.dump(data.bindData.dims);
+				app.u.dump(data.bindData.dims.split(" "));
+				var dims = data.bindData.dims.split(" ");
+				var srcset = "";
+				for(var i = 0; i < dims.length; i++){
+					var da = dims[i].split("|");
+					
+					var param = da[0];
+					var w = da[1];
+					var h = da[2];
+					
+					var src = app.u.makeImage($.extend({},data.bindData,{
+						"name" : data.value,
+						"w" : w,
+						"h" : h,
+						"b" : data.bindData.bgColor || "ffffff"
+						}));
+					if(i==0){
+						$tag.attr('src',src);
+						}
+					srcset += src;
+					if(i!=dims.length-1){
+						srcset += " "+param+",";
+						}
+					}
+				$tag.attr('srcset', srcset);
 				}
 			}, //renderFormats
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\

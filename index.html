@@ -697,8 +697,12 @@ this will likely become more flexible in the future. ###
 		<div class="prodImageContainer floatLeft">
 			<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).attr("data-pid")});' class='pointer clearfix'  data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;'>
 
+				<!--
 				<div data-bind="var: product(zoovy:prod_is_tags); format:addTagSpans;" class='tagsContainer'></div>
-				<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageURL;' width='340' height='340' />
+				<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageURL;' width='340' height='340' /> 
+				-->
+				<iframe data-bind="var:product(); format:imajize360; extension:store_sac;"></iframe>
+				<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageSrcset; extension:store_sac; dims: 479w|310|232 639w|266|200 767w|383|288 959w|460|346 |460|346;'  />
 
 			</div>
 
