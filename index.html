@@ -695,21 +695,23 @@ this will likely become more flexible in the future. ###
 	</div>
 	<div class="prodViewerContainer">
 		<div class="prodImageContainer floatLeft">
-			<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).attr("data-pid")});' class='pointer clearfix'  data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;'>
+			<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).attr("data-pid")});' class='prodBigImageContainer pointer clearfix'  data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;'>
 
 				<!--
 				<div data-bind="var: product(zoovy:prod_is_tags); format:addTagSpans;" class='tagsContainer'></div>
 				<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageURL;' width='340' height='340' /> 
 				-->
-				<iframe data-bind="var:product(); format:imajize360; extension:store_sac;"></iframe>
-				<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageSrcset; extension:store_sac; dims: 479w|310|232 639w|266|200 767w|383|288 959w|460|346 |460|346;'  />
+				<iframe data-bind="var:product(user:prod_360_viewer_id); format:imajize360; extension:store_sac;"></iframe>
+				<div data-bind="var:product(user:prod_360_viewer_id); format:hideIfSet;">
+					<img src='blank.gif' class='prodBigImage' alt='' data-bind='var: product(zoovy:prod_image1); format:imageSrcset; extension:store_sac; dims: 479w|310|232 639w|266|200 767w|383|288 959w|460|346 |460|346;'  />
+				</div>
 
 			</div>
 
-			<div data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;' class='prodThumbs'>
-				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"2"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image2); format:imageURL;' alt='' width='100' height='100' /></div>
-				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"3"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image3); format:imageURL;' alt=''  width='100' height='100' /></div>
-				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"4"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image4); format:imageURL;' alt='' width='100' height='100' /></div>
+			<div data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;' class='prodThumbs highlightGradientBG'>
+				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"2"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image2); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' /></div>
+				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"3"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image3); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' /></div>
+				<div onClick='app.ext.store_product.u.showPicsInModal({"pid":$(this).parent().attr("data-pid"),"int":"4"});' class='pointer'><img src='blank.gif' data-bind='var: product(zoovy:prod_image4); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' /></div>
 			</div>
 		</div>
 

@@ -121,6 +121,16 @@ CATEGORY PAGE STYLES
 PRODUCT PAGE STYLES
 
 *********************************************************/
+.productPage { padding:10px;}
+.prodSideBar { width: 235px;}
+.prodViewerContainer { width: 620px;}
+.prodImageContainer .prodBigImageContainer, .prodImageContainer iframe, .prodImageContainer .prodBigImage {width:383px; height:288px;}
+
+.prodImageContainer .prodThumbs{height:34px; padding: 3px;}
+.prodViewerContainer .prodThumbs div { margin-right: 6px;}
+.prodViewerContainer .prodThumbs img{ width:44px; height:32px;}
+
+.prodSummaryContainer{width: 238px;}
 
 /*********************************************************
 

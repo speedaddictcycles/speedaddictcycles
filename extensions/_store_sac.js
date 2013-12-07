@@ -102,6 +102,10 @@ var store_sac = function() {
 					$tag.text(data.value['%attribs']['zoovy:prod_name']);
 					}
 				},
+			imajize360 : function($tag, data){
+				var src = "http://embed.imajize.com/"+data.value;
+				$tag.attr('src',src);
+				},
 			imageSrcset : function($tag, data){
 				app.u.dump(data.bindData.dims);
 				app.u.dump(data.bindData.dims.split(" "));

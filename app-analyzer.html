@@ -48,8 +48,10 @@ app.u.loadScript("app-analyzer-init.js");
 function getConfig4Domain()	{
 	var domain = $('#domain').val();
 	if(domain)	{
+		
 		console.log('BEGIN getConfig4Domain');
-		var url = 'http://'+$('#domain').val()+'/jquery/config.js';
+		 app.vars.testURL = "http://"+domain+(domain[domain.length-1] == "/" ? "" : "/");
+		var url = app.vars.testURL+'jquery/config.js';
 		$.getScript(url).success(function(script, textStatus) {
 //instantiate wiki parser.
 			app.u.handleRQ(0);

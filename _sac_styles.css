@@ -39,6 +39,16 @@ body {
 	background: linear-gradient(to bottom,#ffe2b0 10px, #ffffff 300px); /* W3C */
 }
 
+.highlightGradientBG{
+	background: #ffe2b0; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ffe2b0 0%, #ffebc9 35%, #ffebc9 65%, #ffe2b0 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffe2b0), color-stop(35%,#ffebc9), color-stop(65%,#ffebc9), color-stop(100%,#ffe2b0)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ffe2b0 0%,#ffebc9 35%,#ffebc9 65%,#ffe2b0 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ffe2b0 0%,#ffebc9 35%,#ffebc9 65%,#ffe2b0 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ffe2b0 0%,#ffebc9 35%,#ffebc9 65%,#ffe2b0 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #ffe2b0 0%,#ffebc9 35%,#ffebc9 65%,#ffe2b0 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffe2b0', endColorstr='#ffe2b0',GradientType=0 ); /* IE6-9 */
+}
 
 #appView {margin: 0px auto;}
 
@@ -166,6 +176,20 @@ HOMEPAGE STYLES
 #homepageFeaturesCarouselNext,
 #homepageFeaturesCarouselBody {height:100%; float: left;}
 
+/*********************************************************
+
+CATEGORY PAGE STYLES
+
+*********************************************************/
+
+/*********************************************************
+
+PRODUCT PAGE STYLES
+
+*********************************************************/
+.prodImageContainer {border: 1px solid #dcdcdc;}
+.prodImageContainer iframe {border:none; padding: 0px; margin:0px;}
+.prodViewerContainer .prodThumbs div {border: 1px solid #dcdcdc; float:right; margin:0px;}
 /*********************************************************
 
 COMPANY PAGE STYLES

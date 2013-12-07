@@ -122,9 +122,13 @@ PRODUCT PAGE STYLES
 .productPage { padding:10px;}
 .prodSideBar { width: 235px;}
 .prodViewerContainer { width: 700px;}
-.prodImageContainer {width: 462px;}
-.prodSummaryContainer{width: 238px;}
+.prodImageContainer .prodBigImageContainer, .prodImageContainer iframe, .prodImageContainer .prodBigImage {width:460px; height:346px;}
 
+.prodImageContainer .prodThumbs{height:42px; padding:3px;}
+.prodViewerContainer .prodThumbs div { margin-right: 5px;}
+.prodViewerContainer .prodThumbs img{ width:54px; height:40px;}
+
+.prodSummaryContainer{width: 238px;}
 /*********************************************************
 
 COMPANY PAGE STYLES
