@@ -189,7 +189,8 @@ PRODUCT PAGE STYLES
 *********************************************************/
 .prodImageContainer .prodImageBox {border: 1px solid #dcdcdc;}
 .prodImageContainer iframe {border:none; padding: 0px; margin:0px;}
-.prodViewerContainer .prodThumbs a {border: 1px solid #dcdcdc; float:right; margin:0px;}
+.prodViewerContainer .prodThumbs a.prodThumb {border: 1px solid #dcdcdc; float:right; margin:0px;}
+.prodImageContainer .icon img{vertical-align:middle;}
 /*********************************************************
 
 COMPANY PAGE STYLES

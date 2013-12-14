@@ -715,13 +715,16 @@ this will likely become more flexible in the future. ###
 				</div>
 
 				<div data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;' class='prodThumbs highlightGradientBG'>
-					<a href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image2; groupingAttr:pid; groupingPrefix:prodPage_;">
+					<a href="#" class="icon floatLeft">
+						<img src="images/videoicon_22x20.png" class="video" srcset="images/videoicon_22x20.png 639w, images/videoicon_31x29.png 767w, images/videoicon_37x35.png" />
+					</a>
+					<a class="prodThumb" href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image2; groupingAttr:pid; groupingPrefix:prodPage_;">
 						<img src='blank.gif' data-bind='var: product(zoovy:prod_image2); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' />
 					</a>
-					<a href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image3; groupingAttr:pid; groupingPrefix:prodPage_;">
+					<a class="prodThumb" href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image3; groupingAttr:pid; groupingPrefix:prodPage_;">
 						<img src='blank.gif' data-bind='var: product(zoovy:prod_image3); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' />
 					</a>
-					<a href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image4; groupingAttr:pid; groupingPrefix:prodPage_;">
+					<a class="prodThumb" href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image4; groupingAttr:pid; groupingPrefix:prodPage_;">
 						<img src='blank.gif' data-bind='var: product(zoovy:prod_image4); format:imageSrcset; extension:store_sac; dims: 479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40;' />
 					</a>
 				</div>

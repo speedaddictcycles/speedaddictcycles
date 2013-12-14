@@ -123,8 +123,10 @@ PRODUCT PAGE STYLES
 .prodImageContainer .prodBigImageContainer, .prodImageContainer iframe, .prodImageContainer .prodBigImage {width:310px; height:232px;}
 
 .prodImageContainer .prodThumbs{height:28px; padding: 2px;}
+.prodImageContainer .icon {height:28px; line-height:28px; margin-left:5px;}
+.prodImageContainer .icon .video { width:22px; height:20px;}
 .prodViewerContainer .prodThumbs div { margin-right: 5px;}
-.prodViewerContainer .prodThumbs img{ width:36px; height:26px;}
+.prodViewerContainer .prodThumb img{ width:36px; height:26px;}
 
 .prodSummaryContainer{width: 300px;padding: 0px 10px;}
 
