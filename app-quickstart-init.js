@@ -15,15 +15,18 @@ app.rq.push(['extension',0,'store_cart','extensions/store_cart.js']);
 app.rq.push(['extension',0,'store_crm','extensions/store_crm.js']);
 app.rq.push(['extension',0,'myRIA','app-quickstart.js','startMyProgram']);
 
-app.rq.push(['extension',0,'entomologist','extensions/entomologist/extension.js']);
 app.rq.push(['extension',0,'store_sac','extensions/_store_sac.js']);
 app.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.js']); 
 app.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
+app.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);
+app.rq.push(['extension',0,'partner_addthis','extensions/partner_addthis.js']);
+
+
+app.rq.push(['extension',0,'entomologist','extensions/entomologist/extension.js']);
 app.rq.push(['extension',0,'tools_animation','extensions/tools_animation.js']);
 
 //app.rq.push(['extension',1,'google_analytics','extensions/partner_google_analytics.js','startExtension']);
 app.rq.push(['extension',1,'tools_ABtesting','extensions/tools_ABtesting.js']);
-//app.rq.push(['extension',0,'partner_addthis','extensions/partner_addthis.js']);
 //app.rq.push(['extension',1,'resellerratings_survey','extensions/partner_buysafe_guarantee.js','startExtension']); /// !!! needs testing.
 //app.rq.push(['extension',1,'buysafe_guarantee','extensions/partner_buysafe_guarantee.js','startExtension']);
 //app.rq.push(['extension',1,'powerReviews_reviews','extensions/partner_powerreviews_reviews.js','startExtension']);

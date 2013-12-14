@@ -187,9 +187,9 @@ CATEGORY PAGE STYLES
 PRODUCT PAGE STYLES
 
 *********************************************************/
-.prodImageContainer {border: 1px solid #dcdcdc;}
+.prodImageContainer .prodImageBox {border: 1px solid #dcdcdc;}
 .prodImageContainer iframe {border:none; padding: 0px; margin:0px;}
-.prodViewerContainer .prodThumbs div {border: 1px solid #dcdcdc; float:right; margin:0px;}
+.prodViewerContainer .prodThumbs a {border: 1px solid #dcdcdc; float:right; margin:0px;}
 /*********************************************************
 
 COMPANY PAGE STYLES
