@@ -14,6 +14,8 @@ body {
 .clearRight { clear: right; }
 .clearLeft{ clear: left; }
 
+.block {display:block;}
+
 .highlightBG{background:#ffe2b0}
 .lowlightText{color:#706757;}
 .highlightText{color:#d05626;}
@@ -56,7 +58,7 @@ body {
 	background: white;
 }
 
-#header {position:relative;}
+#header {position:relative; z-index:1000;}
 #header .tread {
 	position: absolute;
 	z-index: 1;
@@ -126,16 +128,47 @@ body {
 #header #nav {
 	height: 36px;
 	background: #cc4300;
+	position:relative;
 }
 #header #nav > div {height: 36px; line-height: 36px;}
 #header #nav .navOption {border-right: 1px solid #ffe2b0;}
-#header #nav a{
+#header #nav a.navLink{
 	color: #ffe2b0;
 	font-weight: bold;
 	padding: 0px 18px;
 	text-decoration: none;
 }
 #header #nav #allDepts a{ font-size: .8em; }
+
+.dropdownContent {
+	position:absolute;
+	height:0px;
+	overflow:hidden;
+	transition: height .6s;
+	-moz-transition: height .6s;
+	-webkit-transition: height .6s;
+	-o-transition: height .6s;
+	
+	left:0px;
+	z-index:100;
+	color: white;
+	width: 100%;
+	
+	background: -moz-linear-gradient(top,  rgba(96,101,104,1) 0%, rgba(96,101,104,1) 35%, rgba(96,101,104,0.6) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(96,101,104,1)), color-stop(35%,rgba(96,101,104,1)), color-stop(100%,rgba(96,101,104,0.6))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(96,101,104,1) 0%,rgba(96,101,104,1) 35%,rgba(96,101,104,0.6) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(96,101,104,1) 0%,rgba(96,101,104,1) 35%,rgba(96,101,104,0.6) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(96,101,104,1) 0%,rgba(96,101,104,1) 35%,rgba(96,101,104,0.6) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgba(96,101,104,1) 0%,rgba(96,101,104,1) 35%,rgba(96,101,104,0.6) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#606568', endColorstr='#99606568',GradientType=0 ); /* IE6-9 */
+	
+	
+	background: rgb(96,101,104);
+}
+.dropdownContent a {
+	color:white;
+	text-decoration: none;
+}
 
 
 #footer {
@@ -153,7 +186,7 @@ HOMEPAGE STYLES
 
 #homepageSlideshow {overflow:hidden; position:relative;}
 #homepageSlideshow a {width:100%;}
-#homepageSlideshow .pager{position:absolute; bottom:10px; left:10px; z-index:1000; border-radius:5px; background: rgba(45,45,45,.65);}
+#homepageSlideshow .pager{position:absolute; bottom:10px; left:10px; z-index:999; border-radius:5px; background: rgba(45,45,45,.65);}
 #homepageSlideshow .pagerSpan{overflow:hidden; width: 35px; height:35px; border-radius:2px; border: 1px solid grey; margin: 10px; display:block; float: left;}
 
 #homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4); }

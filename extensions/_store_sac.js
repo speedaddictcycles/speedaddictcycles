@@ -33,6 +33,7 @@ var store_sac = function() {
 				
 				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
 				app.ext.store_sac.u.loadBanners();
+				app.ext.store_sac.u.initDropDowns();
 				app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
 					app.ext.store_sac.u.startHomepageSlideshow();
@@ -138,6 +139,14 @@ var store_sac = function() {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
+			initDropDowns : function(){
+				$('[data-sac="dropdown"]').on('mouseenter.dropdown', function(){
+					$('[data-sac="dropdownContent"]', $(this)).addClass('showDropDown');
+				});
+				$('[data-sac="dropdown"]').on('mouseleave.dropdown', function(){
+					$('[data-sac="dropdownContent"]', $(this)).removeClass('showDropDown');
+				});
+			},
 			startHomepageSlideshow : function(attempts){
 				attempts = attempts || 0;
 				if(app.ext.store_sac.vars.bannerJSON){
@@ -165,9 +174,6 @@ var store_sac = function() {
 					}).fail(function(a,b,c){
 						app.ext.store_sac.vars.bannerJSON = {};
 						app.u.dump("BANNERS FAILED TO LOAD");
-						app.u.dump(a);
-						app.u.dump(b);
-						app.u.dump(c);
 						});
 				},
 			makeBanner : function(bannerJSON, dims, b){

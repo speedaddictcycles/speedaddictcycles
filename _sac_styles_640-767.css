@@ -57,6 +57,16 @@
 #header #headerBanners #returnExchangeCombo #exchangeInCombo {height: 38px;}
 #header #headerBanners #minicart {width: 109px; height: 100%;}
 
+.dropdownContent {
+	width: 640px;
+}
+.dropdownContent.showDropDown.helmets {height: 458px;}
+.dropdownContent.showDropDown.parts {height: 394px;}
+.dropdownContent.showDropDown.apparel {height: 394px;}
+.dropdownContent .featBrands {width: 290px;}
+
+.dropdownContent .dropdownList a {line-height: 54px; height: 54px; padding-top: 10px; margin-left: 10px;}
+.dropdownContent .dropdownList img { border: 3px solid #36393e; margin-right: 10px; height:48px; width:48px;}
 
 #header #searchBar {width: 437px;}
 

@@ -59,6 +59,18 @@
 #header #headerBanners #freeExchange {width: 125px; height: 100%;}
 #header #headerBanners #minicart {width: 126px; height: 100%;}
 
+.dropdownContent {
+	width: 768px;
+}
+.dropdownContent.showDropDown.helmets {height: 570px;}
+.dropdownContent.showDropDown.parts {height: 490px;}
+.dropdownContent.showDropDown.apparel {height: 490px;}
+
+.dropdownContent .featBrands {width: 300px;}
+
+.dropdownContent .dropdownList a {line-height: 70px; height: 70px; padding-top: 10px; margin-left: 10px;}
+.dropdownContent .dropdownList img { border: 3px solid #36393e; margin-right: 10px; }
+
 #footer {
 	height: 182px;
 	padding: 20px 34px 0px 34px;
