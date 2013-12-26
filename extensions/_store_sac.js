@@ -65,7 +65,9 @@ var store_sac = function() {
 				app.rq.push(['templateFunction','categoryTemplateFilteredSearch','onCompletes',function(infoObj){
 					app.ext.store_sac.u.initFilteredSearch(infoObj);
 					}]);
-				
+				app.rq.push(['templateFunction','categoryTemplateFilteredSearch','onDeparts',function(infoObj){
+					app.ext.store_sac.u.destroyFilteredSearch(infoObj);
+					}]);
 				$('body').on('click','a[data-onClick], area[data-onClick]', function(e){
 					switch($(this).attr('data-onClick')){
 						case 'appLink':
@@ -99,6 +101,10 @@ var store_sac = function() {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		renderFormats : {
+			filterOption : function($tag,data){
+				$tag.val(data.value.v);
+				$tag.text(data.value.p);
+			},
 			prodChildOption: function($tag, data){
 				$tag.val(data.value.pid);
 				if(data.value['%attribs']['amz:grp_varvalue']){
@@ -221,12 +227,34 @@ var store_sac = function() {
 					}
 				return $banner;
 				},
-			initFilteredSearch(infoObj){
-				$fc = $('#filterContainer');
+			initFilteredSearch : function(infoObj){
+				var $fc = $('#filterContainer');
+				var $fl = $('#filterList', $fc);
+				var timer = $fc.data('filter-list-clear-timer');
+				if(timer){
+					clearTimeout(timer);
+					$fl.removeData().empty();
+					$fc.removeData('filter-list-clear-timer');
+				}
 				
+				$fl.data('jqContext',$(app.u.jqSelector('#',infoObj.parentID)));
+				$fl.data('navcat',infoObj.navcat);
+				$fl.data('filters',app.ext.store_sac.filters[infoObj.navcat]);
 				
+				$fl.anycontent({'data':app.ext.store_sac.filters[infoObj.navcat], 'templateID':'filterListTemplate'});
 				
 				$fc.addClass('active');
+				},
+			destroyFilteredSearch : function(infoObj){
+				var $fc = $('#filterContainer');
+				$fc.removeClass('expand').removeClass('active');
+				
+				var timer = setTimeout(function(){
+					$('#filterList', $fc).removeData().empty();
+					$fc.removeData('filter-list-clear-timer');
+				}, 750);
+				
+				$fc.data('filter-list-clear-timer', timer);
 				},
 			addItemToCart : function($form,obj){
 				var $childSelect = $('.prodChildren.active select', $form);
@@ -254,11 +282,50 @@ var store_sac = function() {
 		e : {
 			}, //e [app Events]
 			
-		// A map of navcats to their default filters for filtered search.  It can be assumed that if a navcat is used as a key here, 
-		//(ie typeof app.ext.store_sac.filters[navcat] !== "undefined") then the app should use the filtered search template for it
+		// A map of navcats to objects containing their base filters and available filters for filtered search.  
+		// It can be assumed that if a navcat is used as a key here, (ie typeof app.ext.store_sac.filters[navcat] !== "undefined") 
+		// then the app should use the filtered search template for it
 		filters : {
-			
-		}
+			".burly_test" : {
+				"base" : {
+					"filter" : {
+						"term" : {
+							"helmet_type" : "dirt"
+						}
+					}
+				},
+				"options" : {
+					"primary_color" : [
+							{
+								"p" : "Black",
+								"v" : "black"
+							},
+							{
+								"p" : "Blue",
+								"v" : "blue"
+							},
+							{
+								"p" : "Brown",
+								"v" : "brown"
+							}
+						],
+					"accent_color" : [
+							{
+								"p" : "Black",
+								"v" : "black"
+							},
+							{
+								"p" : "Blue",
+								"v" : "blue"
+							},
+							{
+								"p" : "Brown",
+								"v" : "brown"
+							}
+						]
+					}
+				}
+			}
 		} //r object.
 	return r;
 	}

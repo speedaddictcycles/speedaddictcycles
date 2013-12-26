@@ -115,7 +115,7 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 
 
 <div id='appView' class='displayNone'>
-
+	
 	<div id="freeship" class="alignCenter">
 	</div>
 	
@@ -359,7 +359,8 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 			</div>
 		</div>
 	</div>
-
+	
+	
 	<div id="mainBody" class="clear">
 		<div id='globalMessaging' class='appMessaging'></div><!-- DO NOT REMOVE - used for some high level error handling (usually appears below breadcrumb nav or top bar) -->
 
@@ -375,6 +376,13 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 		<div class="clear"></div>
 	</div>	
 
+	<div id="filterContainer">
+		<div id="showFilterBtn" class="pointer" onClick="$(this).parent().toggleClass('expand');">Show</div>
+		<div id="filterListContainer">
+			<div id="filterList"></div>
+		</div>
+	</div>
+	<div id="chatContainer"></div>
 
 	<div id="footer" class="alignCenter_320 alignCenter_480">
 		<div id="footerSocial" class="floatRight_960 floatRight_768 floatRight_640 alignCenter_480 alignCenter_320">
@@ -625,22 +633,20 @@ don't modify the 'data-templateid' unless you are changing template names and up
 
 <div id="categoryTemplateFilteredSearch" class="loadingBG categoryTemplate">
 	<ul class='breadcrumb clearfix noPadOrMargin fluidList' data-bind='var: category(id); format:breadcrumb; extension:store_navcats; loadsTemplate: breadcrumbTemplate;'></ul>
-
-	<img data-bind="var: category(%page.banner1); format: banner; editor: banner; height:250; width:750; extension: myRIA;" src='images/blank.gif' alt='' />
-
-	<h2 data-bind="var: category(%page.header); format: text; editor: text;"></h2>
-
-	<p data-bind="var: category(%page.description); format:wiki; wikiFormats:myRIA; editor: textarea;"></p>
-
-	<ul data-bind="var: category(@subcategoryDetail); format: categoryList; extension: store_navcats; loadsTemplate: categoryListTemplate; detail:max;" class='listStyleNone fluidList clearfix noPadOrMargin categoryList'></ul><!-- outputs a list of subcategories -->
-
-	<ul data-bind="var: category(@products); format: productList; editor: finder; extension: store_prodlist; loadsTemplate: productListTemplate; withReviews:1; items_per_page: 25;" class='listStyleNone fluidList clearfix noPadOrMargin productList'></ul><!-- outputs the product list -->
-
-	<p data-bind="var: category(%page.description2); format:wiki; wikiFormats:myRIA; editor: textarea;"></p>
+	
+	<div data-sac="output">
+		
+	</div>
 </div>
 
+<form id="filterListTemplate">
+	<select data-bind="var:filter(options.primary_color); format:stuffList; loadsTemplate:filterOption;"></select>
+	<select data-bind="var:filter(options.accent_color); format:stuffList; loadsTemplate:filterOption;"></select>
+</form>
 
-
+<select>
+	<option id="filterOption" data-bind="useParentData:true; format:filterOption; extension:store_sac;"></option>
+</select>
 
 
 
