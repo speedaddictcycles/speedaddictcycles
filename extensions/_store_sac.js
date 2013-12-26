@@ -35,6 +35,7 @@ var store_sac = function() {
 				app.ext.store_sac.u.loadBanners();
 				app.ext.store_sac.u.initDropDowns();
 				app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
+				
 				app.rq.push(['templateFunction','homepageTemplate','onCompletes',function(infoObj){
 					app.ext.store_sac.u.startHomepageSlideshow();
 					}]);
@@ -59,6 +60,10 @@ var store_sac = function() {
 							},1000);
 						}
 					
+					}]);
+				
+				app.rq.push(['templateFunction','categoryTemplateFilteredSearch','onCompletes',function(infoObj){
+					app.ext.store_sac.u.initFilteredSearch(infoObj);
 					}]);
 				
 				$('body').on('click','a[data-onClick], area[data-onClick]', function(e){
@@ -216,7 +221,13 @@ var store_sac = function() {
 					}
 				return $banner;
 				},
+			initFilteredSearch(infoObj){
+				$fc = $('#filterContainer');
 				
+				
+				
+				$fc.addClass('active');
+				},
 			addItemToCart : function($form,obj){
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
@@ -241,7 +252,13 @@ var store_sac = function() {
 			}, //u [utilities]
 
 		e : {
-			} //e [app Events]
+			}, //e [app Events]
+			
+		// A map of navcats to their default filters for filtered search.  It can be assumed that if a navcat is used as a key here, 
+		//(ie typeof app.ext.store_sac.filters[navcat] !== "undefined") then the app should use the filtered search template for it
+		filters : {
+			
+		}
 		} //r object.
 	return r;
 	}
