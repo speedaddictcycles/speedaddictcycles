@@ -178,15 +178,13 @@ body {
 	-moz-transition: left .6s, width .6s;
 	-webkit-transition: left.6s, width .6s;
 	-o-transition: left .6s, width .6s;
-	left: -20px;
-	top:40px;
 	width:0px;
-	background:green;
+	background:white;
 }
 #filterContainer.active{left: 0px;}
-#filterContainer.expand {width: 200px;}
+#filterContainer.expand {width: 195px; border: 1px solid #cc4300;}
 
-#filterContainer #showFilterBtn{position:absolute; left:100%; background: yellow;}
+#filterContainer #showFilterBtn{position:absolute; left:100%;}
 #filterContainer #filterListContainer{overflow:hidden;}
 #filterContainer #filterListContainer #filterList{width:200px; min-height:400px;}
 

@@ -59,10 +59,13 @@
 #header #searchBar{ padding-right: 0px; width: 230px;}
 #header #searchBar #searchBarInput{ width: 220px;}
 
-#header #nav {height: 73px;}
+#header #nav {height: 73px; }
 #header #nav .navOption {border: none; width: 159px; text-align:center;}
 #header #nav .navOptionBorderRight_320 {border-right: 1px solid #ffe2b0;}
 #header #nav .navOptionBorderBottom_320 {border-bottom: 1px solid #ffe2b0;}
+
+#filterContainer {left:-52px; top:20px;}
+#filterContainer #showFilterBtn { width: 52px; height:121px; background:url(images/show_filter_btn_52x121.png) no-repeat left -2px;}
 
 #footer {
 	padding: 18px 0px;

@@ -70,6 +70,9 @@
 
 #header #searchBar {width: 437px;}
 
+#filterContainer {left:-68px; top:40px;}
+#filterContainer #showFilterBtn { width: 68px; height:285px; background:url(images/show_filter_btn_68x285.png) no-repeat;}
+
 #footer {
 	height: 182px;
 	padding: 20px 10px 0px 10px;

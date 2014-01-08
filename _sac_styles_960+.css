@@ -71,6 +71,9 @@
 .dropdownContent .dropdownList a {line-height: 70px; height: 70px; padding-top: 10px; margin-left: 10px;}
 .dropdownContent .dropdownList img { border: 3px solid #36393e; margin-right: 10px; }
 
+#filterContainer {left:-68px; top:40px;}
+#filterContainer #showFilterBtn { width: 68px; height:285px; background:url(images/show_filter_btn_68x285.png) no-repeat;}
+
 #footer {
 	height: 182px;
 	padding: 20px 34px 0px 34px;
