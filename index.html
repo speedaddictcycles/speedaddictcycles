@@ -643,8 +643,61 @@ don't modify the 'data-templateid' unless you are changing template names and up
 </div>
 
 <form id="filterListTemplate">
-	<select name="primary_color" data-bind="var:filter(options.primary_color); format:filterSelect; extension:store_sac; forceRender:true;"></select>
-	<select name="accent_color" data-bind="var:filter(options.accent_color); format:filterSelect; extension:store_sac; forceRender:true;"></select>
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.app_brand); format:showIfSet;">Brand:</h5>
+	<div data-bind="var:filter(options); index:app_brand; 			format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.helmet_type); format:showIfSet;">Helmet Type:</h5>
+	<div data-bind="var:filter(options); index:helmet_type; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.part_type); format:showIfSet;">Part Type:</h5>
+	<div data-bind="var:filter(options); index:part_type; 			format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.apparel_accessories); format:showIfSet;">Apparel or Accessory Type:</h5>
+	<div data-bind="var:filter(options); index:apparel_accessories;	format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.suomy_model); format:showIfSet;">Suomy Model:</h5>
+	<div data-bind="var:filter(options); index:suomy_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.arai_model); format:showIfSet;">Arai Model:</h5>
+	<div data-bind="var:filter(options); index:arai_model; 			format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.shoei_model); format:showIfSet;">Shoei Model:</h5>
+	<div data-bind="var:filter(options); index:shoei_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.hjc_model); format:showIfSet;">HJC Model:</h5>
+	<div data-bind="var:filter(options); index:hjc_model; 			format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_kit_gearing); format:showIfSet;">Chain Kit Gearing:</h5>
+	<div data-bind="var:filter(options); index:chain_kit_gearing; 	format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.progressive_model); format:showIfSet;">Progressive Model:</h5>
+	<div data-bind="var:filter(options); index:progressive_model; 	format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.burly_model); format:showIfSet;">Burly Model:</h5>
+	<div data-bind="var:filter(options); index:burly_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.glove_style); format:showIfSet;">Glove Style:</h5>
+	<div data-bind="var:filter(options); index:glove_style; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.riding_style); format:showIfSet;">Riding Style:</h5>
+	<div data-bind="var:filter(options); index:riding_style; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.primary_color); format:showIfSet;">Primary Color:</h5>
+	<div data-bind="var:filter(options); index:primary_color; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.accent_color); format:showIfSet;">Accent Color:</h5>
+	<div data-bind="var:filter(options); index:accent_color; 		format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.finish); format:showIfSet;">Brand:</h5>
+	<div data-bind="var:filter(options); index:finish; 				format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.make); format:showIfSet;">Brand:</h5>
+	<div data-bind="var:filter(options); index:make; 				format:filterCheckboxList; extension:store_sac;"></div>
+	
+	<!--
+	<select data-bind="var:filter(options); index:primary_color; format:filterSelect; extension:store_sac;"></select>
+	<select data-bind="var:filter(options); index:accent_color; format:filterSelect; extension:store_sac;"></select>
+	-->
 </form>
 
 <select>

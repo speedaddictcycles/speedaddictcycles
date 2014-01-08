@@ -101,8 +101,27 @@ var store_sac = function() {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		renderFormats : {
+			filterCheckboxList : function($tag,data){
+				var options = false;
+				if(data.bindData.index){
+					options = data.value[data.bindData.index];
+				}
+				
+				if(options){
+					$tag.data('filter-index', data.bindData.index);
+					$tag.data('filter-type','checkboxList');
+					for(var i in options){
+						var o = options[i];
+						var $o = $('<div></div>');
+						$o.append('<input type="checkbox" name="'+o.v+'"/>');
+						$o.append('<label>'+o.p+'</label>');
+						$tag.append($o);
+					}
+				} else {
+					$tag.remove();
+				}
+			},
 			filterSelect : function($tag,data){
-				app.u.dump("here");
 				app.u.dump(data.value);
 				if(data.value){
 					data.bindData.defaultText = data.bindData.defaultText || 'Select a filter';
