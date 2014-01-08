@@ -67,6 +67,7 @@ var myRIA = function() {
 		},
 
 
+
 					////////////////////////////////////   CALLS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\		
 
 
@@ -124,8 +125,8 @@ if(typeof window.onpopstate == 'object')	{
 	}
 //if popstate isn't supporeted, hashchange will use the anchor.
 else if ("onhashchange" in window)	{ // does the browser support the hashchange event?
-		_ignoreHashChange = false; //global var. when hash is changed from JS, set to true. see handleHashState for more info on this.
-		window.onhashchange = function () {
+	_ignoreHashChange = false; //global var. when hash is changed from JS, set to true. see handleHashState for more info on this.
+	window.onhashchange = function () {
 		app.ext.myRIA.u.handleHashState();
 		}
 	}
@@ -147,7 +148,7 @@ document.write = function(v){
 //The request for appCategoryList is needed early for both the homepage list of cats and tier1.
 //piggyback a few other necessary requests here to reduce # of requests
 				app.ext.store_navcats.calls.appCategoryList.init(zGlobals.appSettings.rootcat,{"callback":"showRootCategories","extension":"myRIA"},'mutable');
-				app.calls.appProfileInfo.init({'profile':app.vars.profile},{callback : function(rd){
+				app.calls.appProfileInfo.init({'domain':zGlobals.appSettings.domain_only},{callback : function(rd){
 					if(app.model.responseHasErrors(rd)){
 						$('#globalMessaging').anymessage({'message':rd});
 						}
@@ -156,7 +157,7 @@ document.write = function(v){
 							var $logo = $(this);
 							if($logo.is('img') || $('img',$logo).length)	{} //the element with the logo class already has an image. do nothing.
 							else if(app.data[rd.datapointer]['zoovy:logo_website'])	{
-								$logo.append(app.u.makeImage({'tag':true,'m':true,'b':'TTTTTT','w':$logo.width(),'h':$logo.height(),'alt':app.data[rd.datapointer]['zoovy:company_name'] || "",'name':app.data[rd.datapointer]['zoovy:logo_website']}))
+								$logo.append(app.u.makeImage({'tag':true,'m':false,'b':'TTTTTT','w':$logo.width(),'h':$logo.height(),'alt':app.data[rd.datapointer]['zoovy:company_name'] || "",'name':app.data[rd.datapointer]['zoovy:logo_website']}))
 								}
 							else	{} //logo field not set.
 							});
@@ -182,13 +183,14 @@ document.write = function(v){
 //adds submit functionality to search form. keeps dom clean to do it here.
 				app.ext.myRIA.u.bindAppViewForms('#appView'); //added the selector on 20121026. was blank before.
 				app.ext.myRIA.vars.mcSetInterval = setInterval(function(){app.ext.myRIA.u.handleMinicartUpdate({'datapointer':'cartDetail'})},4000); //make sure minicart stays up to date.
-				showContent = app.ext.myRIA.a.showContent; //a shortcut for easy execution.
-				quickView = app.ext.myRIA.a.quickView; //a shortcut for easy execution.
+				
+				window.showContent = app.ext.myRIA.a.showContent; //a shortcut for easy execution.
+				window.quickView = app.ext.myRIA.a.quickView; //a shortcut for easy execution.
 				
 				app.ext.myRIA.u.bindNav('#appView .bindByAnchor');
 				if(typeof app.u.appInitComplete == 'function'){app.u.appInitComplete(page)}; //gets run after app has been init
 				
-				app.ext.myRIA.u.bindAppNav();
+				app.ext.myRIA.u.bindAppNav(); //adds click handlers for the next/previous buttons (product/category feature).
 
 				}
 			}, //startMyProgram 
@@ -257,22 +259,27 @@ document.write = function(v){
 				}
 			}, //showProd 
 
-
+/*
+*** 201346 -> content for these pages is no longer dynamic. It should be hard coded into the template OR allow to be set thru a wizard.
 		showCompany : 	{
 			onSuccess : function(tagObj)	{
 				app.renderFunctions.translateTemplate(app.data[tagObj.datapointer],tagObj.parentID);
 				app.ext.myRIA.u.bindNav('#companyNav a');
-				app.ext.myRIA.u.showArticle(tagObj.infoObj);
-				if(!tagObj.infoObj.templateID)	{
-					if(tagObj.infoObj.templateID){} //use existing value
-					else if(tagObj.templateID)	{tagObj.infoObj.templateID = 'companyTemplate'}
-					else	{tagObj.infoObj.templateID = 'companyTemplate'}
+				if(app.ext.myRIA.u.showArticle(tagObj.infoObj))	{
+					if(!tagObj.infoObj.templateID)	{
+						if(tagObj.infoObj.templateID){} //use existing value
+						else if(tagObj.templateID)	{tagObj.infoObj.templateID = 'companyTemplate'}
+						else	{tagObj.infoObj.templateID = 'companyTemplate'}
+						}
+					tagObj.infoObj.state = 'onCompletes';
+					app.ext.myRIA.u.handleTemplateFunctions(tagObj.infoObj);
 					}
-				tagObj.infoObj.state = 'onCompletes';
-				app.ext.myRIA.u.handleTemplateFunctions(tagObj.infoObj);				
+				else	{
+					//showArticle will handle the error display.
+					}
 				}
 			}, //showCompany 
-
+*/
 
 
 
@@ -778,7 +785,8 @@ fallback is to just output the value.
 						buttonText = 'Choose Size'; className = 'variational sizeable';
 						}
 //pdata is a shortcut to attribs.
-					else if(!$.isEmptyObject(data.value['@variations']))	{
+//*** 201346 Must also check for product children as variations, as parent products cannot be added to cart.
+					else if(!$.isEmptyObject(data.value['@variations']) || pData['zoovy:grp_children'])	{
 						buttonText = 'Choose Options'; className = 'variational';
 						}
 					else	{
@@ -1435,44 +1443,6 @@ P.listID (buyer list id)
 
 
 		u : {
-			getDataFromInfoObj : function(infoObj){
-				//initialized to an empty object, so that we don't return a null pointer
-				var data = {};
-				
-				if(infoObj.datapointer){
-					data = app.data[infoObj.datapointer];
-					}
-				else {
-					switch(infoObj.pageType){
-						case "product" :
-							data = app.data['appProductGet|'+infoObj.pid];
-							break;
-						case "homepage" :
-							//both homepage and category share the same infoObj.navcat syntax, so we can cascade
-						case "category" :
-							data = app.data['appNavcatDetail|'+infoObj.navcat];
-							break;
-						case "customer" :
-							data = app.data.appBuyerLogin;
-							break;
-						case "company" :
-							//Return an empty object
-							break;
-						case "search" :
-							data = app.data["appPublicSearch|"+JSON.stringify(infoObj.elasticsearch)];
-							break;
-						case "cart" :
-							//Both cart and checkout can return the cart, so we can cascade
-						case "checkout" :
-							data = app.data.cartDetail;
-							break;
-						default :
-							//Return an empty object
-							break;
-						}
-					}
-				return data;
-				},
 
 //executed when the app loads.  
 //sets a default behavior of loading homepage. Can be overridden by passing in infoObj.
@@ -1710,6 +1680,7 @@ if(ps.indexOf('?') >= 1)	{
 				var url = URL; //leave original intact.
 				var hashObj;
 				if(url.indexOf('#') > -1)	{
+//*** 201344 Adds support for #! syntax, which allows links for escaped fragment syntax to be parsed directly over their href. -mc
 					var tmp;
 					if(url.indexOf('#!') > -1){
 						tmp = url.split("#!");
@@ -1765,7 +1736,15 @@ if(ps.indexOf('?') >= 1)	{
 					r.pageType = 'homepage';
 					}
 //the url in the domain may or may not have a slash at the end. Check for both
-				else if(url == zGlobals.appSettings.http_app_url || url+"/" == zGlobals.appSettings.http_app_url || url == zGlobals.appSettings.https_app_url || url+"/" == zGlobals.appSettings.https_app_url)	{
+				else if(	url == zGlobals.appSettings.http_app_url || 
+							url+"/" == zGlobals.appSettings.http_app_url || 
+							url == zGlobals.appSettings.https_app_url || 
+							url+"/" == zGlobals.appSettings.https_app_url ||
+//*** 201344 server structure no longer auto-redirects host-less domains to a host, so we should check if just the domain matches. -mc
+							url == "http://"+zGlobals.appSettings.domain_only ||
+							url == "http://"+zGlobals.appSettings.domain_only+"/" ||
+							url == "https://"+zGlobals.appSettings.domain_only ||
+							url == "https://"+zGlobals.appSettings.domain_only+"/")	{
 					r.pageType = 'homepage'
 					r.navcat = zGlobals.appSettings.rootcat; //left with category.safe.id or category.safe.id/
 					}
@@ -1874,6 +1853,9 @@ if(ps.indexOf('?') >= 1)	{
 				
 				//Try to parse URI information
 				try {
+//*** 201344 	Need to do a check before calling kvp2Array; if there are no params then it will return false, and the pagetype will not get set. -mc
+//				This essentially breaks any page hash that requires no params, ie #homepage, #cart, #checkout
+//				No need to worry about #slide2 or another oblivious anchor affecting this code- app.ext.myRIA.u.thisPageInfoIsValid gets called to check that.
 					if(splits.length > 1){
 						infoObj = app.u.kvp2Array(splits[1]); //will set infoObj.show=something or infoObj.pid=PID
 					}
@@ -2289,6 +2271,7 @@ effects the display of the nav buttons only. should be run just after the handle
 				
 //Show one of the company pages. This function gets executed by showContent.
 //handleTemplateFunctions gets executed in showContent, which should always be used to execute this function.
+// ** 201346 -> The company navlinks are now generated based on what articles are present and not disabled. built to allow for wizard to easily add new pages.
 			showCompany : function(infoObj)	{
 				infoObj.show = infoObj.show ? infoObj.show : 'about'; //what page to put into focus. default to 'about us' page
 //				$('#mainContentArea').empty(); //clear Existing content.
@@ -2297,25 +2280,31 @@ effects the display of the nav buttons only. should be run just after the handle
 				infoObj.templateID = 'companyTemplate';
 				infoObj.state = 'onInits';
 				infoObj.parentID = parentID;
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-				
-				
-
-//only create instance once.
+	
 				if($('#mainContentArea_company').length)	{
-					app.ext.myRIA.u.showArticle(infoObj);
-					infoObj.state = 'onCompletes';
-					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+					//template has already been added to the DOM. likley moving between company pages.
 					}
 				else	{
 					var $content = app.renderFunctions.createTemplateInstance(infoObj.templateID,parentID);
 					$content.addClass("displayNone");
+
+					var $nav = $('#companyNav ul:first',$content);
+//builds the nav menu.
+					$('.textContentArea',$content).not('.disabled').each(function(){
+						$nav.append("<li><a href='#company?show="+$(this).attr('id').replace('Article','')+"'>"+($('h1:first',$(this)).text())+"</a></li>");
+						});
+
 					$('#mainContentArea').append($content);
-					//app.ext.myRIA.u.bindNav('#sideline a');
-					app.calls.appProfileInfo.init({'profile':app.vars.profile},{'callback':'showCompany','extension':'myRIA','infoObj':infoObj,'parentID':parentID},'mutable');
-					app.model.dispatchThis();
+					app.ext.myRIA.u.bindNav('#companyNav a');
 					}
-					
+
+				if(app.ext.myRIA.u.showArticle(infoObj))	{
+					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+					infoObj.state = 'onCompletes';
+					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+					}
+				else	{} //showArticle will handle displaying the error messaging.
+
 
 				}, //showCompany
 				
@@ -2369,18 +2358,21 @@ ex:  elasticsearch.size = 200
 */
 elasticsearch.size = 50;
 
-				$.extend(infoObj,{'callback':'handleElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'store_search','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')});
+// ** 201346 -> extended infoObj w/ a new templateID was causing the ondepart templatefunctions to not execute properly for search results.
+//				$.extend(infoObj,{'callback':'handleElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'store_search','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')});
 				
 				//Used to build relative path
 				infoObj.elasticsearch = $.extend(true, {}, elasticsearch);
 				
 				
 				app.ext.store_search.u.updateDataOnListElement($('#resultsProductListContainer'),elasticsearch,1);
-				app.ext.store_search.calls.appPublicSearch.init(elasticsearch,infoObj);
+//				app.ext.store_search.calls.appPublicSearch.init(elasticsearch,infoObj);
+				app.ext.store_search.calls.appPublicSearch.init(elasticsearch,$.extend(true,{},infoObj,{'callback':'handleElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'store_search','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')}));
 				app.model.dispatchThis();
-
+//				app.u.dump(" --------> execute onCompletes for searchTemplate");
 				infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
 				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+
 
 				}, //showSearch
 
@@ -2418,6 +2410,8 @@ elasticsearch.size = 50;
 							$cart.anymessage({'message':rd});
 							}
 						else	{
+//***201342 this will empty the cart before translating it, meaning it doesn't get duplicate content. -mc
+							$cart.intervaledEmpty();
 							$cart.anycontent({'templateID':infoObj.templateID,'datapointer':'cartDetail'});
 							}
 						}},'mutable');
@@ -2670,7 +2664,9 @@ buyer to 'take with them' as they move between  pages.
 //executed from showCompany (used to be used for customer too)
 //articles should exist inside their respective pageInfo templates (companyTemplate or customerTemplate)
 //NOTE - as of version 201225, the parameter no longer has to be a string (subject), but can be an object. This allows for uri params or any other data to get passed in.
+// * 201346 -> function now returns a boolean based on whether or not hte page is shown.
 			showArticle : function(infoObj)	{
+				var r = true; //what is returned. set to false if the article is NOT shown.
 //				app.u.dump("BEGIN myRIA.u.showArticle"); app.u.dump(infoObj);
 				$('#mainContentArea .textContentArea').hide(); //hide all the articles by default and we'll show the one in focus later.
 				
@@ -2683,21 +2679,44 @@ buyer to 'take with them' as they move between  pages.
 				else	{
 					app.u.dump("WARNING - unknown type for 'infoObj' ["+typeof infoObj+"] in showArticle")
 					}
+
 				if(subject)	{
-//					$('html, body').animate({scrollTop : 0},1000); //scroll up.
-					$('#'+subject+'Article').show(); //only show content if page doesn't require authentication.
-					switch(subject)	{
-						case 'faq':
-							app.ext.store_crm.calls.appFAQsAll.init({'parentID':'faqContent','callback':'showFAQTopics','extension':'store_crm','templateID':'faqTopicTemplate'});
-							app.model.dispatchThis();
-							break;
-						default:
-							//the default action is handled in the 'show()' above. it happens for all.
+					var $article = $('#'+subject+'Article');
+					if($article.length)	{
+						if(!$article.hasClass('disabled'))	{
+							$('#'+subject+'Article').show(); //only show content if page doesn't require authentication.
+							switch(subject)	{
+								case 'faq':
+									app.ext.store_crm.calls.appFAQsAll.init({'parentID':'faqContent','callback':'showFAQTopics','extension':'store_crm','templateID':'faqTopicTemplate'});
+									app.model.dispatchThis();
+									break;
+								default:
+									//the default action is handled in the 'show()' above. it happens for all.
+								}
+							}
+						else	{
+							r = false;
+							$('#globalMessaging').anymessage({
+								'gMessage' : true,
+								'message' : "In myRIA.u.showArticle, subject = "+subject+" no longer exists."
+								});
+							}
+						}
+					else	{
+						r = false;
+						$('#globalMessaging').anymessage({
+							'gMessage' : true,
+							'message' : "In myRIA.u.showArticle, subject = "+subject+" but that article has no length on the DOM"
+							});
 						}
 					}
 				else	{
-					app.u.dump("WARNING! - no article/show set for showArticle");
+					$('#globalMessaging').anymessage({
+						'gMessage' : true,
+						'message' : "In myRIA.u.showArticle, infoObj.show was not defined."
+						});
 					}
+				return r;
 				},
 
 //will return a list of recent searches as a jq object ordered list.
@@ -2760,9 +2779,6 @@ buyer to 'take with them' as they move between  pages.
 						
 					else if(catSafeID == zGlobals.appSettings.rootcat || infoObj.pageType == 'homepage')	{
 						infoObj.templateID = 'homepageTemplate'
-						}
-					else if(typeof app.ext.store_sac.filters[catSafeID] !== "undefined"){
-						infoObj.templateID = 'categoryTemplateFilteredSearch';
 						}
 					else	{
 						infoObj.templateID = 'categoryTemplate'
@@ -3065,16 +3081,14 @@ else	{
 				if($form && $form.length)	{
 					var cartObj = app.ext.store_product.u.buildCartItemAppendObj($form);
 					if(cartObj)	{
-						if(cartObj)	{
-							app.calls.cartItemAppend.init(cartObj,{},'immutable');
-							app.model.destroy('cartDetail');
-							app.calls.cartDetail.init({'callback':function(rd){
-								if(obj.action === "modal"){
-									showContent('cart',obj);
-									}
-								}},'immutable');
-							app.model.dispatchThis('immutable');
-							}
+						app.calls.cartItemAppend.init(cartObj,{},'immutable');
+						app.model.destroy('cartDetail');
+						app.calls.cartDetail.init({'callback':function(rd){
+							if(obj.action === "modal"){
+								showContent('cart',obj);
+								}
+							}},'immutable');
+						app.model.dispatchThis('immutable');
 						}
 					else	{} //do nothing, the validation handles displaying the errors.
 					}
@@ -3213,8 +3227,46 @@ else	{
 					return false;
 					});
 
-				} //bindAppViewForms
-
+				}, //bindAppViewForms
+			
+			getDataFromInfoObj : function(infoObj){
+				//initialized to an empty object, so that we don't return a null pointer
+				var data = {};
+				
+				if(infoObj.datapointer){
+					data = app.data[infoObj.datapointer];
+					}
+				else {
+					switch(infoObj.pageType){
+						case "product" :
+							data = app.data['appProductGet|'+infoObj.pid];
+							break;
+						case "homepage" :
+							//both homepage and category share the same infoObj.navcat syntax, so we can cascade
+						case "category" :
+							data = app.data['appNavcatDetail|'+infoObj.navcat];
+							break;
+						case "customer" :
+							data = app.data.appBuyerLogin;
+							break;
+						case "company" :
+							//Return an empty object
+							break;
+						case "search" :
+							data = app.data["appPublicSearch|"+JSON.stringify(infoObj.elasticsearch)];
+							break;
+						case "cart" :
+							//Both cart and checkout can return the cart, so we can cascade
+						case "checkout" :
+							data = app.data.cartDetail;
+							break;
+						default :
+							//Return an empty object
+							break;
+						}
+					}
+				return data;
+				}
 			
 			}, //util
 

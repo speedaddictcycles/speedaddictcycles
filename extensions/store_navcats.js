@@ -419,6 +419,7 @@ templateID - the template id used (from app.templates)
 							app.u.dump("WARNING! invalid value for 'detail' in categoryList renderFunction");
 							}
 						for(var i = 0; i < L; i += 1)	{
+// *** 201344 null pretty name is NOT a hidden category. But we have to check to avoid a null ptr error. -mc
 							if(!data.value[i].pretty || data.value[i].pretty[0] != '!')	{
 // ** 201336+ appNavcatDetail id param changed to path -mc
 // *** 201338 Missed a few references to id here -mc
@@ -432,9 +433,10 @@ templateID - the template id used (from app.templates)
 //if no detail level is specified, only what is in the actual value (typically, id, pretty and @products) will be available. Considerably less data, but no request per category.
 					else	{
 						for(var i = 0; i < L; i += 1)	{
-							var parentID = data.value[i].id+"_catgid+"+(app.u.guidGenerator().substring(10));
+// ** 201336+ appNavcatDetail id param changed to path -mc
+							var parentID = data.value[i].path+"_catgid+"+(app.u.guidGenerator().substring(10));
 							if(data.value[i].pretty[0] != '!')	{
-								$tag.append(app.renderFunctions.transmogrify({'id':parentID,'catsafeid':data.value[i].id},data.bindData.loadsTemplate,data.value[i]));
+								$tag.append(app.renderFunctions.transmogrify({'id':parentID,'catsafeid':data.value[i].path},data.bindData.loadsTemplate,data.value[i]));
 								}
 							}
 						}
@@ -474,6 +476,8 @@ templateID - the template id used (from app.templates)
 //pass in category safe id as value
 			breadcrumb : function($tag,data)	{
 app.u.dump("BEGIN store_navcats.renderFunctions.breadcrumb"); 
+// * 201346 -> necessary for breadcrumb being supported in master header.
+$tag.empty(); //reset each time
 var numRequests = 0; //number of requests (this format may require a dispatch to retrieve parent category info - when entry is a page 3 levels deep)
 
 if(app.u.isSet(data.value))	{

@@ -246,6 +246,14 @@ has to be within the fieldset to for data-table to work right.
 					<td colspan='3'>Strip CR/LF</td>
 				</tr>
 				<tr>
+					<td><input type="radio" value="set-empty-sku-from-product" name="verb"  data-app-event="admin_tools|powerToolVerbChange"/></td>
+					<td colspan='3'>Copy Base Product attribute into ALL EMPTY SKUs</td>
+				</tr>
+				<tr>
+					<td><input type="radio" value="set-sku-from-product" name="verb"  data-app-event="admin_tools|powerToolVerbChange"/></td>
+					<td colspan='3'>Copy Base Product attribute into ALL SKUs</td>
+				</tr>
+				<tr>
 					<td><input type="radio" value="fmakeupc" name="verb"  data-app-event="admin_tools|powerToolVerbChange" /></td>
 					<td colspan='3'>Generate *FAKE* UPC</td>
 				</tr>
@@ -314,12 +322,12 @@ has to be within the fieldset to for data-table to work right.
 </table>
 </div>
 
-		
+		<!--
 		<label class='marginBottom marginTop'>
 			<input type="text" name="jobtitle" placeholder='Job Title (optional)' value="" size="30" />
 			<span class='toolTip' title="Job title is optional, but is very useful if you plan to use this again.">?</span>
 		</label>
-
+		-->
 		<button data-app-role='saveButton' data-app-event='admin_tools|powerToolBatchJobExec' class='ui-state-focus'>Git er Done</button>
 
 		</div>
@@ -471,7 +479,7 @@ has to be within the fieldset to for data-table to work right.
 
 <form action='#' onSubmit="return false" class='labelsAsBreaks' name='productExportToolForm'>
 <input type="hidden" value="0" name="JOBID" />
-<input type="hidden" value="PRODUCT" name="EXPORT" />
+<input type="hidden" value="PRODUCTS" name="EXPORT" />
 
 <h1>Product Export Tool</h1>
 
@@ -611,6 +619,13 @@ has to be within the fieldset to for data-table to work right.
 		<table class='marginTop'>
 		<tbody>
 		<tr>
+			<td class='valignTop'><button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/INVENTORY_RESUMMARIZE','%vars':{}}); return false;">Inventory Resummarize</button></td>
+			<td class='valignTop small'>
+			Forces the system to recompute the summary inventory for all SKU's. 
+			This should not be necessary unless you have encountered a bug which caused inventory summaries to not match inventory detail.
+			</td>
+		</tr>
+		<tr>
 			<td class='valignTop'><button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/PRODUCT_CLEANUP','%vars':{}}); return false;">Product Cleanup</button></td>
 			<td class='valignTop small'>
 			Resets/Rebuilds Product Index, clears out deleted items, and source pid from zoovy:related_products, and zoovy:accessory_products. Removes unicode characters. 
@@ -637,9 +652,23 @@ has to be within the fieldset to for data-table to work right.
 		</tr>
 		<tr>
 			<td class='valignTop'>
-			<button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/ELASTIC_REBUILD','%vars':{}}); return false; ">Elastic Rebuild</button></td>
+			<button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/ELASTIC_REBUILD','%vars':{'index':'public'}}); return false; ">Elastic Rebuild (Public)</button></td>
 			<td class='valignTop small'>
-			Elastic Search Rebuild (note: will be offline/unavailable during rebuild)
+			Elastic Product Search Rebuild (note: will be offline/unavailable during rebuild)
+			</td>
+		</tr>
+		<tr>
+			<td class='valignTop'>
+			<button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/ELASTIC_REBUILD','%vars':{'index':'private'}}); return false; ">Elastic Rebuild (Private)</button></td>
+			<td class='valignTop small'>
+			Elastic Private Search Rebuild (note: will be offline/unavailable during rebuild)
+			</td>
+		</tr>
+		<tr>
+			<td class='valignTop'>
+			<button onclick="app.ext.admin_batchJob.a.adminBatchJobCreate({'type':'UTILITY/EBAY_LISTING_DOWNLOAD','%vars':{}}); return false; ">eBay Listing Download</button></td>
+			<td class='valignTop small'>
+			eBay Listing Complete Download (note: do not launch any new listings while this is running, eBay limits this to once per day per token)
 			</td>
 		</tr>
 		<tr>
@@ -725,10 +754,13 @@ has to be within the fieldset to for data-table to work right.
 
 
 	<section class='marginTop marginBottom'>
-		<h2>Inspectors</h2>
+		<h2>Inspectors &amp; More</h2>
 		<form class='marginTop'><label><span>Order</span><input type='text' name='orderid' class='marginLeft marginRight' /></label><button data-app-event='admin_tools|inspectorExec' data-inspect='order'>Go</button></form>
 		
-		<form><label><span>Product ID</span><input type='text' name='pid' class='marginLeft marginRight' /></label><button data-app-event='admin_tools|inspectorExec' data-inspect='product'>Go</button></form>
+		<form action='#' onSubmit='return false'><label><span>Product ID</span><input type='text' name='pid' class='marginLeft marginRight' /></label>
+			<button data-app-event='admin_tools|inspectorExec' data-inspect='product'>Inspect</button>
+			<button data-app-click='admin_tools|forcePIDIntoPTL' class='applyButton' title="This will add the sku in question to the product task list">Force into Product Task</button>
+			</form>
 		
 		<form><label><span>Shipping Methods/Rules</span><span class='toolTip' title="This will list the ship methods and their rules for the partition in focus.">?</span></label><button class='marginLeft' data-app-event='admin_tools|inspectorExec' data-inspect='shipmethods'>Go</button></form>		
 		<!--
@@ -818,7 +850,8 @@ has to be within the fieldset to for data-table to work right.
 					<span>Options</span>
 					<textarea data-stringify='true' name='options' data-bind='var: flexedit(options); format:popVal;'></textarea>
 				</label>
-				<button data-app-event="admin_config|dataTableAddExec">Add Attribute</button>
+<!--				<button data-app-event="admin_tools|flexDataTableAddEditCancel">Cancel</button> -->
+				<button data-app-event="admin_config|dataTableAddExec">Apply Attribute</button>
 			</div>
 			</fieldset>
 		</form>
@@ -889,7 +922,7 @@ has to be within the fieldset to for data-table to work right.
 	<fieldset class='marginBottom labelsAsBreaks'>
 		<label>
 			<span>Service</span>
-			<select name='_cmd' data-panel-selector=".debugCMDSpecifics">
+			<select name='_cmd' data-input-change="panel-selector" data-panel-selector=".debugCMDSpecifics">
 				<option value=''>please choose</option>
 				<option value='adminDebugProduct' data-show-panel='debugCMDSpecificsProduct'>Product</option>
 				<option value='adminDebugPromotion' data-show-panel='debugCMDSpecificsCommon'>Promotion</option>
@@ -911,7 +944,7 @@ has to be within the fieldset to for data-table to work right.
 		<div data-panel-id='debugCMDSpecificsCommon' class='displayNone debugCMDSpecifics'>
 			<label>
 				<span>Source</span>
-				<select name='SRC' data-panel-selector=".debugSRCSpecifics">
+				<select name='SRC' data-input-change="panel-selector" data-panel-selector=".debugSRCSpecifics">
 					<option value='CART' data-show-panel='debugSRCSpecificsCart'>Cart</option>
 					<option value='DEST' data-show-panel='debugSRCSpecificsDest'>Dest</option>
 					<option value='ORDER' data-show-panel='debugSRCSpecificsOrder'>Order</option>

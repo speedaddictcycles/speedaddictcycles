@@ -43,7 +43,7 @@
 	height: 76px;
 	width: 171px;
 }
-#header .logoContainer .logo{
+#header .logoContainer .logoLink{
 	display: block;
 	background:url(images/logo_154x73.png) center center no-repeat;
 	width:100%;

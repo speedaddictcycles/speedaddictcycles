@@ -141,6 +141,7 @@ var admin_tools = function() {
 //need to apply datepicker to date inputs.
 				$('button',$target).button();
 				app.u.handleAppEvents($target);
+				$target.anydelegate();
 
 				app.model.addDispatchToQ({
 					'_cmd':'adminPlatformLogList',
@@ -290,10 +291,10 @@ $target.append("<br \/>");
 				},
 			
 			pickerSelection2KVP : function($context)	{
-				app.u.dump("BEGIN admin_tools.u.pickerSelection2KVP");
+//				app.u.dump("BEGIN admin_tools.u.pickerSelection2KVP");
 				var r = ""; //what is returned. line separated w/ each line as  'navcat=.safe.name' or 'vendor=XYZ'
 				var sfo = $context.serializeJSON({'cb':true});
-//				app.u.dump(" -> sfo: "); app.u.dump(sfo);
+				app.u.dump(" -> sfo: "); app.u.dump(sfo);
 				if(Number(sfo.SELECTALL) === 1)	{
 					r = 'all'
 					}
@@ -321,12 +322,13 @@ $target.append("<br \/>");
 					if(sfo.createstart && sfo.createend)	{
 						r += "created="+sfo.createstart+"|"+sfo.createend+"\n";
 						}
-					
+
 					if(sfo.csv)	{
-						r += "csv="+sfo.csv.replace(/\n/,"")+"\n";
+						r += "csv="+sfo.csv.replace(/[\s\t\r\n]+/g,",")+"\n"; //strip out all whitespace of any kind and replace with a comma. adjacent whitespace will only get 1 comma
+//						app.u.dump(" -> r: "); app.u.dump(r);
 						}
 					}
-				app.u.dump(" -> r: "+r);
+//				app.u.dump(" -> r: "+r);
 				return r;
 				},
 
@@ -393,7 +395,14 @@ $target.append("<br \/>");
 						data.attrib = data.attrib_custom;
 						delete attrib_custom;
 						}
-
+					
+					if(data.when == 'when-attrib-contains')	{
+						//data() stores keys without dashes. so some-key is converted to someKey. 
+						data['when-attrib'] = data.whenAttrib;
+						data['when-attrib-operator'] = data.whenAttribOperator;
+						data['when-attrib-contains'] = data.whenAttribContains;
+						}
+					
 					r += verb+"?"+$.param(app.u.getWhitelistedObject(data,['attrib','when','when-attrib','when-attrib-operator','when-attrib-contains'])); //verb not passed because it is macro
 					switch(verb)
 						{
@@ -532,7 +541,7 @@ $target.append("<br \/>");
 				$btn.button();
 				$btn.off('click.powerToolAttribChange').on('click.powerToolAttribChange',function(event){
 					event.preventDefault();
-					app.u.dump("BEGIN powerToolBatchJobExec click event.");
+//					app.u.dump("BEGIN powerToolBatchJobExec click event.");
 					var	$form = $btn.closest('form');
 					
 					if(app.ext.admin.u.validatePicker($form))	{
@@ -609,7 +618,7 @@ $target.append("<br \/>");
 							$form.anymessage({"message":"For attributes, you selected 'specify', which requires at least one attribute in the attribute list textarea."});
 							}
 						else	{
-							app.ext.admin_batchJob.a.adminBatchJobCreate({'%vars':sfo,'guid':app.u.guidGenerator(),'type':'EXPORT/'+$form['EXPORT']});
+							app.ext.admin_batchJob.a.adminBatchJobCreate({'%vars':sfo,'guid':app.u.guidGenerator(),'type':'EXPORT/PRODUCTS'});
 							}
 						}
 					else	{
@@ -687,12 +696,15 @@ $target.append("<br \/>");
 					app.ext.admin.calls.appResource.init('product_attribs_all.json',{
 						'callback' : function(rd){
 							$tbody.parent().hideLoading();
-							$('tr',$tbody).each(function(){$(this).attr('data-guid',app.u.guidGenerator())}); //has to be an attribute (as opposed to data()) so that dataTable update see's the row exists already.
+							
 							if(app.model.responseHasErrors(rd)){
 								$('#globalMessaging').anymessage({'message':rd});
 								}
 							else	{
 								$tbody.anycontent({'datapointer':rd.datapointer});
+								$('tr',$tbody).each(function(){
+									$(this).attr('data-guid',app.u.guidGenerator())
+									}); //has to be an attribute (as opposed to data()) so that dataTable update see's the row exists already.
 //started implementing a button for 'move this to enabled list'.  Worked fine on the short list of attribs. dies on the full list.
 //the issue is handleAppEvents.  Once this uses delegated events, it should work fine (handlebuttons did run w/out dying).
 //however, can't migrate this yet because the data-table format uses app events, not delegated, and I don't want two copies of that.
@@ -701,7 +713,7 @@ $target.append("<br \/>");
 							},
 						'datapointer':'appResource|product_attribs_all.json'
 						},'mutable'); //total sales
-//				app.model.dispatchThis('mutable');
+				app.model.dispatchThis('mutable');
 
 
 					});
@@ -715,8 +727,19 @@ $target.append("<br \/>");
 					$btn.closest("[data-app-role='flexeditManager']").find("tbody[data-app-role='flexeditEnabledListTbody']:first").append($tr)
 					});
 				},
-
-			flexeditAttributeCreateUpdateShow : function($btn)	{
+/*
+till events support multiple actions, can't implement this.
+need the 'apply' button to run both the apply code AND this code.
+uncomment this, the two lines in flexeditAttributeCreateUpdateShow for button(disable) and the cancel button to proceed w/ this.
+OR, since old app events are still in play, could use data-app-click to trigger this and the app event code to trigger the data-table save. could be good temporary work around.
+			flexDataTableAddEditCancel : function($btn)	{
+				$btn.button().off('click.flexDataTableAddEditCancel').on('click.flexDataTableAddEditCancel',function(event){
+					event.preventDefault();
+					$btn.closest('[data-app-role="flexeditManager"]').find("[data-app-event='admin_tools|flexeditAttributeCreateUpdateShow'], [data-app-event='admin_tools|flexeditAttributeCreateUpdateShow']").button('enable');
+					$btn.closest("[data-app-role='flexeditAttributeAddUpdateContainer']").slideUp();
+					})
+				},
+*/			flexeditAttributeCreateUpdateShow : function($btn)	{
 				
 				if($btn.data('mode') == 'update')	{
 					$btn.button({icons: {primary: "ui-icon-pencil"},text: false});
@@ -724,6 +747,10 @@ $target.append("<br \/>");
 				
 				$btn.button().off('click.flexeditAttributeUpdateShow').on('click.flexeditAttributeUpdateShow',function(){
 					var $inputContainer = $btn.closest('form').find("[data-app-role='flexeditAttributeAddUpdateContainer']");
+//disable the add and edit buttons so as to not accidentally lose data while it's being entered (form would clear or populate w/ 'edit' contents )
+//					$btn.button('disable');
+//					$btn.closest('[data-app-role="flexeditManager"]').find("[data-app-event='admin_tools|flexeditAttributeCreateUpdateShow']").button('disable');
+					
 //need to make sure form input area is 'on screen'. scroll to it.
 					$('html, body').animate({
 						scrollTop: $inputContainer.offset().top
@@ -763,7 +790,7 @@ $target.append("<br \/>");
 						})
 					app.model.addDispatchToQ({
 						'_cmd':'adminConfigMacro',
-						'@updates':["GLOBAL/FLEXEDIT-SAVE?json="+JSON.stringify(json)],
+						'@updates':["GLOBAL/FLEXEDIT-SAVE?json="+encodeURIComponent(JSON.stringify(json))],
 						'_tag':	{
 							'callback' : 'showMessaging',
 							'jqObj' : $btn.closest('form'),
@@ -918,8 +945,13 @@ $target.append("<br \/>");
 				app.u.dump(cmdObj);
 				app.model.addDispatchToQ(cmdObj,'mutable');
 				app.model.dispatchThis('mutable');
-				}
+				},
 
+			//for forcing a product into the product task list
+			forcePIDIntoPTL : function($ele,p)	{
+				app.ext.admin_prodEdit.u.addProductAsTask({'pid':$ele.closest('form').find("[name='pid']").val(),'tab':'product','mode':'add'});
+				}
+				
 			} //e [app Events]
 		} //r object.
 	return r;

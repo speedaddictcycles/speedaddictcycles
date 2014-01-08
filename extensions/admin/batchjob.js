@@ -240,8 +240,65 @@ app.model.dispatchThis('mutable');
 		e : {
 
 
+			adminBatchJobParametersRemoveConfirm : function($ele,p)	{
+				if($ele.data('uuid'))	{
+
+					app.ext.admin.i.dialogConfirmRemove({
+						"message" : "Are you sure you want to delete this saved batch process? There is no undo for this action.",
+						"removeButtonText" : "Remove", //will default if blank
+						"title" : "Remove Saved Batch Process", //will default if blank
+						"removeFunction" : function(vars,$D){
+							$D.showLoading({"message":"Deleting saved batch process"});
+							app.model.addDispatchToQ({
+								'_cmd':'adminBatchJobParametersRemove',
+								'UUID' : $ele.data('uuid'),
+								'_tag':	{
+									'callback':function(rd){
+										$D.hideLoading();
+										if(app.model.responseHasErrors(rd)){
+											$D.anymessage({'message':rd});
+											}
+										else	{
+											//success content goes here.
+											$ele.closest("[data-app-role='batchContainer']").empty().remove();
+											$D.dialog('close');
+											}
+										}
+									}
+								},'mutable');
+							app.model.dispatchThis('mutable');
+							//now go delete something.
+							}
+						})
+					}
+				else	{
+					$('#globalMessaging').anymessage({"message":"In admin_reports.e.adminBatchJobParametersRemove, data-uuid not set on trigger element.","gMessage":true});
+					}
+				},
 
 
+			batchJobExec : function($btn)	{
+				if($btn.is('button'))	{
+					$btn.button({text: false,icons: {primary: $btn.attr('data-icon-primary') || "ui-icon-refresh"}})
+					}
+				$btn.off('click.batchJobExec').on('click.batchJobExec',function(event){
+					event.preventDefault();
+					var data = $btn.closest("[data-element]").data();
+					if(data && $btn.data('whitelist') && $btn.data('type'))	{
+						var whitelist = $btn.data('whitelist').split(',');
+						var vars = app.u.getWhitelistedObject(data,whitelist) || {};
+						vars.GUID = app.u.guidGenerator();
+						app.ext.admin_batchJob.a.adminBatchJobCreate({'type':$btn.data('type'), '%vars':vars});
+						}
+//allows for simple (no vars) batch jobs to be created.
+					else if($btn.data('type')){
+						app.ext.admin_batchJob.a.adminBatchJobCreate({'type':$btn.data('type'), '%vars':{'GUID':app.u.guidGenerator()}});
+						}
+					else	{
+						$('#globalMessaging').anymessage({"message":"in admin_batchJobs.e.batchJobExec, either no data found ["+(typeof data)+"] or data-whitelist ["+$btn.data('whitelist')+"] not set and/or data-type ["+$btn.data('type')+"] not set","gMessage":true});}
+					});
+				},
+	
 //NOTE -> the batch_exec will = REPORT for reports.
 			showReport : function($btn)	{
 
@@ -299,30 +356,27 @@ app.model.dispatchThis('mutable');
 				$btn.off('click.adminBatchJobCleanupExec').on('click.adminBatchJobCleanupExec',function(){
 					var jobid = $btn.closest('[data-jobid]').data('jobid');
 					if(jobid)	{
-						var callback;
+						var _tag = {};
 						if($btn.data('mode') == 'list')	{
 							$btn.button('option','icons',{primary:"wait"}).find('ui-icon').removeClass('ui-icon').end().button('disable');
-							callback = function(rd)	{
-if(app.model.responseHasErrors(rd)){
-	$('#globalMessaging').anymessage({'message':rd});
-	}
-else	{
-	$btn.closest('tr').hide();
-	}
+							_tag.callback = function(rd)	{
+								if(app.model.responseHasErrors(rd)){
+									$('#globalMessaging').anymessage({'message':rd});
+									}
+								else	{
+									$btn.closest('tr').hide();
+									}
 								}
 							}
 						else	{
-							$('#batchJobStatusModal').empty().addClass('loadingBG');
-							callback = 'showMessaging';
+							_tag.callback = 'showMessaging';
+							_tag.message = 'Batch job '+jobid+' has been cleaned up';
+							_tag.jqObj = $('#batchJobStatusModal').empty().showLoading({"message":"Deleting batch job "+jobid})
 							}
 						app.model.addDispatchToQ({
 							'_cmd':'adminBatchJobCleanup',
 							'jobid' : jobid,
-							'_tag':	{
-								'callback':callback,
-								'message':'Batch job has been cleaned up',
-								'parentID':'batchJobStatus_'+jobid
-								}
+							'_tag':	_tag
 							},'immutable');
 						app.model.dispatchThis('immutable');
 						}

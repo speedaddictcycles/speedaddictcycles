@@ -24,8 +24,6 @@
 </form>
 		</div>
 
-
-
 	
 	
 		<h2>Item Filters</h2>
@@ -34,6 +32,7 @@
 			<ul class='noPadOrMargin listStyleNone filterGroup'>
 				<li data-filtervalue='backorder' data-app-click='admin_orders|itemListFilterUpdate'>Backorder</li>
 				<li data-filtervalue='preorder' data-app-click='admin_orders|itemListFilterUpdate'>Preorder</li>
+				<li data-filtervalue='return' data-app-click='admin_orders|itemListFilterUpdate'>Returns</li>
 				<li data-filtervalue='pick_noroute' data-app-click='admin_orders|itemListFilterUpdate'>Unrouted Picks</li>
 				<li data-filtervalue='pick_unshipped' data-app-click='admin_orders|itemListFilterUpdate'>Unshipped Picks</li>
 			</ul>
@@ -140,7 +139,7 @@
 						</li>
 
 						<li><a href='#'>Send email</a>
-						<ul data-bind="var: admin_orders(emailMessages); format: emailMessagesListItems; extension:admin_orders;">
+						<ul data-bind="var: admin_orders(emailMessages); format: emailMessagesListItems; extension:admin_orders;" data-app-role='bulkEmailMessagesList'>
 						</ul>
 						</li>
 	
@@ -153,13 +152,15 @@
 				
 				<!-- bulk menu for items -->
 				<div class='floatLeft marginLeft bulkEditMenu hideInOrderListMode'>
-				<ul data-app-role='admin_orders|itemUpdateBulkEditMenu'>
+				<!--<ul data-app-role='admin_orders|itemUpdateBulkEditMenu'>
+				
 					<li><a href='#'>Action</a>
 					<ul>
 						<li class='hideInOrderListMode'><a href='#BTCH|ADDBATCHID' data-app-click='admin_orders|bulkImpactOrderItemListExec'>Do something awesome</a></li>
 					</ul>
 					</li>
-				</ul>
+				
+				</ul>-->
 				</div>
 	
 			</div>
@@ -271,7 +272,7 @@
 	<td><span data-bind='var:order(WMS_ZONE);format:text;'></span></td>
 	<td><span data-bind='var:order(WMS_POSITION);format:text;'></span></td>
 	<td NOWRAP class='alignRight'>
-	
+	<button data-app-click='admin_orders|orderUpdateShowEditor' data-mode='inventoryDetail' data-icon-primary='ui-icon-pencil' data-text='false' class='applyButton' data-bind='var:order(ORDERID);format:assignAttribute; attribute:data-orderid;'>Edit</button>
 	</td>
 </tr>
 
@@ -618,13 +619,11 @@ The following templates are used in the 'order detail' modal/view.
 </tr>
 
 
-<!-- used in the order editor line item template when 'update routes' is clicked. button is shown conditionally. -->
+<!-- used in the order editor line item template when 'update routes' is clicked. button is shown conditionally
 <tr id='itemRoutesTemplate'>
-	<td data-bind='var: route(SKU); format:text; '></td>
-	<td data-bind='var: route(ROUTE); format:text; '></td>
-	<td class='alignRight' data-bind="var: route(@MACROS); format:macros2Buttons; extension:admin;"></td>
+	<td class='alignRight' data-bind="useParentData:true; format:macros2Buttons; extension:admin;"></td>
 </tr>
-
+. -->
 
 </table>
 

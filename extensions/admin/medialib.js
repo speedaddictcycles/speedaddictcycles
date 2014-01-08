@@ -25,6 +25,7 @@ An extension for managing the media library in addition to ALL other file upload
 var admin_medialib = function() {
 	var theseTemplates = new Array('mediaLibTemplate',
 	'mediaLibFolderTemplate','mediaFileTemplate','mediaLibFileDetailsTemplate',
+//	'fileUploadFilePreviewTemplate',
 	'mediaLibSelectedFileTemplate','fileUploadTemplate','page-setup-import-help',
 	'page-setup-publicfiles','page-setup-import-customers','page-setup-import-images',
 	'page-setup-import-inventory','page-setup-import-listings','page-setup-import-navcats',
@@ -265,6 +266,7 @@ var admin_medialib = function() {
 				app.rq.push(['script',0,app.vars.baseURL+'extensions/admin/resources/jquery.fileupload.js']); //
 //here to solve a safari/chrome issue if these scripts load before fileupload.js
 //not a great solution. will have to come up with something better. callback?
+
 setTimeout(function(){
 	app.rq.push(['script',0,app.vars.baseURL+'extensions/admin/resources/canvas-to-blob.min.js']); //
 	app.rq.push(['script',0,app.vars.baseURL+'extensions/admin/resources/jquery.fileupload-fp.js']); //The File Upload file processing plugin
@@ -291,11 +293,11 @@ setTimeout(function(){
 		showMediaLibrary : {
 
 			onSuccess : function(tagObj){
-				app.u.dump("BEGIN admin_medialib.callbacks.showMediaLibrary.onSuccess");
+//				app.u.dump("BEGIN admin_medialib.callbacks.showMediaLibrary.onSuccess");
 				$(app.u.jqSelector('#',tagObj.parentID)).removeClass('loadingBG'); //removes from main col.
 				$('.loadingBG','#mediaLibFolderList').removeClass('loadingBG'); //remove from left col.
 				
-				var L = app.data[tagObj.datapointer]['@folders'].length;
+				var L = app.data[tagObj.datapointer]['@folders'].length; //datapointer is adminMediaFolderList
 				var $template; //recycled. holds template till appended to parent.
 				var fdata; //folder data. recycled. shortcut.
 //				app.u.dump(" -> @folders.length: "+L);
@@ -306,9 +308,9 @@ setTimeout(function(){
 					else	{
 						fdata.id = '#mediaRootFolder_'+fdata.FName //the id given to each root folders.
 						$template = app.renderFunctions.transmogrify(fdata,'mediaLibFolderTemplate',fdata);
-	//number(parentFID) will return false for the root level categories, which are set to "0" (string);
-	//this will add the next folder either as a root or a sub folder, if the parentFID is not 0.
-						Number(fdata.ParentFID) ? $('#mediaChildren_'+app.u.makeSafeHTMLId(fdata.ParentFID)).append($template) : $('#mediaLibFolderListUL').append($template); 
+//number(parentFID) will return false for the root level categories, which are set to "0" (string);
+//this will add the next folder either as a root or a sub folder, if the parentFID is not 0.
+						Number(fdata.ParentFID) ? $('#mediaChildren_'+app.u.makeSafeHTMLId(fdata.ParentFID)).append($template) : $('#mediaLibFolderListUL').append($template);
 						}
 					}
 			
@@ -318,23 +320,65 @@ setTimeout(function(){
 //					app.u.dump(" -> app.ext.admin_medialib.u.getOpenFolderName(): "+app.ext.admin_medialib.u.getOpenFolderName());
 					app.ext.admin_medialib.u.openMediaFolderByFilePath(app.ext.admin_medialib.u.getOpenFolderName())
 					}
+/*
+				$('#mediaFilesUL').anyupload({
+					'instantUpload' : true,
+					'stripExtension' : true,
+					'encode' : 'base64',
+					'templateID' : 'mediaFileTemplate',
+					'filesChange' : function(files,ui)	{
+						//scroll to bottom of div to show new images
+						$("#mediaLibInfiniteScroller").scrollTop($("#mediaLibInfiniteScroller")[0].scrollHeight);
+						},
+					'ajaxRequest' : function(data,ui){
+						app.u.dump("BEGIN ajaxUpload callback.");
+						var fname = ui.container.data('fname');
+						app.model.destroy('adminImageFolderDetail|'+fname);
+						
+						var newFileName = data.filename.substr(0, data.filename.lastIndexOf('.')) || data.filename; //strip file extension
+						newFileName = newFileName.replace(/[^A-Za-z0-9]+/ig, "_").toString().toLowerCase(); //alphanumeric only (this will allow underscores). the +/ig will replace multiple spaces/specialcharacters in a row w/ 1 underscore.
+
+						
+						app.model.addDispatchToQ({
+							'_cmd':'adminImageUpload',
+							'base64' : data.filecontents, //btoa is binary to base64
+							'folder' : fname,
+							'filename' : newFileName,
+							'_tag':	{
+								'callback' : function(rd){
+									if(app.model.responseHasErrors(rd)){
+										$('#mediaLibMessaging').anymessage({'message':rd});
+										}
+									else	{
+										//success content goes here.
+										ui.fileElement.data({
+											'fname':fname,
+											'name':data.filename,
+											'path':fname+"/"+data.filename})
+										app.u.handleButtons(ui.fileElement);
+										}
+									}
+								}
+							},'passive');
+						app.model.dispatchThis('passive');
+						}
+					});
+*/
 //for whatever reason, jqfu has decided it doesn't want to init properly right away. a slight pause and it works fine. weird. ### need a better long term solution.
 				setTimeout(function(){
 					app.ext.admin_medialib.u.convertFormToJQFU('#mediaLibUploadForm','mediaLibrary'); //turns the file upload area into a jquery file upload
 					},2000);
 				}
-
 			}, //showMediaLibrary
 
 		handleMediaLibSrc : {
 			onSuccess : function(tagObj){
-				app.u.dump("BEGIN admin_medialib.callbacks.handleMediaLibSrc.onSuccess");
-				app.u.dump(" -> tagObj: "); app.u.dump(tagObj);
+//				app.u.dump("BEGIN admin_medialib.callbacks.handleMediaLibSrc.onSuccess");
+//				app.u.dump(" -> tagObj: "); app.u.dump(tagObj);
 				var img = app.data[tagObj.datapointer].IMG;
 				var $target = $('#mediaLibraryFocusMediaDetails').show();
 				$target.append(app.renderFunctions.transmogrify({'path':app.data[tagObj.datapointer].IMG,'name':app.data[tagObj.datapointer].IMG},'mediaLibSelectedFileTemplate',app.data[tagObj.datapointer]));
 				app.ext.admin_medialib.u.handleMediaFileButtons($target)
-
 				}
 			},//handleMediaLibUpdate, //showMediaLibrary
 
@@ -704,7 +748,7 @@ setTimeout(function(){
 //				app.u.dump(data.value);
 				var startpoint = $tag.children().length; //will eq 0 at start or 100 after 100 items
 				var itemsPerPage,media;
-//				var settings = app.ext.admin.u.dpsGet('admin_medialib');
+//				var settings = app.model.dpsGet('admin_medialib');
 				var val; //recycled. set to path/filename.
 				var FName = $tag.closest('[data-fname]').attr('data-fname'); //the name of the folder in focus.
 				var listOrigin = $tag.data('list-origin'); //will = search or folder. on a folder imageList req, no 'folder' info is requested (because we already know what folder we're in and the request is faster without requiring the folder lookup)
@@ -810,7 +854,7 @@ if(selector && mode)	{
 				}
 //*** 201324 -> this wasn't getting dispatched!
 			app.model.dispatchThis('immutable');
-			},
+			}, 
 		'publicFileUpload' : function(data,textStatus)	{
 //			app.u.dump("Got to csvUploadToBatch success.");
 //* 201320 -> the adminPublicFileList is slow, so on upload, we do not reload content. The destroy below will remove the data from localStorage so a merchant can exit publick files and return to see their updated list.
@@ -889,14 +933,50 @@ if(selector && mode)	{
 			}
 		}
 	
-	//add domain to form so that it gets passed along to fileupload.cgi
+	//add domain to form so that it gets passed along to fileupload
 	$selector.append("<input type='hidden' name='DOMAIN' value='"+app.vars.domain+"' \/>");
-	
+
+/*
+	$("[data-app-role='anyuploadContainer']",$selector).anyupload({
+		'autoUpload' : false,
+		'stripExtension' : false,
+		'maxSelectableFiles' : 1,
+		'instantUpload' : false,
+		'templateID' : 'fileUploadFilePreviewTemplate',
+		'ajaxRequest' : function(data,ui){
+			app.u.dump("BEGIN ajaxUpload callback (specific to the anyupload instance)."); // app.u.dump(data);
+			$.ajax({
+				'url' : app.vars.jqurl+'upload/',
+				type: 'POST',
+				processData: false,
+				contentType: data.type,
+				data: data,
+				success: function(object,textStatus,jqXHR){
+					app.u.dump("SUCCESS!!")
+					app.u.dump("object: "); app.u.dump(object);
+					app.u.dump("textStatus: "); app.u.dump(textStatus);
+//					app.u.dump("jqXHR: "); app.u.dump(jqXHR);
+					},
+				error: function(jqXHR,textStatus,errorThrown)	{
+					app.u.dump("ERROR!!")
+//					app.u.dump("jqXHR: "); app.u.dump(jqXHR);
+//					app.u.dump("textStatus: "); app.u.dump(textStatus);
+//					app.u.dump("errorThrown: "); app.u.dump(errorThrown);
+					}
+				}); //don't hard code to http or https. breaks safari and chrome.			
+
+			}
+		});
+
+*/
+
+
 	// Initialize the jQuery File Upload widget:
 	$selector.fileupload({
 		// Uncomment the following to send cross-domain cookies:
 		//xhrFields: {withCredentials: true},
-		url: document.location.protocol == 'file:' ? 'http://www.zoovy.com/jsonapi/upload/' : '/jsonapi/upload/', //don't hard code to http or https. breaks safari and chrome.
+		url: app.vars.jqurl+'upload/', //** 201346 -> more consistent to use this url
+//		url: document.location.protocol == 'file:' ? 'http://www.zoovy.com/jsonapi/upload/' : '/jsonapi/upload/', //don't hard code to http or https. breaks safari and chrome.
 		'limitConcurrentUploads' : 4,
 		maxNumberOfFiles : (mode == 'csvUploadToBatch') ? 1 : null, //for csv uploads, allow only 1 file to be selected.
 		success : function(data,textStatus){
@@ -905,8 +985,8 @@ if(selector && mode)	{
 			}
 		});
 	//$selector.bind('fileuploadadd', function (e, data) {}) //use this if a per-file-upload function is needed.
-	
-	function fileuploadstopped() {
+
+	function mediafileuploadstopped() {
 		app.u.dump(" -> MEDIALIB. this should only get run once, after the upload is done.");
 		var folderName = $('#mediaLibFileList ul').attr('data-fname'); /// for now, uploads will go to whatever folder is currently open
 
@@ -918,7 +998,19 @@ if(selector && mode)	{
 	//this bind is used to update the folder list AND the open folder. It's here so that it only occurs once instead as part of each file uploaded.
 	if(mode == 'mediaLibrary')	{
 //		app.u.dump(" -> MODE is mediaLibrary and we're now adding a bind:");
-		$selector.off('fileuploadstopped.jqfu').on('fileuploadstopped.jqfu',fileuploadstopped); //do not double-bind the event. remove then re-add.
+		$selector.off('fileuploadstopped.jqfu').on('fileuploadstopped.jqfu',mediafileuploadstopped); //do not double-bind the event. remove then re-add.
+		}
+	else if(mode == 'adminTicketFileAttach')	{
+		$selector.off('fileuploadstopped.jqfu').on('fileuploadstopped.jqfu',function(a){
+//			app.u.dump(" -> a: "); app.u.dump(a);
+			var ticketID = $("[name='ticketid']",a.target).val();
+			var uuid = $("[name='ticketid']",a.target).val();
+			if(ticketID && uuid && $(app.u.jqSelector('#','ticket_'+ticketID),'#supportContent').length)	{
+				app.ext.admin_support.u.loadTicketContent($(app.u.jqSelector('#','ticket_'+ticketID),'#supportContent'),ticketID,uuid,'mutable');
+				app.model.dispatchThis('mutable');
+				}
+			$('#ticketFileUploadModal').dialog('close');
+			}); //do not double-bind the event. remove then re-add.
 		}
 	// Enable iframe cross-domain access via redirect option:
 	$selector.fileupload(
@@ -1014,11 +1106,11 @@ else	{
 				}, //showFoldersByParentFID
 
 			buildDeleteMediaRequests : function(){
-				app.u.dump("BEGIN admin_medialib.u.buildDeleteMediaRequests");
+//				app.u.dump("BEGIN admin_medialib.u.buildDeleteMediaRequests");
 				$('#mediaFilesUL .btnDelete').each(function(){
 					if($(this).hasClass('ui-state-error'))	{
 						var data = $(this).closest('li').data();
-						app.u.dump(" -> match!"); app.u.dump(data);
+//						app.u.dump(" -> match!"); app.u.dump(data);
 						app.ext.admin_medialib.calls.adminImageDelete.init({'folder':data.fname,'file':data.name},{},'immutable');
 						}
 					else	{} //do nothing.
@@ -1029,19 +1121,19 @@ else	{
 //the root LI's contain UL's with their FID in the ID. (mediaChildren_FID) (arguably, should have been mediaChildrenOf_ to indicate better).
 //each of these UL's contain all the properties of the parent folder. fid, fname, etc
 			openMediaFolderByFilePath : function(path)	{
-				app.u.dump("BEGIN admin_medialib.u.openMediaFolderByFilePath ["+path+"]");
+//				app.u.dump("BEGIN admin_medialib.u.openMediaFolderByFilePath ["+path+"]");
 //if no slashes or periods, is a root category.
 				if(path && path.indexOf('/') == -1 && path.indexOf('.') == -1){
 					$("li[data-fname='"+path+"']:first",'#mediaLibFolderListUL').find('a:first').trigger('click');
 					}
 				else if(path)	{
-					app.u.dump(" -> is a sub folder");
+//					app.u.dump(" -> is a sub folder");
 					var pathArray = path.split('/');
 					var path2Now = pathArray[0]; //puts path back together again. each pass it adds a folder back, starting with the root and working down 2 the last.
 					var L = (path.indexOf('.') > -1) ? pathArray.length - 1 : pathArray.length; //if last spot is filename, ignore.
 //					app.u.dump(" -> L: "+L);
 					var $rootCat = $("li[data-fname='"+pathArray[0]+"']:first",'#mediaLibFolderListUL'); //$('#mediaRootFolder_'+pathArray[0])
-					app.u.dump(" -> $rootCat.length: "+$rootCat.length);
+//					app.u.dump(" -> $rootCat.length: "+$rootCat.length);
 					var fid = $rootCat.data('fid'); //root folder has fname in the id, but all properties in data.
 					var $tmp;
 					$('#mediaChildren_'+fid).toggle(); //turn first set of subfolders.
@@ -1054,7 +1146,7 @@ else	{
 // and the code earlier in this block opens the first subfolder.
 						for(i = 1; i < L; i += 1)	{
 							path2Now += "/"+pathArray[i];
-							app.u.dump(i+") path2Now: "+path2Now+" and fid: "+fid);
+//							app.u.dump(i+") path2Now: "+path2Now+" and fid: "+fid);
 							$tmp = $("[data-fname='"+app.u.jqSelector('',path2Now)+"']",$rootCat);
 							if($tmp.data('fname') == path2Now)	{$("a:first",$tmp).click();}
 							else	{$("ul",$tmp).toggle()} //don't activate click, which would trigger an ajax request. just open it.
@@ -1064,7 +1156,6 @@ else	{
 				else	{
 					app.u.throwGMessage("WARNING! no path specified an admin_medialib.u.openMediaFoldersByFilePath.");
 					}
-
 				},
 
 			resetAndGetMediaFolders : function(Q)	{
@@ -1161,7 +1252,8 @@ $('#mediaLibActionsBar button',$target).each(function(){
 			event.preventDefault(); //keeps button from submitting the form.
 	//		app.u.dump("Uploads Button Pushed.");
 			$('.fileUploadButtonBar',$target).show();
-			$('[type=file]',$target).click();
+			$('[type=file]',$target).click(); 
+//			$("[type='file']",$('#mediaLibInfiniteScroller')).trigger('click');
 			})
 		$button.button('disable');
 		}
@@ -1195,6 +1287,7 @@ $('#mediaLibActionsBar button',$target).each(function(){
 //next, delete the folder.
 
 				app.ext.admin_medialib.calls.adminImageFolderDelete.init(folderInfo['focus-folder-name'],{},'immutable');
+				$("#mediaFilesUL").empty(); //clear out any images in the list.
 				app.ext.admin_medialib.u.resetAndGetMediaFolders('immutable'); //will empty list and create dispatch.
 				app.model.dispatchThis('immutable');
 
@@ -1289,6 +1382,7 @@ var tabs = [
 	{"link":"/biz/setup/import/index.cgi?VERB=CUSTOMERS","name":"Customers","selected":0},
 	{"link":"/biz/setup/import/index.cgi?VERB=REVIEWS","name":"Reviews","selected":0},
 	{"link":"/biz/setup/import/index.cgi?VERB=NAVCATS","name":"Categories","selected":0},
+	{"link":"/biz/setup/import/index.cgi?VERB=VARIATIONS","name":"Variations","selected":0},
 	{"link":"/biz/setup/import/index.cgi?VERB=REWRITES","name":"URL Rewrites","selected":0},
 	{"link":"/biz/setup/import/index.cgi?VERB=ORDERS","name":"Orders","selected":0},
 	{"link":"/biz/setup/import/index.cgi?VERB=TRACKING","name":"Tracking","selected":0},
@@ -1401,7 +1495,8 @@ for(var i = 0; i < L; i += 1)	{
 							break;
 			
 						case 'downloadMedia':
-							window.open(app.u.makeImage({'name':$(this).closest('[data-path]').data('path')}));
+							app.u.dump(" -> $(this).closest('[data-path]').length: "+$ele.closest('[data-path]').length); app.u.dump($ele.closest('[data-path]').data());
+							window.open(app.u.makeImage({'name':$ele.closest('[data-path]').data('path')}));
 							break;
 						
 						default:

@@ -77,6 +77,7 @@ var admin_templateEditor = function() {
 						$D.empty().remove();
 						}
 
+
 					$D = $("<div \/>",{'id':'templateEditor','title':'Edit '+mode+' template'}).attr('data-app-role','templateEditor');
 					
 
@@ -1442,7 +1443,7 @@ var $input = $(app.u.jqSelector('#',ID));
 //executed when a template is selected.
 				templateChooserExec : function($ele)	{
 					if($ele.is('button'))	{$ele.button();}
-					$ele.off('click.templateChooserShow').on('click.templateChooserShow',function(event){
+					$ele.off('click.templateChooserExec').on('click.templateChooserExec',function(event){
 						event.preventDefault();
 						app.ext.admin_templateEditor.u.handleTemplateSelect($.extend(true,{},$('#templateChooser').data(),$ele.closest("[data-app-role='templateDetail']").data()));
 						});
@@ -1516,7 +1517,9 @@ var $input = $(app.u.jqSelector('#',ID));
 
 //used to upload a file (img, zip, .html, etc) into a profile or campaign.				
 				containerFileUploadShow : function($btn){
-					$btn.button({icons: {primary: "ui-icon-arrowthickstop-1-n"},text: ($btn.data('hidebuttontext')) ? false : true});
+					if($btn.is('button'))	{
+						$btn.button({icons: {primary: "ui-icon-arrowthickstop-1-n"},text: ($btn.data('hidebuttontext')) ? false : true});
+						}
 
 					if($btn.data('mode') == 'Site')	{
 						var domainname = $btn.closest("[data-domainname]").data('domainname');
@@ -1525,11 +1528,11 @@ var $input = $(app.u.jqSelector('#',ID));
 								//this domain has a project. open the editor. that occurs later as long as pass=true.
 								}
 							else	{
-								$btn.button('disable').attr('title','Upload not available because no project exists for this domain.');
+								$btn.hide();
 								}
 							}
 						else 	{
-							$btn.button('disable').attr('title','Upload not available because domain ['+domainname+'] data not in memory.');
+							$btn.hide();
 							}	
 						}
 
@@ -1761,14 +1764,23 @@ else	{
 
 //opens the template chooser interface.
 				templateChooserShow : function($btn)	{
-					$btn.button();
+					if($btn.is('button'))	{
+						$btn.button({icons: {primary: "ui-icon-power"},text: ($btn.data('hidebuttontext')) ? false : true}); //text defaults to on.
+						}
 					$btn.off('click.templateChooserShow').on('click.templateChooserShow',function(){
 
 						if($btn.data('mode') == 'Campaign')	{
 							app.ext.admin_templateEditor.a.showTemplateChooserInModal({"mode":"Campaign","campaignid":$btn.closest("[data-campaignid]").data('campaignid')});
 							}
 						else if ($btn.data('mode') == 'Site')	{
-							app.ext.admin_templateEditor.a.showTemplateChooserInModal({"mode":"Site","domain":$btn.closest("[data-domain]").data('domain')});
+							var domainname = $btn.closest("[data-domainname]").data('domainname');
+							var hostname = $btn.closest("[data-hostname]").attr('data-hostname');
+							if(hostname && domainname)	{
+								app.ext.admin_templateEditor.a.showTemplateChooserInModal({"mode":"Site","domain":hostname.toLowerCase()+'.'+domainname});
+								}
+							else	{
+								$('#globalMessaging').anymessage({'message':'In admin_templateEditor.e.templateEditorShow, unable to resolve domain name ['+domainname+'] and/or host name ['+hostname+'].','gMessage':true});
+								}
 							}
 						else if ($btn.data('mode') == 'EBAYProfile')	{
 							app.ext.admin_templateEditor.a.showTemplateChooserInModal({"mode":"EBAYProfile","profile":$btn.closest("[data-profile]").data('profile')});
@@ -1781,9 +1793,10 @@ else	{
 					}, //templateChooserShow
 
 				templateEditorShow : function($btn)	{
-					app.u.dump(" -> $btn.data('buttontext'): "+$btn.data('buttontext'));
-					$btn.button({icons: {primary: "ui-icon-wrench"},text: ($btn.data('hidebuttontext')) ? false : true}); //text defaults to on.
-					
+//					app.u.dump(" -> $btn.data('buttontext'): "+$btn.data('buttontext'));
+					if($btn.is('button'))	{
+						$btn.button({icons: {primary: "ui-icon-wrench"},text: ($btn.data('hidebuttontext')) ? false : true}); //text defaults to on.
+						}
 				
 					$btn.off('click.templateEditorShow').on('click.templateEditorShow',function(){
 						var pass = true;
@@ -1796,23 +1809,13 @@ else	{
 						else if ($btn.data('mode') == 'Site')	{
 							
 							var domainname = $btn.closest("[data-domainname]").data('domainname');
-							if(app.data['adminDomainDetail|'+domainname])	{
-								if(app.data['adminDomainDetail|'+domainname].PROJECTID)	{
-									//this domain has a project. open the editor. that occurs later as long as pass=true.
-									}
-								else	{
-									//no project set. open chooser.
-									pass = false;
-									app.ext.admin_templateEditor.a.showTemplateChooserInModal({"mode":"Site","domain":domainname});
-									}
-								}
-							else 	{
-								pass = false;
-								$('#globalMessaging').anymessage({'message':'In admin_templateEditor.e.templateEditorShow, domain detail is not in memory and is required.','gMessage':true});
-								}
+							var hostname = $btn.closest("[data-hostname]").attr('data-hostname');
 							
-							if(pass)	{
-								app.ext.admin_templateEditor.a.showTemplateEditor('Site',{"domain":$btn.closest("[data-domainname]").data('domainname')});
+							if(hostname && domainname)	{
+								app.ext.admin_templateEditor.a.showTemplateEditor('Site',{"domain":hostname.toLowerCase()+'.'+domainname});
+								}
+							else	{
+								$('#globalMessaging').anymessage({'message':'In admin_templateEditor.e.templateEditorShow, unable to resolve domain name ['+domainname+'] and/or host name ['+hostname+'].','gMessage':true});
 								}
 							}
 						else	{

@@ -1,6 +1,6 @@
 <table>
 <tr id='messageListTemplate'>
-	<td class='valignTop' data-bind="var:message(icon); format:addClass;className:msgIcon_;"></td>
+	<td class='valignTop app-icon' data-bind="var:message(icon); format:addClass;className:app-icon-;"></td>
 	<td class='valignTop'>
 	<h5 data-bind="var:message(origin); format:text;"></h5>
 	<h6 data-bind="var:message(msg); format:text;"></h6>
@@ -28,7 +28,6 @@
 PRODUCT FINDER/CHOOSER
 
 ########################################################
-
 
 -->
 
@@ -249,37 +248,6 @@ LANDING PAGE
 </tr>
 </table>
 
-<!--
-########################
-
-
-DOMAIN CONFIG
-
-
-########################
--->
-
-
-
-
-<div id='domainPanelTemplate' class='panel domainPanel stackedPanels' data-app-role='domainPanel'>
-	<h3 data-bind="var: domain(id); format: assignAttribute; attribute:data-domain;" data-verb="LOAD" onClick="adminUIDomainPanelExecute($(this));" class='panelHeader ui-accordion-header ui-helper-reset ui-state-default ui-accordion-header-default ui-state-default ui-corner-top ui-accordion-icons pointer clearfix'>
-		<span class="ui-accordion-header-icon ui-icon ui-icon-circle-arrow-e"></span>
-		<span data-bind="var: domain(id); format:text;"></span>
-	</h3>
-
-	<div class='panelContents displayNone ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-accordion-content-active marginBottom' >
-	
-	
-	<form action="#" onSubmit="return false;">
-	<fieldset data-app-role='domainEditorContents'></fieldset>
-	</form>
-	
-	</div>	
-
-</div>
-
-
 
 
 
@@ -352,11 +320,6 @@ SETUP PAGE TEMPLATE
 		<div class='stdPadding ui-widget-content ui-corner-bottom'>
 
 			
-			<a href="#" onClick="navigateTo('/biz/vstore/billing/index.cgi'); return false;" title="/biz/setup/billing/index.cgi">Billing History</a><br />
-			<div class="helper marginBottom">View your billing history, update payment information.</div>
-			
-			
-
 			<a href="#" onClick="navigateTo('/biz/vstore/builder/index.cgi?ACTION=COMPANYEDIT&amp;NS=DEFAULT'); return false;" title="/biz/vstore/builder/index.cgi?ACTION=COMPANYEDIT&amp;NS=DEFAULT">Company Information</a><br />
 			<div class="helper">Put in Logo, Address, Policies, etc.</div>
 
@@ -378,11 +341,13 @@ SETUP PAGE TEMPLATE
 				- <a href="#" onClick="navigateTo('/biz/vstore/builder/emails/index.cgi?VERB=EDIT&amp;NS=DEFAULT'); return false;" title="/biz/vstore/builder/emails/index.cgi?VERB=EDIT&amp;NS=DEFAULT">Edit Email Messages</a><br />
 				<div class="helper">Customize the emails that are sent to customers.</div>
 
-			
+
+			<!--			
 			<div >
 			<a href="#" onClick="navigateTo('/biz/vstore/navcats/index.cgi'); return false;" title="/biz/vstore/navcats/index.cgi">Categories &amp; Lists</a><br />
 			<div class="helper">Build your store category tree or add product lists.</div>
 			</div>
+			-->
 						
 			<div >
 			<a href="#" onClick="navigateTo('/biz/vstore/analytics/index.cgi'); return false;" title="/biz/vstore/analytics/index.cgi">Analytics &amp; Plugins</a><br />
@@ -407,6 +372,8 @@ SETUP PAGE TEMPLATE
 			<a href="#" onClick="navigateTo('/biz/vstore/checkout/index.cgi?MODE=INTERNATIONAL'); return false;" title="/biz/vstore/checkout/index.cgi?MODE=INTERNATIONAL">Languages &amp; Currencies</a><br />
 			<div class="helper">Configure which languages and currencies are available.</div>
 
+
+			
 <!--
 * 201338 -> doesn't work w/ new inventory system. WHIM is new version.
 			<a href="#" onClick="navigateTo('/biz/vstore/custom/zephyrsports.cgi'); return false;">Inventory Lookup</a>
@@ -490,6 +457,9 @@ SETUP PAGE TEMPLATE
 			<a href="#" onClick="navigateTo('#!globalSettings'); return false;">Global Settings</a><br />
 			<div class="helper marginBottom">Inventory &amp; Order settings in this area affect all sites managed from this account.</div>
 			
+			<a href="#" onClick="navigateTo('#!notifications'); return false;">Notifications</a><br />
+			<div class="helper marginBottom">Configure notifications based on system events.</div>
+			
 			<a href="#" onClick="navigateTo('#!partitionManager'); return false;">Partitions</a><br />
 			<div class="helper marginBottom">The ability to segment your settings, and databases for each site associated with this account.</div>
 
@@ -543,17 +513,15 @@ SETUP PAGE TEMPLATE
 	</div>
 	
 	
-	<div class='ui-widget-content ui-corner-all displayNone stdPadding' data-bind="var: domains(*nonfavorites); format:showIfSet;">
-<!--	<h3>Non Favorite Domains</h3>-->
-	<table class='fullWidth gridTable marginTop' data-app-role='domainListNonFavorites'>
-		<thead>
-		<tr>
-			<th>Domain</th>
-			<th>Partition</th>
-			<th></th>
-		</tr>
-		</thead>
-		<tbody data-bind="var: domains(*nonfavorites); format:processList; loadsTemplate:domainListTemplate;"></tbody>
+	<div class='ui-widget-content ui-corner-all stdPadding'>
+	<table class='fullWidth gridTable marginTop' data-app-role='domainListNonFavorites' data-bind="var: domains(@DOMAINS); format:processList; loadsTemplate:domainListTemplate;">
+	<thead>
+	<tr>
+		<th colspan='2'>Domain</th>
+		<th>Partition</th>
+		<th></th>
+	</tr>
+	</thead>
 	</table>
 	</div>
 	
@@ -561,41 +529,64 @@ SETUP PAGE TEMPLATE
 
 <ul>
 	
-	<li id='domainListFavoriteTemplate' class='ui-widget-content ui-corner-all domainPanel'>
-		<div class='marginBottom alignCenter'>
-		<img src='blank.gif' class='prodThumb' data-bind='useParentData:1; format:companyLogo; extension:admin;' width='160' height='80' />
+	<li id='domainListFavoriteTemplate' class='ui-widget-content ui-corner-all domainPanel positionRelative smallButton'>
+		<div class='alignCenter'>
+		<img src='blank.gif' class='prodThumb' data-bind='useParentData:1; format:companyLogo; extension:admin;' width='160' height='160' />
 		</div>
 		
-		<h4>
-			<span data-bind="var: domain(DOMAINNAME); format:text;"></span>
-			<span data-bind="var: domain(PRT); format:text; pretext:(;posttext:);" class='marginLeft'></span>
-		</h4>
-		<div class='buttonset marginTop' data-bind="var:domain(DOMAINNAME); format:assignAttribute; attribute:data-domain;">
+		<div class='positionAbsolute positionTop positionRight stdPadding' data-bind="var:domain(DOMAINNAME); format:assignAttribute; attribute:data-domain;"><!-- stdPadding aligns this button w/ host-buttons -->
 			<button data-app-event="admin|domainPutInFocus">Use Domain</button>
-			<button data-app-event="admin|domainView" data-mode='Site'>View Site</button>
-			<button data-app-event='admin_templateEditor|templateEditorShow' data-hidebuttontext='1' data-mode='Site'>Edit Project</button>
-<!-- buttons locked UNLESS a project is in place -->
-			<button data-app-event='admin_templateEditor|containerZipDownloadExec' data-mode='Site' data-hidebuttontext='true'>Download Zip of Template</button>
-			<button data-app-event='admin_templateEditor|containerFileUploadShow' data-mode='Site' data-hidebuttontext='true'>Upload Template Files</button>
-<!-- end project dependant buttons -->
-			
-			<button data-app-event="admin_config|adminDomainToggleFavoriteExec">Tag as Favorite</button>
-			<button data-app-event="admin_config|adminDomainDetailShow" data-mode='dialog'>Edit Domain Settings</button>
 		</div>
+		
+		<h4 class='alignCenter smallPadding'>
+			<span data-bind="var: domain(DOMAINNAME); format:text;"></span>
+			<span data-bind="var: domain(PRT); format:text; pretext:(;posttext:);"></span>
+		</h4>
+		
+
+	
+		<table class='fullWidth'>
+		<tbody data-bind="var: domain(@HOSTS); format:processList; loadsTemplate:domainListHostsRowTemplate;" data-app-role='domainHostsTbody'>
+		</tbody>
+		</table>
+	
 	</li>
 </ul>
 
+
+
+
+
 <table>
-<tr id='domainListTemplate'>
-	<td data-bind="var: domain(DOMAINNAME); format:text;"></td>
+
+<tbody id='domainListTemplate' data-bind="var: domain(@HOSTS); format:processList; loadsTemplate:domainListHostsRowTemplate;" data-element='domain'>
+<tr>
+	<td colspan='2'><h6 data-bind="var: domain(DOMAINNAME); format:text;"></h6></td>
 	<td data-bind="var: domain(PRT); format:text; hideZero:false;"></td>
-	<td class='alignRight'>
+	<td class='alignRight width50'>
+		<button data-app-event='admin_batchJob|batchJobExec' data-whitelist='DOMAINNAME,PRT' data-type='UTILITY/SITEMAP'>Update Sitemap</button>
 		<button data-app-event="admin|domainPutInFocus">Use Domain</button>
-		<button data-app-event="admin|domainView" data-mode='Site'>View Site</button>
 		<button data-app-event="admin_config|adminDomainToggleFavoriteExec">Tag as Favorite</button>
 		<button data-app-event="admin_config|adminDomainDetailShow" data-mode='dialog'>Edit Domain Settings</button>
 	</td>
 </tr>
+</tbody>
+
+
+<tr id='domainListHostsRowTemplate'  data-element='host'>
+	<td class='width1'><span class="ui-icon ui-icon-arrow-1-e marginLeft"></span></td>
+	<td>
+		<span data-bind="var: host(HOSTNAME); format:text;"></span>
+		<span data-bind="var: host(HOSTTYPE); format:text; pretext:(; posttext:);"></span>
+	</td>
+	<td></td>
+	<td class='alignRight width50'>
+	<button data-app-event="admin|domainView" data-mode='host'>View Site</button><!-- buttons that always show up should be on the right so they don't move -->
+	<span data-bind="var: host(HOSTTYPE); format:appHostButtons; extension:admin;" class='positionRelative'></span>
+	</td>
+</tr>
+
+
 </table>
 
 
@@ -658,6 +649,7 @@ UTILITIES PAGE TEMPLATE
 		<div class='stdPadding ui-widget-content ui-corner-bottom'>
 			<a href="#" onClick="navigateTo('#!batchManager'); return false;">Batch Manager</a><br />
 			<div class="helper marginBottom">A list of recently run batches, including reports and syndication published files</div>
+
 
 			
 						
@@ -1092,6 +1084,7 @@ ACHIEVEMENTS
 	<td data-bind="var: projects(CREATED_TS); format:text;" class='hideInDetailMode'></td>
 	<td data-bind="var: projects(UPDATED_TS); format:text;" class='hideInDetailMode'></td>
 	<td class='alignRight'>
+	<button data-app-event='admin|projectRemove'>Remove this Project</button>
 	<button data-app-event='admin|projectGitRepoOpen'>Visit GitHub Repo</button>
 	<button data-app-event='admin|projectLinkOpen'>Update Project From Repo</button>
 	<button data-app-event='admin|projectUpdateShow'>View Details</button><!-- this will eventually be 'edit' -->
@@ -1100,7 +1093,7 @@ ACHIEVEMENTS
 </table>
 
 
-<div id='projectDetailTemplate' class='labelsAsBreaks'>
+<div id='projectDetailTemplate' class='labelsAsBreaks clearfix'>
 
 	<h3 class='label' data-bind="var: project(TITLE); format:text;"></h3>
 	<div class='label' data-bind="var: project(ID); format:text; pretext:ID: ;"></div>
@@ -1223,7 +1216,7 @@ ACHIEVEMENTS
 	
 	<label>
 		<span>Feed Link</span>
-			<input type="url" name="feed_link" value="" data-bind="var: rss(feed_link); format: popVal;" />
+			<input type="text" name="LINK" value="" data-bind="var: rss(LINK); format: popVal;" readonly="readonly" />
 			<span class="toolTip" title="The URL to your store, or for this promotion.">?</span>
 	</label>
 	<label>
@@ -1341,13 +1334,13 @@ search tags: DMI
 
 	<section class='dualModeList' data-app-role='dualModeList'>
 		<div class='ui-widget-header ui-corner-top'><!-- do NOT add clearfix to this. screws up right column of panels -->
-			<div class='floatRight smallPadding' data-app-role='dualModeListButtons'>
+			<div class='floatRight smallPadding smallButton' data-app-role='dualModeListButtons'>
 			<button data-app-event='admin|toggleDualMode'>Toggle between list and detail view</button>
 			</div>
 			
 			<h1 class='dualModeHeader' data-app-role='dualModeListHeader'><!-- title will go here --></h1>
 		</div>
-		<div class='ui-state-default dualModeListControls clearfix' data-app-role='dualModeListControls'>
+		<div class='ui-state-default dualModeListControls smallButton' data-app-role='dualModeListControls'><!-- do NOT add clearfix to this. gets distorted when right panel is opened. -->
 		<!-- forms can go here (search) -->
 		</div>
 		
@@ -1424,8 +1417,10 @@ data-contentloaded is used to determine if dynamic content has already been load
 		<div data-bind="var: list(%CATEGORIES); format: manageCatsList; extension:admin_prodEdit; loadsTemplate:pickerManageCatsRowTemplate;"></div>
 		
 		<h6 data-pickmethod='CUSTOM'>Comma Separated List</h6>
+
 		<div data-contentloaded='true'>
 <textarea name='csv' rows='10' class='fullWidth'></textarea>
+<span class='hint'>use commas or linebreaks to separate each product</span>
 		</div>
 		
 	</div>

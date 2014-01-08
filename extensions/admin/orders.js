@@ -328,7 +328,7 @@ else	{
 			app.u.dump("BEGIN admin_orders.a.initOrderManager. targetID:"+P.targetID);
 //			app.u.dump(P);
 			app.ext.admin_orders.u.handleOrderListTab('deactivate');
-			var oldFilters = app.ext.admin.u.dpsGet('admin_orders');
+			var oldFilters = app.model.dpsGet('admin_orders');
 			if(P.filters){app.u.dump(" -> filters were passed in");} //used filters that are passed in.
 			else if(oldFilters != undefined)	{
 //				app.u.dump(" -> use old filters.");
@@ -355,8 +355,11 @@ else	{
 
 				$("[data-app-role='admin_orders|orderUpdateBulkEditMenu']",$target).menu().hide();
 				$("[data-app-role='admin_orders|itemUpdateBulkEditMenu']",$target).menu().hide();
-				
-				
+
+				//Adds the click events to the order bulk update dropdown menu. The render format that generates the list is shared, so the events are added separately.
+				$("[data-app-role='bulkEmailMessagesList']",$target).find('a').each(function(){
+					$(this).attr('data-app-click','admin_orders|bulkImpactOrderItemListExec');
+					})
 
 
 //note - attempted to add a doubleclick event but selectable and dblclick don't play well. the 'distance' option wasn't a good solution
@@ -408,14 +411,14 @@ else	{
 				if(P.filters.LIMIT)	{$('#filterLimit').val(P.filters.LIMIT)} //set default val for limit.
 
 //check to see which index in accordian was open last.
-				var settings = app.ext.admin.u.dpsGet('admin_orders','accordion') || {};
+				var settings = app.model.dpsGet('admin_orders','accordion') || {};
 				settings.active = settings.active || 0; //default to search.
 				$(".searchAndFilterContainer",$target).accordion({
 					heightStyle: "content",
 					collapsible: true,
 					active : settings.active,
 					change : function(e,ui)	{
-						app.ext.admin.u.dpsSet('admin_orders','accordion',{'active':$(this).accordion('option', 'active')}); //update settings with active accordion index.
+						app.model.dpsSet('admin_orders','accordion',{'active':$(this).accordion('option', 'active')}); //update settings with active accordion index.
 						}
 					});
 				
@@ -452,7 +455,6 @@ else	{
 				}
 //			app.u.dump("END initOrderManager");
 			}, //initOrderManager
-
 
 //will open dialog so users can send a custom message (content 'can' be based on existing message) to the user. order specific.
 //though not a modal, only one can be open at a time.
@@ -582,6 +584,7 @@ app.ext.admin.u.handleAppEvents($order);
 
 		//now is the time on sprockets when we enhance.
 		//go through lineitems and make item-specific changes. locking inputs. color changes, etc.
+		//INVDETAIL 'may' be blank.
 		if(orderData['@ITEMS'] && orderData['%INVDETAIL'])	{
 			var $table = $("[data-app-role='orderContentsTable']",$order); //used for context.
 			var L = orderData['@ITEMS'].length;
@@ -593,9 +596,10 @@ app.ext.admin.u.handleAppEvents($order);
 					$('li',$menu).hide();  //hide all the items in the base type menu. show as needed. li is used to hide (as opposed to using anchor) otherwise extra spacing occurs
 					//done means done. no adjusting price or quantity at this point.
 					if(invDetail.BASETYPE == "DONE")	{
-						$tr.attr('title','This item has been shipped. It is no longer editable');
-						$('button',$tr).button('disable');
-						$(':input',$tr).prop('disabled','disabled');
+//						$tr.attr('title','This item is DONE. It is no longer editable');
+						$tr.attr('title','This item is DONE. Be very cautions about editing it.');
+//						$('button',$tr).button('disable'); //** 201346 -> commented out for holidays (till we have a permanent solution.
+//						$(':input',$tr).prop('disabled','disabled'); //** 201346 -> commented out for holidays (till we have a permanent solution.
 						}
 					else if(invDetail.BASETYPE == 'UNPAID')	{
 						$("button[data-app-role='inventoryDetailOptionsButton']",$tr).button('disable').attr('title',"This item is unpaid. The base type can not be modified.");
@@ -794,7 +798,7 @@ else	{
 				var actions = app.ext.admin_orders.u.determinePaymentActions(data.value), //returns actions as an array.
 				L = actions.length;
 				if(L > 0)	{
-					$select = $("<select \/>").attr('name','action').data(data.value);
+					var $select = $("<select \/>").attr('name','action').data(data.value);
 					$select.off('change.showActionInputs').on('change.showActionInputs',function(){
 						var $tr = $(this).closest('tr');
 						if($(this).val())	{
@@ -822,9 +826,10 @@ else	{
 //used for adding email message types to the actions dropdown.
 //recycled in list mode and edit mode. #MAIL| is important in list mode and stripped in edit mode during click event.
 //designed for use with the vars object in this extension, not the newer adminEmailList _cmd
+//this is shared, so do NOT add an app-click to the li here, do it with JS. -> used by bulk edit AND in order edit.
 		emailMessagesListItems : function($tag,data)	{
 			for(key in data.value)	{
-				$tag.append("<li class='emailmsg_"+key.toLowerCase()+"'><a href='#MAIL|"+key+"' data-app-click='admin_orders|bulkImpactOrderItemListExec'>"+data.value[key]+" ("+key+")</a></li>");
+				$tag.append("<li class='emailmsg_"+key.toLowerCase()+"'><a href='#MAIL|"+key+"' >"+data.value[key]+" ("+key+")</a></li>");
 				}
 			},
 
@@ -1105,7 +1110,7 @@ else	{
 				//tab already exists. don't create a duplicate.
 				}
 			else	{
-				$table.stickytab({'tabtext':'order results','tabID':'productListTab'});
+				$table.stickytab({'tabtext':'order results','tabID':'productListTab','handleEventDelegation':true});
 //make sure buttons and links in the stickytab content area close the sticktab on click. good usability.
 				$('button, a',$table).each(function(){
 					$(this).off('close.stickytab').on('click.closeStickytab',function(){
@@ -1142,7 +1147,7 @@ else	{
 				}
 			else	{
 //						app.u.dump(" -> filter change is getting set locally.");
-				app.ext.admin.u.dpsSet('admin_orders','managerFilters',obj);
+				app.model.dpsSet('admin_orders','managerFilters',obj);
 //						app.u.dump("Filter Obj: "); app.u.dump(obj);
 				app.model.destroy('adminOrderList'); //clear local storage to ensure request
 				app.ext.admin_orders.a.showOrderList(obj);
@@ -1735,7 +1740,8 @@ $('.editable',$container).each(function(){
 									}
 								else	{
 									//success content goes here.
-									$tbody.anycontent(rd)
+									$tbody.anycontent(rd);
+									app.u.handleButtons($tbody);
 									}
 								}
 							}
@@ -1774,13 +1780,13 @@ $('.editable',$container).each(function(){
 					});
 				$tbody.closest('table').data("ui-selectable")._mouseStop(null); // trigger the mouse stop event 
 				}, //orderListUpdateDeselectAll
-			
+
 			"bulkImpactOrderItemListExec" : function($ele,P)	{
 
 				if($ele.attr('href') == '#')	{
 				//if the li has a child list, do nothing on click, the children contain the actions.
 					app.u.dump(" -> selected command has children.");
-					} 
+					}
 				else	{
 					var command = $ele.attr('href').substring(1), //substring drops the #. will = POOL|PENDING or  PRNT|INVOICE
 					actionType = command.substring(0,4); //will = PRNT or POOL. 4 chars
@@ -1820,8 +1826,17 @@ $('.editable',$container).each(function(){
 
 //the edit button in the order list mode. Will open order editable format.
 			"orderUpdateShowEditor" : function($ele,P){
-				var orderID = $ele.attr('data-orderid'),
-				CID = $ele.closest('tr').attr('data-cid'); //not strictly required, but helpful.
+				var
+					orderID,
+					CID = $ele.closest('tr').attr('data-cid') || ""; //not strictly required, but helpful.
+					
+				if($ele.data('mode') == 'inventoryDetail')	{
+					orderID = $ele.closest('[data-our_orderid]').attr('data-our_orderid');
+					}
+				else	{
+					orderID = $ele.attr('data-orderid');
+					}
+				
 				if(orderID)	{
 					app.ext.admin_orders.u.handleOrderListTab('activate');
 					$(app.u.jqSelector('#',"ordersContent")).empty();
@@ -2223,7 +2238,7 @@ else	{
 				menu.css({'position':'absolute','width':'300px','z-index':'10000'}).parent().css('position','relative');
 				
 				menu.find('li a').each(function(){
-					$(this).on('click',function(event){
+					$(this).off('click.sendmail').on('click.sendmail',function(event){
 						event.preventDefault();
 						if($(this).attr('href') == '#MAIL|CUSTOMMESSAGE')	{
 							app.ext.admin_orders.a.showCustomMailEditor(orderID,app.data["adminOrderDetail|"+orderID].our.prt || 0); //if partition isn't set, use default partition.
@@ -2236,6 +2251,7 @@ else	{
 							}
 						});
 					});
+
 
 //simply trigger the dropdown on the next button in the set.
 				$btn.off('click.orderEmailShowMessageList').on('click.orderEmailShowMessageList',function(event){
@@ -2582,9 +2598,10 @@ else	{
 								cmd = "ITEM-UUID-DONE?"
 								}
 							cmd += "UUID="+uuid;
-//							app.u.dump(" -> CMD: "+cmd);
+							app.u.dump(" -> CMD: "+cmd);
+							app.u.dump(" -> orderID: "+orderID);
 							app.ext.admin.calls.adminOrderMacro.init(orderID,[cmd],{});
-							app.ext.admin_orders.a.showOrderView(orderID,app.data['adminOrderDetail|'+orderID].customer.cid,$ele.closest("[data-order-view-parent]"),'immutable');
+							app.ext.admin_orders.a.showOrderView(orderID,app.data['adminOrderDetail|'+orderID].customer.cid,$ele.closest("[data-order-view-parent]").intervaledEmpty().attr('id'),'immutable');
 							app.model.dispatchThis('immutable');
 							}
 						else	{
@@ -2599,6 +2616,33 @@ else	{
 				},
 
 
+			adminOrderMacroExec : function($ele,p)	{
+				var orderID = $ele.closest("[data-orderid]").attr('data-orderid');
+				if(orderID)	{
+					app.model.addDispatchToQ({
+						'_cmd':'adminOrderMacro',
+						'orderid' : orderID,
+						'@updates' : [$ele.attr('data-macro-cmd')],
+						'_tag':	{
+							'callback':function(rd){
+	//this is used in orders > routes for inventory detail. test there if changes are made.
+								if(app.model.responseHasErrors(rd)){
+									$ele.parent().anymessage({'message':rd}); //tag is a button.
+									}
+								else	{
+									$ele.parent().empty().anymessage(app.u.successMsgObject('Route assigned'));
+									app.ext.admin_orders.a.showOrderView(orderID,'','ordersContent')
+									}
+								}
+							}
+						},'immutable');
+					app.model.dispatchThis('immutable');
+					}
+				else	{
+					$ele.parent().anymessage({"message":"In admin_orders.e.adminOrderMacroExec, unable to ascertain order ID.","gMessage":true});
+					}
+				},
+
 			routingDialogShow : function($ele)	{
 				$ele.button(); //{icons: {primary: "ui-icon-gear",secondary: "ui-icon-triangle-1-s"},text: true}
 				$ele.off('click.itemHandleRoutingExec').on('click.itemHandleRoutingExec',function(e){
@@ -2611,9 +2655,9 @@ else	{
 							'title' : 'Routing options for '+uuid,
 							'showLoading' : false
 							});
-						$D.append("<table><tbody data-bind='var: routes(@ROWS); format:processList; loadsTemplate:itemRoutesTemplate;'></tbody></table>");
+						$D.append("<table data-orderid='"+orderID+"'><tbody data-bind='var: routes(@ROUTES); format:macros2Buttons; extension:admin; _cmd:adminOrderMacro;'></tbody></table>");
 						$D.dialog('open');
-												
+						app.u.handleEventDelegation($D);
 						app.model.addDispatchToQ({
 							'_cmd':'adminOrderRouteList',
 							'orderid' : orderID,

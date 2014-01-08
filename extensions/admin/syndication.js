@@ -83,6 +83,7 @@ var admin_syndication = function() {
 				
 				
 				if(macroResponses && macroResponses['@RESPONSES'])	{
+					macroResponses.persistent = true; //leave messages open.
 					$target.anymessage(macroResponses);
 					}
 				else	{
@@ -1062,14 +1063,14 @@ if(mode == 'test' || mode == 'update')	{
 						}
 					
 					setShippingServices('dom');
-					if(sfo['InternationalShipping\@BOOLEAN'] == 1)	{
+					if(sfo['InternationalShipping\\@BOOLEAN'] == 1)	{
 						setShippingServices('int');
 						}
 					else	{
 //international shipping is disabled, so nuke all international settings. This is how eBay wants the data (empty if disabled)
-						sfo['Item\ShipToLocations\@ARRAY'] = [];
-						sfo['Item\ShippingDetails\InternationalInsuranceDetails\InsuranceOption'] = "";
-						sfo['Item\ShippingDetails\InternationalInsuranceDetails\InsuranceFee@CURRENCY'] = "";
+						sfo['Item\\ShipToLocations\\@ARRAY'] = [];
+						sfo['Item\\ShippingDetails\\InternationalInsuranceDetails\\InsuranceOption'] = "";
+						sfo['Item\\ShippingDetails\\InternationalInsuranceDetails\\InsuranceFee@CURRENCY'] = "";
 						sfo['@ship_intservices'] = [];
 						}
 //form inputs used in shipping. shouldn't be saved into the profile. Won't hurt, but let's keep it clean.
@@ -1599,11 +1600,65 @@ after that cmd is sent, the modal is closed and the original input is updated. I
 				
 				}, //ebayTokenDeleteButtonset
 
+			ebayTokenVerify : function($btn)	{
+				$btn.button();
+				$btn.off('click.ebayTokenVerify').on('click.ebayTokenVerify',function(){
+					//get a token and use that in the redirect to ebay.					
+					app.model.addDispatchToQ({
+						'_cmd':'adminPartnerSet',
+						'partner' : 'EBAY',
+						'SessionID' : app.data.adminPartnerGet.SessionID,
+						'RuName' : app.data.adminPartnerGet.RuName,
+						'_tag':	{
+							'datapointer' : 'adminPartnerSet',
+							'callback':function(rd){
+								if(app.model.responseHasErrors(rd)){
+									$('#globalMessaging').anymessage({'message':rd});
+									}
+								else	{
+									$('#globalMessaging').anymessage({'message':'eBay authorization is now complete.','errtype':'success'});
+									//reload the ebay interface so that presence of valid token enables UI as needed.
+									app.ext.admin_syndication.a.showDSTDetails('EBF',$btn.closest("[data-app-role='slimLeftContentSection']"))
+									}
+								}
+							}
+						},'mutable');
+					app.model.dispatchThis('mutable');						
+					})
+				},
+
+
 			ebayTokenLinkTo : function($btn)	{
 				$btn.button();
 				$btn.off('click.ebayGetToken').on('click.ebayGetToken',function(){
-					var url = $btn.data('sandbox') ==1 ? 'https://signin.sandbox.ebay.com/saw-cgi/eBayISAPI.dll?SignIn&runame=Zoovy-gtagruve-tly&ruparams='+encodeURIComponent('linkFrom=ebay-token&partner=EBAY&trigger=adminPartnerSet&sb=1') : 'https://signin.ebay.com/saw-cgi/eBayISAPI.dll?SignIn&runame=Zoovy-gtagruv3-ronj&ruparams='+encodeURIComponent('linkFrom=ebay-token&partner=EBAY&trigger=adminPartnerSet')
-					linkOffSite(url); //ruparams are what we get back on the URI, as well as ebaytkn, tknexp and username (which is the ebay username).
+//get a token and use that in the redirect to ebay.					
+app.model.addDispatchToQ({
+	'_cmd':'adminPartnerGet',
+	'partner' : 'EBAY',
+	'_tag':	{
+		'datapointer' : 'adminPartnerGet',
+		'callback':function(rd){
+			if(app.model.responseHasErrors(rd)){
+				$('#globalMessaging').anymessage({'message':rd});
+				}
+			else	{
+				if(app.data[rd.datapointer].SessionID && app.data[rd.datapointer].RuName)	{
+				//show the button the user needs to click. disable the rest to avoid confusion.
+					$btn.parent().find('button').button('disable').end().find("button[data-app-event='admin_syndication|ebayTokenVerify']").button('enable').show().end().anymessage({'message':'Upon returning from eBay, you MUST push the complete authorization button below to finish the process','errtype':'todo','persistent':true});
+					//no, that's not a typo, ebay is expecting SessID. We left it as SessionID because that's how it is referred to EVERYWHERE else.
+					linkOffSite(($btn.data('sandbox') == 1 ? 'https://signin.sandbox.ebay.com' : 'https://signin.ebay.com') + '/ws/eBayISAPI.dll?SignIn&RuName='+app.data[rd.datapointer].RuName+'&SessID='+encodeURIComponent(app.data[rd.datapointer].SessionID),'ebay.com to continue this registration process','',true);
+					}
+				else	{
+					$('#globalMessaging').anymessage({'message':'The response for appPartnerGet did not include SessionID ['+app.data[rd.datapointer].SessionID+'] and/or RuName ['+app.data[rd.datapointer].RuName+']. Both are required.','gMessage':true,'errtype':'fail-soft'});
+					}
+				}
+			}
+		}
+	},'mutable');
+app.model.dispatchThis('mutable');					
+					
+//					var url = $btn.data('sandbox') ==1 ? 'https://signin.sandbox.ebay.com/saw-cgi/eBayISAPI.dll?SignIn&runame=Zoovy-gtagruve-tly&ruparams='+encodeURIComponent('linkFrom=ebay-token&partner=EBAY&trigger=adminPartnerSet&sb=1&domain='+document.domain) : 'https://signin.ebay.com/saw-cgi/eBayISAPI.dll?SignIn&runame=Zoovy-gtagruv3-ronj&ruparams='+encodeURIComponent('linkFrom=ebay-token&partner=EBAY&trigger=adminPartnerSet&domain='+document.domain);
+//					linkOffSite(url); //ruparams are what we get back on the URI, as well as ebaytkn, tknexp and username (which is the ebay username).
 					});
 				}, //ebayTokenLinkTo
 

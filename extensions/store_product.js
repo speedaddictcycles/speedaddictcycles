@@ -353,7 +353,7 @@ addToCart : function (pid,$form){
 //add all the necessary fields for quantity inputs.
 			atcQuantityInput : function($tag,data)	{
 				var $input = $("<input \/>",{'name':'qty'});
-				if(app.ext.store_product.u.productIsPurchaseable(data.value.pid) || data.value['%attribs']['zoovy:grp_children'])	{
+				if(app.ext.store_product.u.productIsPurchaseable(data.value.pid))	{
 					$input.attr({'size':3,'min':0,'step':1,'type':'number'}).appendTo($tag);
 					$input.on('keyup.classChange',function(){
 						if(Number($(this).val()) > 0){$(this).addClass('qtyChanged ui-state-highlight');}
@@ -541,13 +541,13 @@ it has no inventory AND inventory matters to merchant
 //if variations are NOT present, inventory count is readily available.
 				if(app.data['appProductGet|'+pid])	{
 					if((app.data['appProductGet|'+pid]['@variations'] && $.isEmptyObject(app.data['appProductGet|'+pid]['@variations'])) && !$.isEmptyObject(app.data['appProductGet|'+pid]['@inventory']))	{
-						inv = Number(app.data['appProductGet|'+pid]['@inventory'][pid].inv);
+						inv = Number(app.data['appProductGet|'+pid]['@inventory'][pid].AVAILABLE);
 	//					app.u.dump(" -> item has no variations. inv = "+inv);
 						}
 	//if variations ARE present, inventory must be summed from each inventory-able variation.
 					else	{
 						for(var index in app.data['appProductGet|'+pid]['@inventory']) {
-							inv += Number(app.data['appProductGet|'+pid]['@inventory'][index].inv)
+							inv += Number(app.data['appProductGet|'+pid]['@inventory'][index].AVAILABLE)
 							}
 	//					app.u.dump(" -> item HAS variations. inv = "+inv);
 						}
@@ -622,7 +622,7 @@ NOTES
 						}
 					
 					
-					$parent.dialog('open');
+					$parent.dialog('open').append(app.renderFunctions.createTemplateInstance(P.templateID,P));
 
 					app.ext.store_product.calls.appProductGet.init(P.pid,{'callback': function(rd){
 						if(app.model.responseHasErrors(rd)){
@@ -630,12 +630,12 @@ NOTES
 							}
 						else	{
 							$parent.dialog( "option", "title", app.data["appProductGet|"+P.pid]['%attribs']['zoovy:prod_name'] );
-							$parent.anycontent({'templateID':P.templateID,'datapointer':"appProductGet|"+P.pid});
+							$parent.anycontent({'templateID':P.templateID,'translateOnly':true,'datapointer':"appProductGet|"+P.pid});
 							}
 						}});
 					app.ext.store_product.calls.appReviewsList.init(P.pid); //
 					app.model.dispatchThis();
-
+					app.u.handleCommonPlugins($parent);
 					}
 				else	{
 					app.u.dump(" -> pid ("+P.pid+") or templateID ("+P.templateID+") not set for viewer. both are required.");
@@ -727,7 +727,7 @@ NOTES
 				if($form && $form.length && $form.is('form'))	{
 					var cartObj = app.ext.store_product.u.buildCartItemAppendObj($form);
 					if(cartObj)	{
-						app.u.dump(" -> have a valid cart object"); app.u.dump(cartObj);
+//						app.u.dump(" -> have a valid cart object"); app.u.dump(cartObj);
 						if(cartObj)	{
 							r = true;
 							app.calls.cartItemAppend.init(cartObj,_tag || {},'immutable');

@@ -64,7 +64,7 @@ body {
 	z-index: 1;
 }
 
-#header .logoContainer .logo {
+#header .logoContainer .logoLink {
 	position:relative;
 	z-index: 2;
 }

@@ -2,7 +2,7 @@
 
 <div id='mediaLibTemplate'>
 
-<form id="mediaLibUploadForm" action="https://www.zoovy.com/webapi/jquery/fileupload.cgi/" method="POST" enctype="multipart/form-data">
+<form id="mediaLibUploadForm" action="#" onsubmit="return false;" method="POST" enctype="multipart/form-data">
 <table class='mediaLibrary'>
 <tr>
 	<td>
@@ -166,12 +166,26 @@ the data-btn-action='selectUploads' triggers a click of the span btn-success bel
 </div>
 
 
+<!--
+not in use yet.
+<div id='fileUploadFilePreviewTemplate'>
+	<span class='fileUpload_file fileUpload_default'></span>
+	<b data-bind="var: file(name); format:text;"></b><br />
+	<span data-bind="var: file(size); format:text; pretext:size: ;"></span><br />
+	<span data-bind="var: file(type); format:text; pretext:type: ;"></span><br />
+	<span data-bind="var: file(lastModifiedData); format:text; pretext:last modified: ;"></span>
+</div>
+-->
+
+<div id='fileUploadTemplate_anyupload' data-app-role='anyuploadContainer' class='genericFileUpload width50'>
+<!-- here for some backward compatibility -->
+</div>
 
 
 
 <div id='fileUploadTemplate'>
 
-<div id='fileUploadMessaging'></div>
+	<div id='fileUploadMessaging'></div>
 
 <!-- START JQFU CODE THAT SHOULD BE LOADED FROM DIV ABOVE -->
 <fieldset class='borderNone'>
@@ -360,6 +374,20 @@ PAGE TEMPLATES FOR setup/import
 
 
 
+<div class='page pageSetup pageSetupImport'  id='page-setup-import-variations'>
+<h1>Load Variations from CSV File</h1>
+<form name="csvUploadToBatchForm" id="csvUploadToBatchForm" class='clearfix marginBottom'  action='#' method='post' enctype='multipart/form-data'>
+<input type='hidden' name='filetype' value='VARIATIONS'>
+
+<!-- adds the file upload area -->
+<div data-bind="loadsTemplate: fileUploadTemplate; format: loadsTemplate;"></div>
+
+
+</form>
+</div>
+
+
+
 <div class='page pageSetup pageSetupImport'  id='page-setup-import-help'>
 
 <h1>Welcome to the Comma Separated Value (CSV) Import utility.</h1>
@@ -413,6 +441,7 @@ account being billed for the time necessary to diagnose and repair the issue.
 <form name="csvUploadToBatchForm" id="csvUploadToBatchForm" class='clearfix marginBottom'  action='#' method='post' enctype='multipart/form-data'>
 <input type='hidden' name='filetype' value='INVENTORY'>
 <fieldset>
+	<h3>Import Type &amp; Target</h3>
 	<label><input type='radio' name='HEADERS' checked value='BASETYPE=SIMPLE'> SIMPLE (%SKU,%QTY,%NOTE,%COST)</label>
 
 	<div data-app-role='fileImportWMSContainer'></div>
@@ -431,7 +460,11 @@ account being billed for the time necessary to diagnose and repair the issue.
 	<label><input type="checkbox" name="ENABLEINVENTORY"> Enable Inventory for each SKU imported</label>
 	<label><input type="checkbox" name="STRIPDASH"> Strip Dashes from SKU field.</label>
 -->
-	<label><input type="checkbox" name="INCREMENTAL"> Incremental: Treat %QTY as ADD/SUB (+/-) instead of SET.</label>
+	<h3>Action</h3>
+	<label><input type="radio" name="CMD" checked value="SET"> SET: %QTY is the absolute number.</label>
+	<label><input type="radio" name="CMD" value="INC"> INC: %QTY is an incremental (+/-) number that should be added or removed.</label>
+	<label><input type="radio" name="CMD" value=""> CMD: Use the CMD= specified in file header, or %CMD column.</label>
+	<br>
 	<label><input type="checkbox" name="CHECKSKU"> Skip Invalid: Verify PID's exist and SKU's are valid.</label>
 </fieldset>
 
@@ -590,7 +623,7 @@ Columns headers are as follows:<br />
 	<label><input form="csvUploadToBatchForm" type="checkbox" name="PRODNAVCAT" CHECKED> Configure Management Categories using Navigation Categories schema.</label>
 	<label><input form="csvUploadToBatchForm" type='checkbox' name="REMOVEREST"> Remote System Synchronization: Delete products which were are not found in this import.</label>
 	<label><input form="csvUploadToBatchForm" type="checkbox" name="RESORT_NAVCATS"> Reorder navigation categories after import. (only necessary if updating category sort fields via update - VERY SLOW)</label>
-	<label><input form="csvUploadToBatchForm" type="checkbox" name="NONDESTRUCTIVE" CHECKED> Perform Non-Destructive Import - updates products, rather than doing a complete overwrite of a products data! (slower)</label>
+	<label><input form="csvUploadToBatchForm" type="checkbox" name="DESTRUCTIVE" > Destructive Import - deletes all data from product before doing import (very dangerous)</label>
 </fieldset>
 
 <!-- adds the file upload area -->

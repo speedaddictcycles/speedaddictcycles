@@ -82,7 +82,7 @@ function zoovyModel() {
 	var r = {
 	
 		
-		version : "201336",
+		version : "201346",
 		
 		
 	// --------------------------- GENERAL USE FUNCTIONS --------------------------- \\
@@ -289,7 +289,7 @@ function zoovyModel() {
 			if(app.globalAjax.overrideAttempts < 30)	{
 				setTimeout("app.model.dispatchThis('"+QID+"')",500); //try again soon. if the first attempt is still in progress, this code block will get re-executed till it succeeds.
 				}
-			else if(app.globalAjax.overrideAttempts < 60)	{
+			else if(app.globalAjax.overrideAttempts < 75)	{
 // slow down a bit. try every second for a bit and see if the last response has completed.
 				setTimeout("app.model.dispatchThis('"+QID+"')",1000); //try again. if the first attempt is still in progress, this code block will get re-executed till it succeeds or until
 				}
@@ -396,9 +396,9 @@ can't be added to a 'complete' because the complete callback gets executed after
 			for(var index in Q) {
 				app.model.changeDispatchStatusInQ(QID,Q[index]['_uuid'],'abort');
 				}
-
 			}
 		else	{
+//			app.u.dump(j);
 			app.u.dump(' -> REQUEST FAILURE! Request returned high-level errors or did not request: textStatus = '+textStatus+' errorThrown = '+errorThrown);
 //			app.u.dump("pipeUUID: "+pipeUUID);
 			delete app.globalAjax.requests[QID][pipeUUID];
@@ -410,9 +410,9 @@ can't be added to a 'complete' because the complete callback gets executed after
 			}
 		});
 
-	app.globalAjax.requests[QID][pipeUUID].success(function(d)	{
-		delete app.globalAjax.requests[QID][pipeUUID];
-		app.model.handleResponse(d,QID);
+		app.globalAjax.requests[QID][pipeUUID].success(function(d)	{
+			delete app.globalAjax.requests[QID][pipeUUID];
+			app.model.handleResponse(d,QID,Q);
 			}
 		)
 	r = pipeUUID; //return the pipe uuid so that a request can be cancelled if need be.
@@ -458,7 +458,7 @@ set adjustAttempts to true to increment by 1.
 				msgDetails += "<li>release: "+app.model.version+"|"+app.vars.release+"<\/li>";
 				msgDetails += "<\/ul>";
 				
-				this.handleErrorByUUID(uuid,QID,{'errid':666,'errtype':'ISE','persistent':true,'errmsg':'The request has failed. The app may continue to operate normally.<br \/>Please try again or contact the site administrator with the following details:'+msgDetails})
+				this.handleErrorByUUID(uuid,QID,{'errid':666,'errtype':'ise','persistent':true,'errmsg':'The request has failed. The app may continue to operate normally.<br \/>Please try again or contact the site administrator with the following details:'+msgDetails})
 				}
 			},
 	
@@ -531,25 +531,29 @@ set adjustAttempts to true to increment by 1.
 QID is the dispatchQ ID (either passive, mutable or immutable. required for the handleReQ function.
 	*/
 	
-		handleResponse : function(responseData,QID)	{
+		handleResponse : function(responseData,QID,Q)	{
 //			app.u.dump('BEGIN model.handleResponse.');
 			
 //if the request was not-pipelined or the 'parent' pipeline request contains errors, this would get executed.
 //the handlereq function manages the error handling as well.
 			if(responseData && !$.isEmptyObject(responseData))	{
 				var uuid = responseData['_uuid'];
-				var QID = QID || this.whichQAmIFrom(uuid); //don't pass QID in. referenced var that could change before this block is executed.
-				
-//				app.storageFunctions.writeLocal("response_"+uuid, JSON.stringify(responseData),'session'); //save a copy of each dispatch to sessionStorage for entymologist
+				var QID = QID || this.whichQAmIFrom(uuid);
 				
 //				app.u.dump(" -> responseData is set. UUID: "+uuid);
 //if the error is on the parent/piped request, no qid will be set.
 //if an iseerr occurs, than even in a pipelined request, errid will be returned on 'parent' and no individual responses are returned.
 				if(responseData && (responseData['_rcmd'] == 'err' || responseData.errid))	{
-					
+					app.u.dump(' -> API Response for '+QID+' Q contained an error at the top level (on the pipe)','warn');
+					if(Q && Q.length)	{
+//						app.u.dump(" -> Q.length: "+Q.length); app.u.dump(Q);
+						for(var i = 0, L = Q.length; i < L; i += 1)	{
+							this.handleErrorByUUID(Q[i]._uuid,QID,responseData);
+							}
+						}
 //QID will b set if this is a NON pipelined request.
-					if(QID)	{
-						app.u.dump(' -> High Level Error in '+QID+' response!');
+// could get here in a non-pipelined request.
+					else if(QID)	{
 //					app.u.dump(responseData);
 						this.handleErrorByUUID(responseData['_uuid'],QID,responseData);
 						}
@@ -721,14 +725,16 @@ QID is the dispatchQ ID (either passive, mutable or immutable. required for the 
 			var status = null; //status of request. will get set to 'error' or 'completed' later. set to null by defualt to track cases when not set to error or completed.
 			var hasErrors = app.model.responseHasErrors(responseData);
 //			app.u.dump(" -> handleresponse "+responseData._rcmd+" uuid: "+uuid+" and hasErrors: "+hasErrors);
-//			app.u.dump(" -> responseData:"); app.u.dump(responseData);
+			if(responseData._rcmd == 'adminTicketFileGet')	{
+				app.u.dump(" -> responseData:"); app.u.dump(responseData);
+				}
 
 			if(!$.isEmptyObject(responseData['_rtag']) && app.u.isSet(responseData['_rtag']['callback']))	{
 	//callback has been defined in the call/response.
 				callback = responseData['_rtag']['callback']; //shortcut
-//				app.u.dump(' -> callback: '+callback);
+//				app.u.dump(' -> callback: '+(typeof callback == 'string' ? callback : 'function'));
 				if(typeof callback == 'function'){} //do nothing to callback. will get executed later.
-				else if(responseData['_rtag']['extension'] && !$.isEmptyObject(app.ext[responseData['_rtag']['extension']].callbacks[callback]))	{
+				else if(responseData['_rtag']['extension'] && app.ext[responseData['_rtag']['extension']] && app.ext[responseData['_rtag']['extension']].callbacks && !$.isEmptyObject(app.ext[responseData['_rtag']['extension']].callbacks[callback]))	{
 					callback = app.ext[responseData['_rtag']['extension']].callbacks[callback];
 //					app.u.dump(' -> callback node exists in app.ext['+responseData['_rtag']['extension']+'].callbacks');
 					}
@@ -738,7 +744,7 @@ QID is the dispatchQ ID (either passive, mutable or immutable. required for the 
 					}
 				else	{
 					callback = false;
-					app.u.dump(' -> WARNING! callback defined but does not exist.');
+					app.u.dump('A callback defined but does not exist. The _rtag follows: ','warn'); app.u.dump(responseData['_rtag']);
 					}
 				}
 			else	{callback = false;} //no callback defined.
@@ -1190,7 +1196,7 @@ will return false if datapointer isn't in app.data or local (or if it's too old)
 //			app.u.dump(" -> datapointer = "+datapointer);
 			var local;
 			var r = false;
-			var expires = datapointer == 'authAdminLogin' ? (60*60*24*6) : (60*60*24); //how old the data can be before we fetch new.
+			var expires = datapointer == 'authAdminLogin' ? (60*60*24*15) : (60*60*24); //how old the data can be before we fetch new.
 //checks to see if the request is already in app.data. IMPORTANT to check if object is empty in case empty objects are put up for extending defaults (checkout)
 			if(app.data && !$.isEmptyObject(app.data[datapointer]))	{
 //				app.u.dump(' -> data already in memory.');
@@ -1636,7 +1642,6 @@ This is checks for two things:
 // if set to true and in a non-admin mode, won't hurt anything, but is less clean.
 //these are whitelisted server side. add anything non supported and comatibility mode calls will die a most horrible death.
 		setHeader : function(xhr){
-//			xhr.setRequestHeader('x-auth','sporks');
 			if(app.vars.thisSessionIsAdmin)	{
 				xhr.setRequestHeader('x-clientid',app.vars._clientid); //set by app
 				xhr.setRequestHeader('x-session',app.vars._session); //set by app. 
@@ -1732,8 +1737,72 @@ app.model.dispatchThis('mutable');
 				beforeSend: app.model.setHeader //uses headers to pass authentication info to keep them  off the uri.
 				});
 //			app.u.dump(" admin.vars.uiRequest:"); app.u.dump(app.ext.admin.vars.uiRequest);
-	*/		}
-		
+	*/		},
+
+
+/*
+
+methods of getting data from non-server side sources, such as cookies, local or session storage.
+
+*/
+
+//Device Persistent Settings (DPS) Get  ### here for search purposes:   preferences settings localstorage
+//false is returned if there are no matchings session vars.
+//if no extension is passed, return the entire sesssion object (if it exists).
+//this allows for one extension to read anothers preferences and use/change them.
+//ns is an optional param. NameSpace. allows for nesting.
+			dpsGet : function(ext,ns)	{
+//				app.u.dump(" ^ DPS GET. ext: "+ext+" and ns: "+ns);
+				var r = false, obj = app.storageFunctions.readLocal('session');
+//				app.u.dump("DPS 'session' obj: "); app.u.dump(obj);
+				if(obj == undefined)	{
+//					app.u.dump(" ^^ Entire 'session' object is empty.");
+					// if nothing is local, no work to do. this allows an early exit.
+					} 
+				else	{
+					if(ext && obj[ext] && ns)	{r = obj[ext][ns]} //an extension and namespace were passed and an object exists.
+					else if(ext && obj[ext])	{r = obj[ext]} //an extension was passed and an object exists.
+					else if(!ext)	{r = obj} //return the global object. obj existing is already known by here.
+					else	{} //could get here if ext passed but obj.ext doesn't exist.
+//					app.u.dump(" ^^ value for DPS Get: "); app.u.dump(r);
+					}
+				return r;
+				},
+
+//Device Persistent Settings (DPS) Set
+//For updating 'session' preferences, which are currently device specific.
+//for instance, in orders, what were the most recently selected filter criteria.
+//ext is required (currently). reduces likelyhood of nuking entire preferences object.
+			dpsSet : function(ext,ns,varObj)	{
+//				app.u.dump(" * DPS SET. \next: "+ext+"\nns: "+ns);
+//				app.u.dump(" * varObj (value for dps set): "); app.u.dump(varObj);
+				if(ext && ns && (varObj || varObj == 0))	{
+//					app.u.dump("device preferences for "+ext+"["+ns+"] have just been updated");
+					var sessionData = app.storageFunctions.readLocal('session'); //readLocal returns false if no data local.
+//					app.u.dump(" ** sessionData: "); app.u.dump(sessionData);
+					sessionData = sessionData || {};
+					if(typeof sessionData[ext] === 'object'){
+						sessionData[ext][ns] = varObj;
+						}
+					else	{
+						sessionData[ext] = {}; //each dataset in the extension gets a NameSpace. ex: orders.panelState
+						sessionData[ext][ns] = varObj;
+						} //object  exists already. update it.
+
+//can't extend, must overwrite. otherwise, turning things 'off' gets obscene.					
+//					$.extend(true,sessionData[ext],varObj); //merge the existing data with the new. if new and old have matching keys, new overwrites old.
+
+					app.storageFunctions.writeLocal('session',sessionData,'local'); //update the localStorage session var.
+					}
+				else	{
+					app.u.throwGMessage("Either extension ["+ext+"] or ns["+ns+"] or varObj ["+(typeof varObj)+"] not passed into admin.u.dpsSet.");
+					}
+				}
+
+
+
+
+
 		}
 
 	return r;

@@ -148,8 +148,9 @@ if(_rtag.jqObj)	{
 //hidden pid input is used by save. must come after the 'anycontent' above or form won't be set.
 	_rtag.jqObj.find('form').append("<input type='hidden' name='pid' value='"+pid+"' \/>");
 
-	app.u.handleEventDelegation(_rtag.jqObj);
-	app.ext.admin.u.applyEditTrackingToInputs(_rtag.jqObj);
+//	app.u.handleEventDelegation(_rtag.jqObj);
+//	app.ext.admin.u.applyEditTrackingToInputs(_rtag.jqObj);
+	_rtag.jqObj.anydelegate({'trackEdits':true});
 	app.u.handleCommonPlugins(_rtag.jqObj);
 	app.u.handleButtons(_rtag.jqObj);
 	
@@ -177,36 +178,32 @@ _rtag.jqObj.hideLoading();
 _rtag.jqObj.anycontent({'templateID':'productEditorTabbedTemplate','data':$.extend(true,{},app.data[_rtag.datapointer],app.data['adminProductReviewList|'+pid])});
 
 
-//If the item has variations, show the variations tab.
-if(!$.isEmptyObject(app.data[_rtag.datapointer]['%variations']))	{
-	$("[data-anytabs-tab='variations']",_rtag.jqObj).show();
-	}
-
 //check to see if item has inventoryable variations.
-if(app.data[_rtag.datapointer]['@skus'][0].sku.indexOf(':') >= 0)	{
+if(app.data[_rtag.datapointer]['@skus'] && app.data[_rtag.datapointer]['@skus'][0] && app.data[_rtag.datapointer]['@skus'][0].sku.indexOf(':') >= 0)	{
 	//this product has inventoryable options.
-	$("[data-app-role='auctionConfigurationSettings']",_rtag.jqObj).hide() // inventory-able variations and ebay are not compatible.
+	$("[data-app-role='showProductWithVariations']",_rtag.jqObj).show();
+	$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).hide();
+	}
+else {
+	// no variations
+	$("[data-app-role='showProductWithVariations']",_rtag.jqObj).hide();
+	$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).show();
 	}
 
 
 $('form',_rtag.jqObj).each(function(){
-	app.ext.admin.u.applyEditTrackingToInputs($(this));
+// ** 201344 -> edit tracking now in anydelegate.
+//	app.ext.admin.u.applyEditTrackingToInputs($(this));
 	$(this).append("<input type='hidden' name='pid' value='"+pid+"' \/>");
 	});
 
 app.ext.admin_prodEdit.u.handleImagesInterface($("[data-app-role='productImages']",_rtag.jqObj),pid);
 app.u.handleCommonPlugins(_rtag.jqObj);
 app.u.handleButtons(_rtag.jqObj);
-
-//This tab is now always showing up because it has both flexedit and wholesale pricing in it.
-//if the merchant has flex fields enabled, show the attributes tab. needs to be after the handleCommonPlugins function so that tabs have already been generated.
-//if(app.data['adminConfigDetail|flexedit'] && !$.isEmptyObject(app.data['adminConfigDetail|flexedit']['%flexedit']))	{
-//	$("[data-anytabs-tab='attributes']",_rtag.jqObj).show();
-//	}	
-
-if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
-	$("[name='zoovy:inv_enable']",_rtag.jqObj).prop('checked','checked');
-	}
+_rtag.jqObj.anydelegate({
+	trackEdits:true,
+	trackSelector:'form'
+	});
 					}
 				} //handleProductEditor
 			}, //callbacks
@@ -224,7 +221,7 @@ if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
 //This code should NOT bring the product tab into focus. That should be done by the code that executes this.
 //  -> allows this code build the product manager interface in the background so that the product task list 'add' works prior to the product editor being opened.
 			showProductManager : function(P)	{
-				app.u.dump("BEGIN admin_prodEdit.a.showProductManager");
+//				app.u.dump("BEGIN admin_prodEdit.a.showProductManager");
 				P = P || {};
 				var $target = $("#productContent");
 //				app.u.dump(" -> P:"); app.u.dump(P);
@@ -234,7 +231,8 @@ if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
 				if($target.children().length)	{} //product manager only gets rendered once and ONLY within the product tab.
 				else	{
 					$target.anycontent({'templateID':'productManagerLandingContentTemplate','showLoading':false});
-					app.u.handleEventDelegation($("[data-app-role='productManager']",$target));
+					$("[data-app-role='productManagerResultsContent']",$target).anydelegate(); //this delegate is just on the results. each product get's it's own in quickview.
+//					app.u.handleEventDelegation($("[data-app-role='productManager']",$target));
 					}
 				}, //showProductManager
 
@@ -243,7 +241,7 @@ if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
 				if($target instanceof jQuery && pid)	{
 
 					$target.empty().showLoading({'message':'Fetching product record'});
-					$target.attr('data-pid',pid);
+					$target.attr({'data-pid':pid});
 					
 					app.model.addDispatchToQ({
 						'_cmd':'adminProductReviewList',
@@ -287,7 +285,6 @@ if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
 							}
 						},'mutable');
 					
-					
 					app.model.dispatchThis('mutable');
 
 					}
@@ -308,12 +305,10 @@ if(app.data['adminProductDetail|'+pid]['%attribs']['zoovy:inv_enable'] > 31)	{
 						modal:true,
 						autoOpen:false
 						});
-					
-					app.u.handleEventDelegation($modal);
 					}
 				$modal.empty().append(app.renderFunctions.createTemplateInstance('ProductCreateNewTemplate'));
 				app.u.handleButtons($modal);
-				app.ext.admin.u.handleFormConditionalDelegation($('form',$modal));
+				$modal.anydelegate();
 				$modal.dialog('open');
 				}, //showCreateProductDialog
 	
@@ -327,8 +322,8 @@ $target.anycontent({'templateID':P.templateID,'showLoading':false}).attr('data-p
 
 app.u.handleCommonPlugins($target);
 app.u.handleButtons($target);
-app.u.handleEventDelegation($target);
-
+//app.u.handleEventDelegation($target);
+$target.anydelegate();
 					}
 				else if($target instanceof jQuery)	{
 					$target.anymessage({"message":"In admin_prodEdit.a.showProductDebugger, either no pid ["+P.pid+"] and/or no templateid ["+P.templateID+"] passed. both are required.","gMessage":true});
@@ -445,7 +440,7 @@ app.u.handleEventDelegation($target);
 								});
 							//now hide all the options in the 'global' list that are already enabled on the product.
 							$("tbody[data-app-role='variationsOptionsTbody'] tr",$r).each(function(){
-								app.u.dump(" -> $(this).data('v'): "+$(this).data('v'));
+//								app.u.dump(" -> $(this).data('v'): "+$(this).data('v'));
 								$("[data-v='"+$(this).data('v')+"']",$tbody).empty().remove(); //removed instead of just hidden so that css even/odd works. also, not necessary on DOM for anything.
 								})
 							//data-v="00"			
@@ -521,13 +516,7 @@ app.u.handleEventDelegation($target);
 			app.u.handleButtons($('.buttonset',$target)); //the save button uses delegated events. the rest was built prior to the new product editor.
 	// compare the sog list and the variations on the product and disable the buttons.
 	// this avoids the same SOG being added twice.
-			$('tbody tr',$prodOptions).each(function(){
-				var $tr = $(this);
-				if($tr.data('id') && $tr.data('id').charAt('0') != '#')	{ //ignore pogs.
-					$("tr[data-id='"+$tr.data('id')+"']",$storeOptions).find('button').button('disable'); //disable 'add to product' button if already enabled on the product.
-	//				$("tr[data-id='"+$tr.data('id')+"']",$storeOptions).hide();  //don't use this. causes alternating colors to get messed up.
-					}
-				})
+			app.ext.admin_prodEdit.u.handleApply2ProdButton($target);
 			
 			}		
 		
@@ -552,7 +541,7 @@ app.u.handleEventDelegation($target);
 
 			link2eBayByID : function($tag,data)	{
 				$tag.off('click.link2eBayByID').on('click.link2eBayByID',function(){
-					linkOffSite("http://www.ebay.com/itm/"+data.value);
+					linkOffSite("http://www.ebay.com/itm/"+data.value,'',true);
 					});
 				},
 
@@ -610,7 +599,7 @@ app.u.handleEventDelegation($target);
 							$btn.parent().find('.toggleMe').hide();
 							}
 						}).appendTo($tag);
-					$("<div \/>").addClass('displayNone toggleMe').append(app.ext.admin_prodEdit.u.amazonFeeds2Message(data.value['%IS'])).appendTo($tag);
+					$("<div \/>").addClass('displayNone toggleMe').append(app.ext.admin_prodEdit.u.amazonFeeds2Message(data.value['SKU'],data.value['%IS'])).appendTo($tag);
 					}
 				else	{} //all the values of the is report are zero. no point showing an empty report.
 				},
@@ -660,16 +649,42 @@ app.u.handleEventDelegation($target);
 	
 		u : {
 
+//will go through the list of sogs that are enabled and disable the sog in the 'store variations' list.
+			handleApply2ProdButton : function($container)	{
+				var $storeOptions = $("[data-app-role='productVariationManagerStoreContainer']",$container);
+				$("[data-app-role='productVariationManagerProductTbody'] tr",$container).each(function(){
+					var $tr = $(this);
+					if($tr.data('id') && $tr.data('id').charAt('0') != '#')	{ //ignore pogs.
+						$("tr[data-id='"+$tr.data('id')+"']",$storeOptions).find('button').button('disable'); //disable 'add to product' button if already enabled on the product.
+		//				$("tr[data-id='"+$tr.data('id')+"']",$storeOptions).hide();  //don't use this. causes alternating colors to get messed up.
+						}
+					})
+
+				},
 
 
-			amazonFeeds2Message : function(feedsObj) {
+//product must be in memory with sku:1 passed for this to work.
+			thisPIDHasInventorableVariations : function(pid)	{
+				var r = false;
+				if(pid && app.data['adminProductDetail|'+pid] && app.data['adminProductDetail|'+pid]['@skus'] && app.data['adminProductDetail|'+pid]['@skus'].length)	{
+					app.u.dump(" -> sku: "+app.data['adminProductDetail|'+pid]['@skus'][0].sku);
+					if(app.data['adminProductDetail|'+pid]['@skus'][0].sku.indexOf(':') > 0 )	{r = true}
+					}
+				else	{
+					//missing something we need.
+					$('#globalMessaging').anymessage({"message":"in admin_prodEdit.u.thisPIDHasInventorableVariations, either pid ["+pid+"] not set or product record ["+typeof app.data['adminProductDetail|'+pid]+"](with sku detail) not in memory.","gMessage":true});
+					}
+				return r;
+				},
+
+			amazonFeeds2Message : function(SKU,feedsObj) {
 			
 				var $messaging = $("<div \/>");
 			
 				// describe_bw - this function takes a bitwise value and returns a string of the equivalent feed names
 				// eg ( If a bitwise value of 3 is passed to this function it will return "Init,Products" (Init is 1, Products is 2)
 				var describe_bw = function(bitVal) {
-						console.log('made it to descibe_bw');
+//						app.u.dump('made it to descibe_bw');
 			
 						var $feedsArray =  [];
 						if ((bitVal & 1<<0)>0) { $feedsArray.push("Init"); }
@@ -757,31 +772,31 @@ app.u.handleEventDelegation($target);
 			// lets summarize the product's state.
 				if ((feedsObj['TODO'] & feedLookupObj['init'])>0) {
 					// all feeds waiting to be sent
-					$("<div class='summary' \/>").text(feedsObj['SKU'] + " has been queued for a full sync and will be sent shortly").appendTo($messaging);
+					$("<div class='summary' \/>").text(SKU + " has been queued for a full sync and will be sent shortly").appendTo($messaging);
 					}
 				else if ( ((feedsObj['ERROR'] > 0) && (feedsObj['DONE'] & feedLookupObj['init'])==0) ) {
 					// we have an error and init is still turned on
-					$("<div class='summary' \/>").text(" An error has been returned for the [" + describe_bw(feedsObj['ERROR']) + "feed/feeds. Please review the error message detailed above. As our records indicate " + feedsObj['SKU'] + " has either never been sent to Amazon or has recently been reset, The error(s) will need to be corrected before any feeds can be sent.").appendTo($messaging);
+					$("<div class='summary' \/>").text(" An error has been returned for the [" + describe_bw(feedsObj['ERROR']) + "feed/feeds. Please review the error message detailed above. As our records indicate " + SKU + " has either never been sent to Amazon or has recently been reset, The error(s) will need to be corrected before any feeds can be sent.").appendTo($messaging);
 					}
 				else if (feedsObj['ERROR'] > 0) {
 					// we have an error but init has been turned off - the feeds that don't have errors will still be sent
-					$("<div class='summary' \/>").text(" An error has been returned for the [".describe_bw(feedsObj['ERROR']) + "feed/feeds of $row->{'SKU'}. Although feeds that have not encountered errors may continue to syndicate this issue should be resolved order for the sku to function correctly. Please review the error message detailed above.").appendTo($messaging);
+					$("<div class='summary' \/>").text(" An error has been returned for the ["+describe_bw(feedsObj['ERROR']) + "feed/feeds of "+SKU+". Although feeds that have not encountered errors may continue to syndicate this issue should be resolved order for the sku to function correctly. Please review the error message detailed above.").appendTo($messaging);
 					}
 				else if ((feedsObj['SENT'] & feedLookupObj['init'])>0 && (feedsObj['DONE'] & feedLookupObj['init'])==0) {
 					// init sent - waiting to process
-					$("<div class='summary' \/>").text("The initial product feed has been sent for" + feedsObj['SKU'] + "In order for the other feeds [" + describe_bw[feedsObj['TODO']] + "] to be accepted by Amazon the initial product feed must be processed first. As soon as Amazon confirm it has been processed we will send the remaining feeds").appendTo($messaging);
+					$("<div class='summary' \/>").text("The initial product feed has been sent for" + SKU + "In order for the other feeds [" + describe_bw[feedsObj['TODO']] + "] to be accepted by Amazon the initial product feed must be processed first. As soon as Amazon confirm it has been processed we will send the remaining feeds").appendTo($messaging);
 					}
 				else if ((feedsObj['DONE'] & feedLookupObj['init'])>0 && feedsObj['TODO']>0) {
 					// init done - waiting for others to sync
-					$("<div class='summary' \/>").text("The initial product feed for $row->{'SKU'} has been processed. The other feeds [" + describe_bw[feedsObj['TODO']] + "] will be sent during the next sync. If the product feed is included in that list, the product has been saved since the intial sync and will be sent again").appendTo($messaging);
+					$("<div class='summary' \/>").text("The initial product feed for "+SKU+" has been processed. The other feeds [" + describe_bw[feedsObj['TODO']] + "] will be sent during the next sync. If the product feed is included in that list, the product has been saved since the intial sync and will be sent again").appendTo($messaging);
 					}
 				else if ((feedsObj['SENT'] & feedLookupObj['all']) == feedLookupObj['all']){
 					// all feeds have been sent but we're waiting for Amazon to process
-					$("<div class='summary' \/>").text("All feeds have now been sent for " + feedsObj['SKU'] + ". We are now waiting for Amazon to process them.").appendTo($messaging);
+					$("<div class='summary' \/>").text("All feeds have now been sent for " + SKU + ". We are now waiting for Amazon to process them.").appendTo($messaging);
 					}
 				else if ((feedsObj['DONE'] & feedLookupObj['all']) == feedLookupObj['all']) {
 					// all feeds finished
-					$("<div class='summary' \/>").text("Amazon has notified us that all feeds have been processed, and" + feedsObj['SKU'] + " is now live on Seller Central.").appendTo($messaging);
+					$("<div class='summary' \/>").text("Amazon has notified us that all feeds have been processed, and" + SKU + " is now live on Seller Central.").appendTo($messaging);
 					}
 				else {
 					// should never be reached
@@ -805,8 +820,10 @@ app.u.handleEventDelegation($target);
 				$div.appendTo($navtabs);
 
 // commented out till management categories get added to elastic.				
-//				app.ext.admin_prodEdit.u.handleManagementCategoryFilters();//handleManagementCategoryFilters 'may' add a dispatch.
-				app.ext.admin_prodEdit.u.handleLaunchProfileFilters();//handleManagementCategoryFilters 'may' add a dispatch.
+
+//buildFilterListByCommand -> whitelisted by cmd type. will use local storage if available.
+				app.ext.admin_prodEdit.u.buildFilterListByCommand('adminEBAYProfileList');
+//				app.ext.admin_prodEdit.u.buildFilterListByCommand('adminSupplierList'); //need to uncomment data-elastic-key='prod_supplierid' in .html file too.
 				
 				app.u.handleButtons($navtabs);
 
@@ -828,8 +845,8 @@ app.u.handleEventDelegation($target);
 						}
 					});
 				$( "[data-app-role='priceFilterRange']" ).val( "$" + $( ".sliderRange" ).slider( "values", 0 ) + " - $" + $( ".sliderRange" ).slider( "values", 1 ) );
-
-				app.u.handleEventDelegation($div);
+				$div.anydelegate();
+//				app.u.handleEventDelegation($div);
 				},
 
 //** 201334 -> for new product manager interface.
@@ -883,17 +900,31 @@ app.u.handleEventDelegation($target);
 				
 				}, //handleManagementCategoryFilters
 			
-			handleLaunchProfileFilters : function()	{
+
+//vars should include:  _cmd (which should match the data-app-role value), arrayPointer (for launchProfiles, this would be @PROFILES
+			buildFilterListByCommand : function(_cmd)	{
+				var vars = {}
+				if(_cmd == 'adminSupplierList')	{
+					vars.arrayPointer = '@SUPPLIERS';
+					vars.termPointer = 'CODE';
+					vars.textPointer = 'NAME';
+					}
+				else if(_cmd == 'adminEBAYProfileList')	{
+					vars.arrayPointer = '@PROFILES';
+					vars.termPointer = 'PROFILE';
+					vars.textPointer = 'PROFILE';
+					}				
+				
 //				app.u.dump("BEGIN admin_prodEdit.u.handleLaunchProfileFilters");
 				var $navtabs = $('#navTabs');// tabs container
-				var $profileList = $("[data-app-role='launchProfileList']",$navtabs);
-				
-				if($profileList.children().length)	{
-//					app.u.dump("Launch Profiles have been rendered already. leave them as they are");
+				var $list = $("[data-app-role='"+_cmd+"']",$navtabs);
+
+				if($list.children().length)	{
+//					app.u.dump("list rendered already. leave them as they are");
 					} //already rendered management categories.
 				else	{
 					var cmdObj = {
-						_cmd : "adminEBAYProfileList",
+						_cmd : _cmd,
 						_tag : {
 							callback : function(rd){
 //								app.u.dump(" -> executing callback for management categories request");
@@ -904,22 +935,24 @@ app.u.handleEventDelegation($target);
 								else	{
 									var $tmp = $("<ul \/>"); //add list items to this, then move to $manCatsList after. decreases DOM updates which is more efficient.
 //									app.u.dump(" -> rd: "); app.u.dump(rd);
-									if(app.data[rd.datapointer]['@PROFILES'] && !$.isEmptyObject(app.data[rd.datapointer]['@PROFILES']))	{
-										var profiles = app.data[rd.datapointer]['@PROFILES'] // Object.keys(app.data[rd.datapointer]['@PROFILES']).sort(function (a, b) {return a.toLowerCase().localeCompare(b.toLowerCase());});
-										for(var i = 0; i < profiles.length; i += 1)	{
-											$tmp.append($("<li data-elastic-term='"+profiles[i].PROFILE+"' \/>").text((profiles[i].PROFILE.toLowerCase())));
+									var data = app.data[rd.datapointer][vars.arrayPointer]; //shortcut
+									if(data && !$.isEmptyObject(data))	{
+										for(var i in data)	{
+											$tmp.append($("<li data-elastic-term='"+data[i][vars.termPointer]+"' \/>").text((data[i][vars.textPointer].toString().toLowerCase())));
 											}
-										$profileList.append($tmp.children());
+										$list.append($tmp.children());
 										}
 									else	{
 										//successful call, but no management categories exist. do nothing.
+										 $list.closest('fieldset').hide();
 										}
 									}
 								},
-							datapointer : 'adminEBAYProfileList'
+							datapointer : _cmd
 							}
 						}
-					if(app.model.fetchData('adminEBAYProfileList'))	{
+
+					if(app.model.fetchData(_cmd))	{
 						app.u.handleCallback(cmdObj._tag)
 						}
 					else	{
@@ -930,7 +963,8 @@ app.u.handleEventDelegation($target);
 					}
 				
 				}, //handleLaunchProfileFilters
-	
+
+
 			handleImagesInterface : function($context,pid)	{
 //				app.u.dump("BEGIN admin_prodEdit.u.handleImagesInterface.  pid: "+pid);
 				if(pid && $context && $context instanceof jQuery)	{
@@ -983,9 +1017,9 @@ app.u.handleEventDelegation($target);
 							},
 						'revert' : true
 						});
-		
+
 					$(".sortableImagery",$context).anydropzone({
-						folder : 'product/'+pid.toLowerCase(),
+						folder : 'product/'+pid.toString().toLowerCase().replace(/[^A-Z0-9]/ig, "_"), //folders are lowercase w/ no special characters except underscore.
 						drop : function(files,event,self){
 		
 							for (var i = 0; i < files.length; i++) {
@@ -1210,8 +1244,9 @@ app.u.handleEventDelegation($target);
 						
 						$("<button \/>").button().on('click',function(event){
 							event.preventDefault();
-							$image.attr('src','/images/blank.gif');
-							$input.val('');
+							$image.attr('src','app-admin/images/blank.gif');
+							$input.val('').addClass('edited'); //save uses the input, so add the class there.
+							app.ext.admin.u.handleSaveButtonByEditedClass($(this)); //make sure save button unlocks.
 							}).text('Clear').appendTo($r);
 						}
 					else	{
@@ -1367,7 +1402,7 @@ app.model.dispatchThis('immutable');
 				var r = false; //what is returned. will be term or terms object if valid.
 				if($obj.length == 1)	{
 					r = {term:{}};
-					r.term[attr] = $obj.data('elastic-term').toLowerCase();
+					r.term[attr] = $obj.data('elastic-term').toString().toLowerCase();
 					}
 				else if($obj.length > 1)	{
 					r = {terms:{}};
@@ -1513,19 +1548,21 @@ Required params include:
 						$("button[data-taskmode='edit']",$li).show();
 						}
 					else	{
-						
+						//to get here, we are in 'add' or 'edit' mode.
 						if($li.length)	{}//product is already in list.
 						else	{
 							var $li = app.renderFunctions.createTemplateInstance($taskList.data('loadstemplate'));
 							$li.hide();
 							$li.attr('data-pid',P.pid);
+							$li.anydelegate();
 							}
 						$taskList.prepend($li); //always put at top of the list.
 
 //when simply adding to the list, we can use product data from localStorage/memory if it's available.
 						if(P.mode == 'add')	{
-
+							
 							if($ele && $ele.is('tr'))	{
+								//app.u.dump(" -> $ele.data(): "); app.u.dump($ele.data());
 								//This is the search result tr.
 								var $tmpTable = $("<table \/>"); //need a tmp table. orphan TR's are treated inconsistently between browsers.
 								var $tr = $ele.data('clone') ? $ele.clone() : $ele; //setting data-clone allows for the item to be left in the row (ex: amazon marketplace status) or removed from row (ex: search results) when being animated.
@@ -1662,6 +1699,20 @@ Required params include:
 									}
 								}
 
+							if($('tbody:first',$target).find('tr:hidden').length)	{
+								var $ul = $("button[data-app-click='admin_prodEdit|invDetailFilterShow']",$target).show().next('ul');
+								
+								if($('tbody:first',$target).find("tr[data-basetype='_ASM_']").length)	{
+									$ul.append("<li data-app-click='admin_prodEdit|invDetailFilterExec' data-show-basetype='_ASM_'>show "+$('tbody:first',$target).find("tr[data-basetype='_ASM_']").length+" ASM record(s)</li>");
+									}
+								if($('tbody:first',$target).find("tr[data-basetype='DONE']").length)	{
+									$ul.append("<li data-app-click='admin_prodEdit|invDetailFilterExec' data-show-basetype='DONE'>show "+$('tbody:first',$target).find("tr[data-basetype='DONE']").length+" done record(s)</li>");
+									}
+								if($('tbody:first',$target).find("tr[data-basetype='PICK']").length)	{
+									$ul.append("<li data-app-click='admin_prodEdit|invDetailFilterExec' data-show-basetype='PICK'>show "+$('tbody:first',$target).find("tr[data-basetype='PICK']").length+" pick record(s)</li>");
+									}
+								$ul.width(220).menu();
+								}
 
 							}
 						else	{
@@ -1769,6 +1820,9 @@ Required params include:
 				if(!$.isEmptyObject(cmdObj['%attribs']))	{
 					app.model.addDispatchToQ(cmdObj,'immutable');
 					}
+				else	{
+					$form.hideLoading();
+					}
 				}, //attributes
 
 
@@ -1788,22 +1842,33 @@ Required params include:
 						}
 					}
 
+				if(app.ext.admin_prodEdit.u.thisPIDHasInventorableVariations(pid))	{
+					$("[data-app-role='skuSchedulesContainer']",$form).find('input.edited').each(function(){
+						cmdObj['@updates'].push("SET-SCHEDULE-PRICE?SKU="+$(this).closest("[data-sku]").attr('data-sku')+"&schedule="+$(this).closest("[data-schedule]").attr('data-schedule')+"&price="+$(this).val());
+						});				
+					}
+				else	{
 // loop through all the rows and check to see if any have been edited.
-				$("[data-app-role='schedulesContainer'] tbody",$form).children().each(function(){
-					var $tr = $(this);
-					if($('.edited',$tr).length)	{
-						cmdObj['@updates'].push("SET-SCHEDULE?schedule="+$tr.data('schedule')+"&"+$.param($tr.serializeJSON()))
-						}
-					//if any input for the record has been updated, update qty and loc.
-					else {
+					$("[data-app-role='pidSchedulesContainer'] tbody",$form).children().each(function(){
+						var $tr = $(this);
+						if($('.edited',$tr).length)	{
+							cmdObj['@updates'].push("SET-SCHEDULE-PROPERTIES?schedule="+$tr.data('schedule')+"&"+$.param($tr.serializeJSON()))
+							}
+						//if any input for the record has been updated, update qty and loc.
+						else {
+	
+							}
+						});
 
-						}
-					});
+					}
 
 //				app.u.dump(" -> cmdObj for schedule:"); app.u.dump(cmdObj);
 				
 				if(cmdObj['@updates'].length)	{
 					app.model.addDispatchToQ(cmdObj,'immutable');
+					}
+				else	{
+					$form.hideLoading();
 					}
 				
 				}, //schedule
@@ -1856,11 +1921,14 @@ Required params include:
 						}
 					});
 
-				app.u.dump(" -> cmdObj for inventory:"); app.u.dump(cmdObj);
+//				app.u.dump(" -> cmdObj for inventory:"); app.u.dump(cmdObj);
 //				app.u.dump(" -> cmdObj._tag: "); app.u.dump(cmdObj._tag);
 				
 				if(cmdObj['@updates'].length)	{
 					app.model.addDispatchToQ(cmdObj,'immutable');
+					}
+				else	{
+					$form.hideLoading();
 					}
 				
 				}, //inventory
@@ -1892,9 +1960,13 @@ Required params include:
 					if(cmdObj['@updates'].length)	{
 						app.model.addDispatchToQ(cmdObj,'immutable');
 						}
+					else	{
+						$form.hideLoading();
+						}
 					}
 				else	{
 					//no changes in navcats.
+					$form.hideLoading();
 					}
 				}, //navigation
 
@@ -1925,8 +1997,11 @@ Required params include:
 					if(cmdObj['@updates'].length)	{
 						app.model.addDispatchToQ(cmdObj,'immutable');
 						}
+					else	{
+						$form.hideLoading();
+						}
 					}
-				else	{} //no changes to sku imagery.
+				else	{$form.hideLoading();} //no changes to sku imagery.
 
 				},
 
@@ -1976,8 +2051,12 @@ Required params include:
 				if(cmdObj['@updates'].length || !$.isEmptyObject(cmdObj['%attribs']))	{
 					app.model.addDispatchToQ(cmdObj,'immutable');
 					}
+				else	{
+					$form.hideLoading();
+					}
 
 				},
+
 			prodImages : function($form)	{
 
 				var $prodImageUL = $("[data-app-role='prodImagesContainer']",$form);
@@ -1997,30 +2076,32 @@ Required params include:
 						}
 					if(!$.isEmptyObject(cmdObj['%attribs']))	{
 						app.model.addDispatchToQ(cmdObj,'immutable');
-						}				
+						}
+					else	{
+						$form.hideLoading();
+						}
 
 					}
-				else	{} //no changes to the images. that's fine.
+				else	{$form.hideLoading();} //no changes to the images. that's fine.
 
 				}, //prodImages
 			
 			variations : function($form)	{
 				//data-app-role='productVariationManager'
-
-
+				if($('.edited',$form).length)	{
 					var cmdObj = {
 						'_cmd' : 'adminProductOptionsUpdate', 
 						pid : $form.closest("[data-pid]").data('pid'),
 						'_tag' : {
 							'callback' : function(rd){
 								$form.hideLoading();
-								
 								if(app.model.responseHasErrors(rd)){
 									$form.anymessage({'message':rd});
 									}
 								else	{
 									$form.anymessage(app.u.successMsgObject('Variations have been updated.'));
 									app.ext.admin_prodEdit.a.showProductVariationManager($("[data-app-role='productVariations']",$form).empty(),cmdObj.pid);
+									$form.closest('.eventDelegation').anydelegate('updateChangeCounts'); //execute AFTER showPordVarMan above or the counts will be off (cuz old variation data still on DOM).
 									}
 								}
 							},
@@ -2048,6 +2129,8 @@ Required params include:
 					
 					app.model.addDispatchToQ(cmdObj,'immutable');
 //					app.model.dispatchThis('immutable');
+					}
+				else	{$form.hideLoading();}
 				},
 			
 // executed from the save button in the variations panel. called sku because it doesn't impact add/removing variations, just updating attribs for each option.
@@ -2073,7 +2156,8 @@ if($('.edited',$tbody).length)	{
 		var $tr = $(this);
 		var SKU = $(this).closest("[data-sku]").data('sku');
 		if($('.edited',$tr).length)	{
-			cmdObj['@updates'].push("SET-SKU?SKU="+SKU+"&"+$.param($tr.serializeJSON({'selector':'.edited'}))); //if any input changed, all are updated.
+			//$.param sends the keys encoded, which is OK.
+			cmdObj['@updates'].push("SET-SKU?SKU="+SKU+"&"+$('.edited',$tr).serialize());
 			}
 		else	{} //no updates in this row.
 		});
@@ -2086,6 +2170,7 @@ else	{} //no changes in sku attribs.
 				if(cmdObj['@updates'].length)	{
 					app.model.addDispatchToQ(cmdObj,'immutable');
 					}
+				else{$form.hideLoading();}
 				}, //prodImages
 				
 			buycom : function($form)	{
@@ -2109,10 +2194,11 @@ else	{} //no changes in sku attribs.
 					$editedInputs.each(function(){
 						cmdObj['@updates'].push("SET-SKU?SKU="+$(this).closest('tr').data('sku')+"&"+$(this).attr('name')+"="+this.value);
 						})
+//					app.u.dump(" -> cmdObj for buycom:"); app.u.dump(cmdObj);
+					app.model.addDispatchToQ(cmdObj,'immutable');
 					}
+				else	{$form.hideLoading();}
 
-//				app.u.dump(" -> cmdObj for buycom:"); app.u.dump(cmdObj);
-				app.model.addDispatchToQ(cmdObj,'immutable');
 				} //buycom
 
 			}, //saveProductByTab
@@ -2145,7 +2231,7 @@ else	{} //no changes in sku attribs.
 
 				var $container = $(app.u.jqSelector('#',app.ext.admin.vars.tab+'Content')).find("[data-app-role='productManager']");
 				app.ext.admin_prodEdit.u.prepContentArea4Results($container);
-				$("[data-app-role='productManagerSearchResults']",$container).showLoading({'message':'Performing search...'})
+				$("[data-app-role='productManagerSearchResults']",$container).showLoading({'message':'Performing search...'});
 				$ele.parent().find("[data-app-click='admin_prodEdit|productFiltersClose']").trigger('click');
 //				app.u.dump("name='size'.length: "+$("select[name='size']",'#navTabs').length+" and val: "+$("select[name='size']",'#navTabs').val());
 
@@ -2206,6 +2292,55 @@ else	{} //no changes in sku attribs.
 				},
 
 
+			amazonLogShow : function($ele,p)	{
+				var
+					pid = $ele.closest("[data-pid]").data('pid'),
+					index = $ele.closest("[data-obj_index]").attr('data-obj_index'),
+					errors = 0; //the number of 'error' messages in @LOG
+				
+				if(pid && index && app.data["adminProductAmazonDetail|"+pid] && app.data["adminProductAmazonDetail|"+pid]['@DETAIL'] && app.data["adminProductAmazonDetail|"+pid]['@DETAIL'][index] && app.data["adminProductAmazonDetail|"+pid]['@DETAIL'][index]['@LOG'])	{
+					var 
+						logArr = app.data["adminProductAmazonDetail|"+pid]['@DETAIL'][index]['@LOG'],
+						L = logArr.length,
+						$D = app.ext.admin.i.dialogCreate({
+							'title':'Amazon Log for '+$ele.closest("[data-sku]").data('sku')
+							}); //using dialogCreate ensures that the div is 'removed' on close, clearing all previously set data().
+					$D.addClass('amazonLog');
+					$D.dialog('option','height',500);
+
+function type2class(type)	{
+	if(type == 'ERROR')	{return 'red'}
+	else if(type == 'STOP') {return 'orange'}
+	else	{return ""}
+	}
+
+					for(var i = 0; i < L; i += 1)	{
+						if(logArr[i].type == 'ERROR') {errors++}
+						var $P = $("<p \/>").addClass('marginTop marginBottom');
+						if(logArr[i].detail)	{$P.addClass('isDetail displayNone')}
+						$P.append("<span class='floatLeft marginRight marginBottom app-icon app-icon-"+logArr[i].type.toLowerCase()+"'><\/span>");
+						$P.append($("<h5>"+logArr[i].type+"<\/h5>").addClass(type2class(logArr[i].type)));
+						$P.append("<h6>Feed: "+logArr[i].feed+"<\/h6>");
+						$P.append("<h6>"+app.u.unix2Pretty(logArr[i].ts,true)+"<\/h6>");
+						$P.append(logArr[i].msg);
+						$P.appendTo($D);
+						}
+					if(errors)	{$D.prepend("<h5>There are "+errors+" for this sku")}
+					$D.prepend($("<label>").text("Show more detail").prepend($("<input \/>").prop('type','checkbox').on('click',function(){
+						if($(this).is(':checked'))	{
+							$('.isDetail',$(this).closest('.ui-dialog-content')).show();
+							}
+						else	{
+							$('.isDetail',$(this).closest('.ui-dialog-content')).hide();
+							}
+						})));
+					$D.dialog('open');
+					}
+				else	{
+					$ele.closest('fieldset').anymessage({"message":"In admin_prodEdit.e.amazonLogShow, unable to ascertain pid ["+pid+"] or index ["+index+"] or app.data['adminProductAmazonDetail|"+pid+"']['@DETAIL']["+index+"] doesn't exist.","gMessage":true});
+					}
+				
+				},
 
 //executed from within the search results.
 //if it's already in the list, it's removed. If it is not in the list, it's added.
@@ -2234,6 +2369,27 @@ else	{} //no changes in sku attribs.
 					$PE = $ele.closest("[data-app-role='productEditorContainer']"),
 					pid = $PE.data('pid'),
 					$flexContent = $("[data-app-role='flexeditContainer']",$PE);
+
+//Check to see if inventory-able variations are present.  If so, a different price schedule table should be displayed.
+					if(app.ext.admin_prodEdit.u.thisPIDHasInventorableVariations(pid))	{
+						var $scheduleContainer = $("[data-app-role='skuSchedulesContainer']",$PE).show();
+//build the table headers for the schedules.
+						if(app.data['adminProductDetail|'+pid]['@skus'][0] && app.data['adminProductDetail|'+pid]['@skus'][0]['@schedule_prices'] && app.data['adminProductDetail|'+pid]['@skus'][0]['@schedule_prices'].length)	{
+							//make sure to only add the headers once.
+							if($scheduleContainer.data('headersAdded'))	{}
+							else	{
+								var o = '';
+								for(var i = 0, L = app.data['adminProductDetail|'+pid]['@skus'][0]['@schedule_prices'].length; i < L; i += 1)	{
+									o += "<th>"+app.data['adminProductDetail|'+pid]['@skus'][0]['@schedule_prices'][i].schedule+"</th>";
+									}
+								$scheduleContainer.data('headersAdded',true).find('thead tr').append(o);
+								}
+							}
+						}
+					else	{
+						$("[data-app-role='pidSchedulesContainer']",$PE).show();
+						}
+
 
 //				app.u.dump(" -> $flexContent.length: "+$flexContent.length);
 //				app.u.dump(" -> $PE.length: "+$PE.length);
@@ -2302,7 +2458,7 @@ else	{} //no changes in sku attribs.
 										app.u.dump(" -> skus.length: "+skus.length);
 										for(var i = 0; i < L; i += 1)	{
 											var thisSku = skus[i].sku;
-											app.u.dump(" -> thisSku: "+thisSku);
+//											app.u.dump(" -> thisSku: "+thisSku);
 											$tbody.anycontent({
 												"templateID":"inventoryRowTemplate",
 												dataAttribs : {'sku' : thisSku}, //will apply these as data- to each row.
@@ -2315,6 +2471,7 @@ else	{} //no changes in sku attribs.
 											});
 										app.u.handleButtons($tbody);
 										}
+
 									}
 								}
 							}
@@ -2349,7 +2506,11 @@ else	{
 	//success content goes here.
 //	app.u.dump(" -> pid: "+pid+"\nebay:storecat: "+app.data['adminProductDetail|'+pid]['%attribs']['ebay:storecat']);
 //	app.u.dump(" -> select.length: "+$("[data-app-role='ebayStoreCategoryContainer']",$PE).anycontent(rd).find("input[name='ebay:storecat']").length);
-	$("[data-app-role='ebayStoreCategoryContainer']",$PE).anycontent(rd).find("select[name='ebay:storecat']").val(app.data['adminProductDetail|'+pid]['%attribs']['ebay:storecat']);
+	$("[data-app-role='ebayStoreCategoryContainer']",$PE)
+		.anycontent(rd)
+		.find("select[name='ebay:storecat']").val(app.data['adminProductDetail|'+pid]['%attribs']['ebay:storecat'])
+		.end()
+		.find("select[name='ebay:storecat2']").val(app.data['adminProductDetail|'+pid]['%attribs']['ebay:storecat2']);
 	}
 								}
 							}
@@ -2537,6 +2698,30 @@ $(":checkbox",$ele.closest('form')).prop('checked','');
 					}
 				},
 
+			invDetailFilterExec : function($ele,p)	{
+				if($ele.attr('data-show-basetype'))	{
+					$ele.closest('table').find("tr[data-basetype='"+$ele.attr('data-show-basetype')+"']").toggle();
+					}
+				else	{
+					$ele.closest('td').anymessage({'message':'In admin_prodEdit.e.invDetailFilterExec, trigger element had no data-show-basetype.','gMessage':true});
+					}
+				},
+
+			invDetailFilterShow : function($ele,p)	{
+				var $menu = $ele.next('ul')
+				$menu.show().css('position','absolute').position({
+					my: "left top",
+					at: "left bottom",
+					of: $ele
+					});
+//the click to open the menu seems to trigger the 'one' as well. not sure how/why, but adding after a short timeout cure's it.
+//could be that the click event doesn't return a false?
+				setTimeout(function(){
+					$(document).one( "click", function() {
+						$menu.hide();
+						});
+					},1000);
+				},
 
 //executed on the 'validate' button. Gives a report of whether or not this product needs anything to be successfully syndicated.
 			adminProductAmazonValidateExec : function($ele,p)	{
@@ -2559,7 +2744,7 @@ $(":checkbox",$ele.closest('form')).prop('checked','');
 						'datapointer' : 'adminProductAmazonValidate|'+pid,
 						'callback':function(rd)	{
 							if(app.model.responseHasErrors(rd)){
-								$D.anymessage({'message':rd});
+								$D.anymessage({'message':rd,'persistent':true}); //if api repsonse gets treated as an error/warning, keep that open.
 								}
 							else	{
 								$D.anymessage({'message':app.data[rd.datapointer],'persistent':true}); //will be @MSGS array.
@@ -2607,11 +2792,11 @@ $(":checkbox",$ele.closest('form')).prop('checked','');
 
 			
 			adminProductMacroExec : function($ele,p)	{
-				app.u.dump("BEGIN admin_prodEdit.e.adminProductMacroExec (Click!)");
+//				app.u.dump("BEGIN admin_prodEdit.e.adminProductMacroExec (Click!)");
 				var
 					$PE = $ele.closest("[data-app-role='productEditorContainer']"),
 					pid = $PE.data('pid');
-				app.u.dump(" -> $ele.data('macro-cmd'): "+$ele.data('macro-cmd'));
+//				app.u.dump(" -> $ele.data('macro-cmd'): "+$ele.data('macro-cmd'));
 				if($ele.data('macro-cmd') && pid)	{
 
 					if($ele.is('button'))	{
@@ -2677,7 +2862,7 @@ $(":checkbox",$ele.closest('form')).prop('checked','');
 
 			webPageEditor : function($ele,p)	{
 				var pid = $ele.closest("[data-pid]").data('pid');
-				if(pid)	{navigateTo('/biz/vstore/builder/index.cgi?ACTION=INITEDIT&amp;FORMAT=PRODUCT&amp;FS=P&amp;SKU='+pid);}
+				if(pid)	{navigateTo('/biz/vstore/builder/index.cgi?ACTION=INITEDIT&FORMAT=PRODUCT&FS=P&SKU='+pid);}
 				else	{app.u.throwGMessage("In admin_prodEdit.uiActions.webPageEditor, unable to determine pid.");}
 				}, //webPageEditor
 
@@ -2685,7 +2870,7 @@ $(":checkbox",$ele.closest('form')).prop('checked','');
 				app.u.dump("BEGIN admin_prodEdit.e.viewProductOnWebsite");
 				var pid = $ele.closest("[data-pid]").data('pid');
 				if(pid)	{
-					app.ext.admin.u.linkOffSite("http://"+app.vars.domain+"/product/"+pid+"/");
+					app.ext.admin.u.linkOffSite("http://"+app.vars.domain+"/product/"+pid+"/",'',true);
 					}
 				else	{
 					$('#globalMessaging').anymessage({"message":"In admin_prodEdit.uiActions.configOptions, unable to determine pid.","gMessage":true});
@@ -2868,7 +3053,7 @@ else	{
 					app.u.dump(" -> "+index+" form");
 //					app.u.dump(" -> save button length: "+$("[data-app-role='saveButton']",this).length);
 //skipDispatch tells the individual save buttons to not dispatch themselves. We'll do one dispatch at the end.
-					$("[data-app-role='saveButton']",this).trigger('click',{'skipDispatch':true});
+					$("button[data-app-role='saveButton']",this).trigger('click',{'skipDispatch':true});
 					app.model.dispatchThis('immutable');
 					});
 				},
@@ -2959,7 +3144,9 @@ $D.showLoading({"message":"Creating inventory record"});
 app.model.addDispatchToQ({
 	_cmd : 'adminProductMacro',
 	pid : pid,
-	'@updates' : ["INV-"+$ele.data('detail-type')+"-SKU-INIT?SKU="+sku+"&"+$.param($('form',$D).serializeJSON())],
+// * 201346 -> changed to a more effient method for serializing inputs.
+//	'@updates' : ["INV-"+$ele.data('detail-type')+"-SKU-INIT?SKU="+sku+"&"+$.param($('form',$D).serializeJSON())],
+	'@updates' : ["INV-"+$ele.data('detail-type')+"-SKU-INIT?SKU="+sku+"&"+$('form',$D).serialize()],
 	_tag : {
 		callback : function(rd){
 			$D.hideLoading();
@@ -3042,9 +3229,9 @@ app.model.dispatchThis("immutable");
 			variationSearchByIDExec : function($btn)	{
 				$btn.button({icons: {primary: "ui-icon-search"},text: false});
 				$btn.off('click.variationSearchByIDExec').on('click.variationSearchByIDExec',function(){
-					app.ext.admin_prodEdit.u.prepContentArea4Results($("[data-app-role='productManager']",app.u.jqSelector('#',app.ext.admin.vars.tab+'Content')));
-					$('#prodEditorResultsTbody').showLoading({'message':'Performing search...'});
 					var varID = $btn.closest('tr').data('id');
+					app.ext.admin_prodEdit.u.prepContentArea4Results($('#productContent'));
+					
 					app.model.addDispatchToQ({
 						"mode":"elastic-native",
 						"size":250,
@@ -3054,11 +3241,12 @@ app.model.dispatchThis("immutable");
 							'callback':'handleElasticResults',
 							'extension':'store_search',
 							'datapointer' : 'appPublicSearch|variation|'+varID,
-							'templateID':'productManagerResultsItemTemplate',
-							'list':$('#prodEditorResultsTbody')
+							'templateID':'prodManagerProductResultsTemplate',
+							'list': $("[data-app-role='productManagerSearchResults']",$('#productContent'))
 							},
 						"type":"product"
 						},"mutable");
+					navigateTo('#!product');
 					app.model.dispatchThis("mutable");
 					});
 				}, //variationSearchByIDExec
@@ -3132,8 +3320,15 @@ app.model.dispatchThis("immutable");
 
 // pog editor just applies changes in memory till master 'save' is done.
 					if(variationData.variationmode == 'product')	{
+						//update the variations manager so this variation is tagged as edited. 
+						$btn.closest("[data-app-role='productVariations']").find("tr[data-id='"+variationID+"']:first").addClass('edited');
+						var $EDParent = $btn.closest('.eventDelegation'); //find the parent before the modal is closed/destroyed (or it won't be found).
 						$btn.closest('.ui-dialog-content').dialog('close');
-						$("[data-app-role='saveButton']",'#productTabMainContent').addClass('ui-state-highlight');
+//update change counts AFTER dialog is destroyed or the changes to the variation itself will be in the count.
+//This may sound like a good idea, but it isn't because the dialog is destroyed and if another variation is edited, the count change could be misleading .
+//so ALL changes to one variation count as 1 edit.
+						$EDParent.anydelegate('updateChangeCounts');
+//						$("[data-app-role='saveButton']",'#productTabMainContent').addClass('ui-state-highlight');
 						}
 					else	{
 						$form.showLoading({"message":"Saving Changes To Variations"});
@@ -3179,7 +3374,7 @@ app.model.dispatchThis("immutable");
 
 					var pid = $btn.closest("[data-app-role='productVariationManager']").data('pid');
 					if(pid)	{
-						app.u.dump(" -> pid: "+pid);
+//						app.u.dump(" -> pid: "+pid);
 						if(app.data['adminProductDetail|'+pid] && app.data['adminProductDetail|'+pid]['@variations'])	{
 
 							$("[data-app-role='saveButton']",'#productTabMainContent').addClass('ui-state-highlight');
@@ -3193,7 +3388,8 @@ app.model.dispatchThis("immutable");
 								'dataAttribs':app.data.adminSOGComplete['%SOGS'][$btn.closest('tr').data('id')]
 								})
 							app.u.handleAppEvents($tbody,{'pid':pid});
-							$tbody.children().attr({'data-isnew':'true','data-issog':'true'}).appendTo($btn.closest("[data-app-role='productVariationManagerContainer']").find("[data-app-role='productVariationManagerProductTbody']"));
+							$tbody.children().attr({'data-isnew':'true','data-issog':'true'}).addClass('edited').appendTo($btn.closest("[data-app-role='productVariationManagerContainer']").find("[data-app-role='productVariationManagerProductTbody']"));
+							app.ext.admin.u.handleSaveButtonByEditedClass($btn.closest('form'));
 							}
 						else	{
 							$('#globalMessaging').anymessage({"message":"In admin_prodEdit.e.variationAddToProduct, product or product variation object not in memory.","gMessage":true});
@@ -3305,7 +3501,7 @@ app.model.dispatchThis('mutable');
 
 				var varEditorData = $btn.closest(".variationEditorContainer").data();
 				if(!varEditorData.ispog && varEditorData.variationid)	{
-					app.u.dump("ispog was not set. varEditorData.variationid.indexOf('#'): "+varEditorData.variationid.indexOf('#'));
+//					app.u.dump("ispog was not set. varEditorData.variationid.indexOf('#'): "+varEditorData.variationid.indexOf('#'));
 					if(varEditorData.variationid.indexOf('#') == 0)	{
 						app.u.dump("setting ispog to true because variationid contains a #");
 						varEditorData.ispog = true;
@@ -3368,8 +3564,8 @@ app.model.dispatchThis('mutable');
 				$btn.off('click.variationUpdateShow').on('click.variationUpdateShow',function(){
 					vars = vars || {};
 					
-					app.u.dump("BEGIN admin_prodEdit.e.variationUpdateShow click event");
-					app.u.dump(" -> $btn.data('variationmode'): "+$btn.data('variationmode'));
+//					app.u.dump("BEGIN admin_prodEdit.e.variationUpdateShow click event");
+//					app.u.dump(" -> $btn.data('variationmode'): "+$btn.data('variationmode'));
 					
 					if($btn.data('variationmode') == 'store')	{
 						$(app.u.jqSelector('#',app.ext.admin.vars.tab+'Content')).empty().append(app.ext.admin_prodEdit.a.getVariationEditor('store',app.data.adminSOGComplete['%SOGS'][$btn.closest('tr').data('id')]));
@@ -3380,12 +3576,12 @@ app.model.dispatchThis('mutable');
 // if isnew is true, that means this is a sog or pog that was just added to the product.
 // pogs do not have an ID immediately after they're added, so the guid is used to get the data from the product object in memory.
 						if($btn.closest('tr').data('isnew') && $btn.closest('tr').data('ispog'))	{
-							app.u.dump(" -> this is a newly added POG");
+//							app.u.dump(" -> this is a newly added POG");
 							variationID = ""; //set to blank so modal title doesn't show 'undefined'.
 							data = app.data['adminProductDetail|'+vars.pid]['@variations'][app.ext.admin.u.getIndexInArrayByObjValue(app.data['adminProductDetail|'+vars.pid]['@variations'],'guid',$btn.closest('tr').data('guid'))]
 							}
 						else if($btn.closest('tr').data('isnew') && $btn.closest('tr').data('issog'))	{
-							app.u.dump(" -> this is a sog just added to the pid");
+//							app.u.dump(" -> this is a sog just added to the pid");
 							data = app.data.adminSOGComplete['%SOGS'][variationID]
 							}
 						else	{
@@ -3396,13 +3592,18 @@ app.model.dispatchThis('mutable');
 
 						var $D = app.ext.admin.i.dialogCreate({
 							'title' : 'Edit Variation '+variationID+' for '+vars.pid,
-							'showLoading' : false
+							'showLoading' : false,
+							'appendTo' : $btn.closest("[data-app-role='productVariations']") //appended to the variation editor so that the dialog can look up the tree to modify the variation editor itself.
 							});
 
 						$D.append(app.ext.admin_prodEdit.a.getVariationEditor('product',data,vars.pid));
+						$D.dialog('option','height',($(document.body).height() - 100));
 //a little css tuning to make this shared content look better in a modal.
 						$('hgroup',$D).hide();
 						$('section.ui-widget-content',$D).css('border-width',0);
+// There's a usability issue between the app and FireFox where after doing a ctrl+f and clicking within the variations/options box, the browser jumps to top of the scrolly div on click.
+//putting the variation options into their own scroller solved this, but made the interface more clumsy.
+//						$("[data-app-role='storeVariationsOptionsContainer']",$D).wrap($("<div \/>").css({'padding':0,'overflow':'auto','height':($D.innerHeight() - 200)}));
 
 						$D.dialog('open');
 						}
@@ -3452,6 +3653,24 @@ app.model.dispatchThis('mutable');
 					}
 				},
 
+//used in product editor.  shows a DD which allows user to chooser product or store for scope.
+			variationCreateShowMenu : function($btn)	{
+				$btn.button({text: true,icons: {secondary: "ui-icon-triangle-1-s"}});
+				$btn.off('click.variationCreateShowMenu').on('click.vavariationCreateShowMenuriationCreateShow',function(){
+					var $menu = $btn.next()
+					$menu.show().css({'position':'absolute','width':'200px','padding':'2px 0'}).position({
+						my: "left top",
+						at: "left bottom",
+						of: $btn
+						}).find('button').css({'width':'90%','margin':'2px auto'});
+					 setTimeout(function(){
+						 $( document ).one( "click", function() {
+							$menu.hide();
+							});
+						 },1000);
+					});
+				}, //variationCreateShow
+
 			variationCreateShow : function($btn)	{
 				$btn.button();
 				$btn.off('click.variationCreateShow').on('click.variationCreateShow',function(){
@@ -3462,25 +3681,70 @@ app.model.dispatchThis('mutable');
 						'showLoading' : false
 						});
 					$D.data('variationmode',mode);
-					if(mode == 'product')	{
-						$D.attr('data-pid',$btn.closest('[data-pid]').data('pid'));
+					if(mode == 'store')	{
+						//container ID is used to refresh the list of global variations when adding a new global variation from within the product editor.
+						var $container = $btn.closest("[data-app-role='productVariationManager']");
+						if($container.attr('id'))	{}
+						else	{
+							$container.attr('id','pvm_'+app.u.guidGenerator());
+							}
+						$D.data({'containerid':$container.attr('id')});
+						$D.dialog('open');
 						}
-					$D.dialog('open');
+					else if(mode == 'product')	{
+						$D.attr({'data-pid':$btn.closest('[data-pid]').data('pid')});
+						$D.dialog('open');
+						}
+					else	{
+						$('#globalMessaging').anymessage({"message":"In admin_prodedit.e.variationCreateShow, invalid data-mode ["+mode+"] on trigger element. must be store or product.","gMessage":true});
+						} //invalid mode.
+					
+					
 					});
 				}, //variationCreateShow
+//used within product editor to allow for the list of global variations to be refreshed.
+			storeVariationsRefresh : function($btn)	{
+				$btn.button({text: false,icons: {secondary: "ui-icon-refresh"}});
+				$btn.off('click.variationsCreateExec').on('click.variationsCreateExec',function(event){
+					event.preventDefault();
+					var $tbody = $btn.closest("[data-app-role='productVariationManagerStoreContainer']").find("tbody[data-app-role='storeVariationsTbody']:first");
+					$tbody.empty().showLoading({'message':'Fetching store variations'});
+					app.model.addDispatchToQ({
+						'_cmd':'adminSOGComplete',
+						'_tag':	{
+							'datapointer' : 'adminSOGComplete',
+							'callback' : function(rd)	{
+								$tbody.hideLoading();
+								if(app.model.responseHasErrors(rd)){
+									$tbody.closest('div').anymessage({'message':rd});
+									}
+								else	{
+									$tbody.anycontent(rd); 
+									app.u.handleAppEvents($tbody);
+									app.ext.admin_prodEdit.u.handleApply2ProdButton($btn.closest("[data-app-role='productVariationManagerContainer']"));
+									}
+								}
+							}
+						},'mutable');
+					app.model.dispatchThis('mutable');
+					});
+				},
 
 			variationCreateExec : function($btn)	{
 				$btn.button();
 				$btn.off('click.variationsCreateExec').on('click.variationsCreateExec',function(event){
 					event.preventDefault();
-					var mode =
-						$btn.closest('.ui-dialog-content').data('variationmode'),
+					var 
+						mode = $btn.closest('.ui-dialog-content').data('variationmode'),
 						pid = $btn.closest("[data-pid]").data('pid'),
 						$form = $btn.closest('form'),
-						sfo = $form.serializeJSON({'cb':true});
+						sfo = $form.serializeJSON({'cb':true}),
+						containerid = $btn.closest('.ui-dialog-content').data('containerid'),
+						newSogID;
 						
 					app.u.dump(" -> mode: "+mode);
 					if(app.u.validateForm($form) && sfo.type)	{
+						$form.showLoading({'message':'Creating '+mode+' variation'});
 						sfo.autoid = 1; //tells API to give this option a variation ID (next in sequence) and to assign id's to the options.
 						if(mode == 'store')	{
 							sfo.v = '2'; //sog version.
@@ -3495,6 +3759,7 @@ app.model.dispatchThis('mutable');
 											}
 										else	{
 											$btn.closest('.ui-dialog-content').dialog('close');
+											newSogID = app.data[rd.datapointer].sogid;
 											app.ext.admin_prodEdit.a.showStoreVariationsManager($('#productTabMainContent'));
 											$('#productTabMainContent').anymessage(app.u.successMsgObject('Your variation group has been added.'))
 											}
@@ -3504,7 +3769,33 @@ app.model.dispatchThis('mutable');
 							app.model.addDispatchToQ({
 								'_cmd':'adminSOGComplete',
 								'_tag':	{
-									'datapointer' : 'adminSOGComplete'
+									'datapointer' : 'adminSOGComplete',
+									'callback' : function(rd)	{
+										app.u.dump(" -> INTO the callback for adminSOGComplete");
+										if(app.model.responseHasErrors(rd)){
+											$form.anymessage({'message':rd});
+											}
+										else	{
+
+if(containerid)	{
+	app.u.dump(" -> containerid is specified. reload the list of store variations");
+	var $container = $(app.u.jqSelector('#',containerid));
+	if($container.length)	{
+		var $tbody = $("tbody[data-app-role='storeVariationsTbody']:first",$container);
+	//update the list of sogs.
+		$tbody.empty().anycontent(rd); 
+		app.u.handleAppEvents($tbody);
+//apply the new sog to the list of product variations.
+		if(newSogID)	{
+			$("[data-id='"+newSogID+"']",$tbody).find("button[data-app-event='admin_prodEdit|variationAddToProduct']").trigger('click');
+			}
+		}
+	else	{
+		app.u.dump(" -> no matching element for containerid");
+		}
+	}
+											}
+										}
 									}
 								},'mutable');
 							app.model.dispatchThis('mutable');
@@ -3539,6 +3830,8 @@ app.model.dispatchThis('mutable');
 					});
 				}, //variationCreateExec
 
+
+			
 
 //a button for toggling was added for two reasons: people may not like/have drag and drop and if no options were enabled, hard to get placement exactly right.
 			variationsOptionToggle : function($btn)	{
