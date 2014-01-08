@@ -101,9 +101,19 @@ var store_sac = function() {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		renderFormats : {
-			filterOption : function($tag,data){
-				$tag.val(data.value.v);
-				$tag.text(data.value.p);
+			filterSelect : function($tag,data){
+				app.u.dump("here");
+				app.u.dump(data.value);
+				if(data.value){
+					data.bindData.defaultText = data.bindData.defaultText || 'Select a filter';
+					$tag.append('<option value="">'+data.bindData.defaultText+'</option>');
+					for(var i in data.value){
+						var o = data.value[i];
+						$tag.append('<option value="'+o.v+'">'+o.p+'</option>');
+					}
+				} else {
+					$tag.remove();
+				}
 			},
 			prodChildOption: function($tag, data){
 				$tag.val(data.value.pid);
@@ -245,6 +255,10 @@ var store_sac = function() {
 				
 				$fc.addClass('active');
 				},
+			sendFilteredSearch : function(){
+				var filters = $('#filterList').serializeJSON();
+				app.u.dump(filters);
+				},
 			destroyFilteredSearch : function(infoObj){
 				var $fc = $('#filterContainer');
 				$fc.removeClass('expand').removeClass('active');
@@ -308,7 +322,7 @@ var store_sac = function() {
 								"p" : "Brown",
 								"v" : "brown"
 							}
-						],
+						]/*,
 					"accent_color" : [
 							{
 								"p" : "Black",
@@ -322,7 +336,7 @@ var store_sac = function() {
 								"p" : "Brown",
 								"v" : "brown"
 							}
-						]
+						]*/
 					}
 				}
 			}

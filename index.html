@@ -379,7 +379,7 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 	<div id="filterContainer">
 		<div id="showFilterBtn" class="pointer" onClick="$(this).parent().toggleClass('expand');">Show</div>
 		<div id="filterListContainer">
-			<div id="filterList"></div>
+			<form id="filterList"></form>
 		</div>
 	</div>
 	<div id="chatContainer"></div>
@@ -640,8 +640,8 @@ don't modify the 'data-templateid' unless you are changing template names and up
 </div>
 
 <form id="filterListTemplate">
-	<select data-bind="var:filter(options.primary_color); format:stuffList; loadsTemplate:filterOption;"></select>
-	<select data-bind="var:filter(options.accent_color); format:stuffList; loadsTemplate:filterOption;"></select>
+	<select name="primary_color" data-bind="var:filter(options.primary_color); format:filterSelect; extension:store_sac; forceRender:true;"></select>
+	<select name="accent_color" data-bind="var:filter(options.accent_color); format:filterSelect; extension:store_sac; forceRender:true;"></select>
 </form>
 
 <select>

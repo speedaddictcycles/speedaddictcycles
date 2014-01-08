@@ -173,6 +173,7 @@ body {
 
 #filterContainer {
 	position:absolute;
+	z-index:1001;
 	transition: left .6s, width .6s;
 	-moz-transition: left .6s, width .6s;
 	-webkit-transition: left.6s, width .6s;
