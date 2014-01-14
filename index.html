@@ -634,7 +634,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 
 </div>
 
-<div id="categoryTemplateFilteredSearch" class="loadingBG categoryTemplate">
+<div id="categoryTemplateFilteredSearch" class="loadingBG categoryTemplateFilteredSearch">
 	<ul class='breadcrumb clearfix noPadOrMargin fluidList' data-bind='var: category(id); format:breadcrumb; extension:store_navcats; loadsTemplate: breadcrumbTemplate;'></ul>
 	
 	<ul data-sac="output" class='listStyleNone fluidList noPadOrMargin productList'></ul>
@@ -866,16 +866,15 @@ remember to NOT put the button inside the 'onclick' container or two events will
 SANITY -> if you change the height and width of this image, change the .minimalMode .searchResultsProduct in qs_styles.css to match
 -->
 <li id='productListTemplateResults' class='loadingBG searchResultsProduct ' >
-	<div onClick="app.ext.myRIA.a.handleProdPreview($(this).parent().attr('data-pid'));" class='pointer'>
+	<div onClick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" class='pointer'>
 		<div class='prodThumbContainer'>
-		<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='120' height='120' />
+		<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='232' height='232' />
 		</div>
 
-		<h5 class='hideInMinimalMode' data-bind='var: product(prod_name); format:text;'></h5>
+		<h5 class='name' data-bind='var: product(prod_name); format:text;'></h5>
 
-		<h6 class='hideInMinimalMode' data-bind='var: product(base_price); format:money; isElastic:1; currencySign: $;  hideZero:true; className:price; pretext: Our Price: ;'></h6>
+		<h4 class='price' data-bind='var: product(base_price); format:money; isElastic:1; currencySign: $;  hideZero:true;'></h4>
 	</div>
-	<div class='hideInMinimalMode pointer moreDetails' onClick="showContent('product',{'pid':$(this).parent().attr('data-pid')});">more details</div>
 </li>
 
 <li id='productListTemplateResultsNoPreview' class='loadingBG searchResultsProduct ' >
