@@ -120,7 +120,7 @@ P.query = { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_S
 				if($list && $list.length)	{
 //*** 201336 -> setting data-app-role on the element was a bad idea. it may have already been set and it doesn't appear to get used at all.
 					$list.empty().removeClass('loadingBG'); //.attr('data-app-role','searchResults');
-					$list.closest('.previewListContainer').find('.resultsHeader').empty().remove(); //remove any previous results multipage headers
+					$list.parent().find('.resultsHeader').empty().remove(); //remove any previous results multipage headers
 
 					if(L == 0)	{
 						$list.append("Your query returned zero results.");

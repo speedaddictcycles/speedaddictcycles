@@ -310,6 +310,7 @@ var store_sac = function() {
 				app.u.dump(elasticsearch);
 				var es = app.ext.store_search.u.buildElasticRaw(elasticsearch);
 				es.size = 50;
+				app.ext.store_search.u.updateDataOnListElement($('[data-sac=output]', $context),es,1);
 				app.ext.store_search.calls.appPublicSearch.init(es, {'callback':'handleElasticResults', 'datapointer':'appFilteredSearch','extension':'store_search','templateID':'productListTemplateResults','list':$('[data-sac=output]', $context)});
 				app.model.dispatchThis();
 				
