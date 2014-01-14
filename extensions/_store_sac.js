@@ -105,35 +105,40 @@ var store_sac = function() {
 				var options = false;
 				if(data.bindData.index){
 					options = data.value[data.bindData.index];
-				}
+					}
 				
 				if(options){
-					$tag.data('filter-index', data.bindData.index);
-					$tag.data('filter-type','checkboxList');
+					$tag.attr('data-filter-index', data.bindData.index);
+					$tag.attr('data-filter-type','checkboxList');
 					for(var i in options){
 						var o = options[i];
 						var $o = $('<div></div>');
 						$o.append('<input type="checkbox" name="'+o.v+'"/>');
 						$o.append('<label>'+o.p+'</label>');
 						$tag.append($o);
+						}
 					}
-				} else {
+				else {
 					$tag.remove();
-				}
-			},
-			filterSelect : function($tag,data){
-				app.u.dump(data.value);
-				if(data.value){
-					data.bindData.defaultText = data.bindData.defaultText || 'Select a filter';
-					$tag.append('<option value="">'+data.bindData.defaultText+'</option>');
-					for(var i in data.value){
-						var o = data.value[i];
-						$tag.append('<option value="'+o.v+'">'+o.p+'</option>');
 					}
-				} else {
-					$tag.remove();
-				}
-			},
+				},
+			// filterSelect : function($tag,data){
+				// app.u.dump(data.value);
+				// if(data.value){
+					// data.bindData.defaultText = data.bindData.defaultText || 'Select a filter';
+					// $tag.append('<option value="">'+data.bindData.defaultText+'</option>');
+					// for(var i in data.value){
+						// var o = data.value[i];
+						// $tag.append('<option value="'+o.v+'">'+o.p+'</option>');
+					// }
+				// } else {
+					// $tag.remove();
+				// }
+			// },
+			assignData : function($tag, data){
+				$tag.data(data.bindData.attribute, data.value);
+				app.u.dump($tag.data(data.bindData.attribute));
+				},
 			prodChildOption: function($tag, data){
 				$tag.val(data.value.pid);
 				if(data.value['%attribs']['amz:grp_varvalue']){
@@ -273,10 +278,41 @@ var store_sac = function() {
 				$fl.anycontent({'data':app.ext.store_sac.filters[infoObj.navcat], 'templateID':'filterListTemplate'});
 				
 				$fc.addClass('active');
+				//TODO
+				//$fc.addClass('expand');
 				},
 			sendFilteredSearch : function(){
-				var filters = $('#filterList').serializeJSON();
-				app.u.dump(filters);
+				var $context = $('#filterList').data('jqContext');
+				var elasticsearch = {
+					"filter" : {
+						"and" : []
+						}
+					}
+				app.u.dump($('#filterList [data-sac=filterBase]').length);
+				app.u.dump($('#filterList [data-sac=filterBase]').data('filter-base'));
+				elasticsearch.filter.and.push($('#filterList [data-sac=filterBase]').data('filter-base'));
+				
+				$('#filterList [data-filter-type=checkboxList]').each(function(){
+					var index = $(this).attr('data-filter-index');
+					var filter = {"or" : []};
+					$('input', $(this)).each(function(){
+						if($(this).is(":checked")){
+							var f = {"term" : {}};
+							f.term[index] = $(this).attr('name');
+							filter.or.push(f);
+							}
+						});
+					if(filter.or.length > 0){
+						elasticsearch.filter.and.push(filter);
+						}
+					});
+				app.u.dump(elasticsearch);
+				var es = app.ext.store_search.u.buildElasticRaw(elasticsearch);
+				es.size = 50;
+				app.ext.store_search.calls.appPublicSearch.init(es, {'callback':'handleElasticResults', 'datapointer':'appFilteredSearch','extension':'store_search','templateID':'productListTemplateResults','list':$('[data-sac=output]', $context)});
+				app.model.dispatchThis();
+				
+				//app.u.dump(es);
 				},
 			destroyFilteredSearch : function(infoObj){
 				var $fc = $('#filterContainer');
@@ -321,12 +357,10 @@ var store_sac = function() {
 		filters : {
 			".burly_test" : {
 				"base" : {
-					"filter" : {
-						"term" : {
-							"helmet_type" : "dirt"
+					"term" : {
+							"helmet_type" : "full_face"
 						}
-					}
-				},
+					},
 				"options" : {
 					"primary_color" : [
 							{
@@ -341,7 +375,7 @@ var store_sac = function() {
 								"p" : "Brown",
 								"v" : "brown"
 							}
-						]/*,
+						],
 					"accent_color" : [
 							{
 								"p" : "Black",
@@ -355,7 +389,7 @@ var store_sac = function() {
 								"p" : "Brown",
 								"v" : "brown"
 							}
-						]*/
+						]
 					}
 				}
 			}

@@ -637,12 +637,12 @@ don't modify the 'data-templateid' unless you are changing template names and up
 <div id="categoryTemplateFilteredSearch" class="loadingBG categoryTemplate">
 	<ul class='breadcrumb clearfix noPadOrMargin fluidList' data-bind='var: category(id); format:breadcrumb; extension:store_navcats; loadsTemplate: breadcrumbTemplate;'></ul>
 	
-	<div data-sac="output">
-		
-	</div>
+	<ul data-sac="output" class='listStyleNone fluidList noPadOrMargin productList'></ul>
 </div>
 
 <form id="filterListTemplate">
+	<input type="hidden" data-sac="filterBase" data-bind="var:filter(base); format:assignData; extension:store_sac; attribute:filter-base;"></input>
+	
 	<h5 class="displayNone highlightText" data-bind="var:filter(options.app_brand); format:showIfSet;">Brand:</h5>
 	<div data-bind="var:filter(options); index:app_brand; 			format:filterCheckboxList; extension:store_sac;"></div>
 	
