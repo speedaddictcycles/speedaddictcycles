@@ -113,6 +113,8 @@ li.prodListItemCarousel { margin: 3px; }
 CATEGORY PAGE STYLES
 
 *********************************************************/
+.categoryTemplateFilteredSearch .productList {margin: 0px 36px;}
+.productList li.searchResultsProduct {width: 232px; height: 320px; margin: 8px;}
 
 /*********************************************************
 

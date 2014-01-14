@@ -116,6 +116,9 @@ li.prodListItemCarousel { margin: 3px; }
 CATEGORY PAGE STYLES
 
 *********************************************************/
+.categoryTemplateFilteredSearch .productList {margin: 0px 5px;}
+.productList li.searchResultsProduct {width: 140px; height: 250px; margin: 8px;}
+.searchResultsProduct .prodThumb {width: 140px; height: 140px;}
 
 /*********************************************************
 
