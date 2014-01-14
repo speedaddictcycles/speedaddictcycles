@@ -276,8 +276,9 @@ var store_sac = function() {
 				$fl.data('filters',app.ext.store_sac.filters[infoObj.navcat]);
 				
 				$fl.anycontent({'data':app.ext.store_sac.filters[infoObj.navcat], 'templateID':'filterListTemplate'});
-				
+				$('button', $fl).button();
 				$fc.addClass('active');
+				app.ext.store_sac.u.sendFilteredSearch();
 				//TODO
 				//$fc.addClass('expand');
 				},
