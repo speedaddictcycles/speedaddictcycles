@@ -1,7 +1,7 @@
 {
 	"slides": [
 		{
-			"src": "banner/leovince_gp_corsa_banner.jpg",
+			"src": "banner/leovince_gp_corsa_exhausts.jpg",
 			"alt": "",
 			"title": "",
 			"searchLink": "gp corsa"
@@ -10,19 +10,7 @@
 			"src": "banner/slideshow_test900x403.jpg",
 			"alt": "",
 			"title": "",
-			"catLink": ".shop_by_brand.airoh-helmets"
-		},
-		{
-			"src": "banner/free_progrip_goggle_mrjump.jpg",
-			"alt": "",
-			"title": "",
-			"catLink": ".shop_by_brand.suomy-mr-jump-mx-helmets"
-		},
-		{
-			"src": "banner/slideshow_test900x403.jpg",
-			"alt": "",
-			"title": "",
-			"catLink": ".shop_by_brand.airoh-helmets"
+			"catLink": ".brands.airoh"
 		}
 	],
 	"dims": [
