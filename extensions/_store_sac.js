@@ -248,13 +248,13 @@ var store_sac = function() {
 				$banner.append($img);
 				
 				if(bannerJSON.prodLink){
-					$banner.data("onClick", "appLink").attr("href","#!product?pid="+bannerJSON.prodLink);
+					$banner.attr("data-onClick", "appLink").attr("href","#!product?pid="+bannerJSON.prodLink);
 					}
 				else if(bannerJSON.catLink){
-					$banner.data("onClick", "appLink").attr("href","#!category?navcat="+bannerJSON.catLink);
+					$banner.attr("data-onClick", "appLink").attr("href","#!category?navcat="+bannerJSON.catLink);
 					}
 				else if(bannerJSON.searchLink){
-					$banner.data("onClick", "appLink").attr("href","#!category?KEYWORDS="+bannerJSON.searchLink);
+					$banner.attr("data-onClick", "appLink").attr("href","#!search?KEYWORDS="+bannerJSON.searchLink);
 					}
 				else {
 					//just a banner!
