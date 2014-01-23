@@ -885,9 +885,9 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 			
 		</div>
 	</div>
-	<img class="tag freeshipTag "  src="images/shipfree.jpg"data-bind="var:product(tags); format:showIfShipFree; extension:store_sac;"/>
-	<img class="tag imajizeTag " src="images/360tag.png" data-bind="var:product(tags); format:showIfSet;"/>
-	<img class="tag videoTag " src="images/videotag.png"  data-bind="var:product(tags); format:showIfSet;"/>
+	<img class="tag freeshipTag displayNone"  src="images/shipfree.jpg"data-bind="var:product(tags); format:showIfShipFree; extension:store_sac;"/>
+	<img class="tag imajizeTag displayNone" src="images/360tag.png" data-bind="var:product(prod_360_viewer_id); format:showIfSet;"/>
+	<img class="tag videoTag displayNone" src="images/videotag.png"  data-bind="var:product(videoid); format:showIfSet;"/>
 </li>
 
 <li id='productListTemplateResultsNoPreview' class='loadingBG searchResultsProduct ' >

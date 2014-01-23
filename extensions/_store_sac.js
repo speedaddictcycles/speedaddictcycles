@@ -122,22 +122,14 @@ var store_sac = function() {
 					$tag.remove();
 					}
 				},
-			// filterSelect : function($tag,data){
-				// app.u.dump(data.value);
-				// if(data.value){
-					// data.bindData.defaultText = data.bindData.defaultText || 'Select a filter';
-					// $tag.append('<option value="">'+data.bindData.defaultText+'</option>');
-					// for(var i in data.value){
-						// var o = data.value[i];
-						// $tag.append('<option value="'+o.v+'">'+o.p+'</option>');
-					// }
-				// } else {
-					// $tag.remove();
-				// }
-			// },
 			assignData : function($tag, data){
 				$tag.data(data.bindData.attribute, data.value);
 				//app.u.dump($tag.data(data.bindData.attribute));
+				},
+			showIfShipFree : function($tag, data){
+				if($.inArray("IS_SHIPFREE", data.value) >= 0){
+					$tag.show();
+					}
 				},
 			prodChildOption: function($tag, data){
 				$tag.val(data.value.pid);
