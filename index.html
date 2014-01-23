@@ -305,7 +305,7 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 				</div>
 			</div>
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderRight_320">
-				<a class="navLink" href="#!category?navcat=.shop_by_type.street" data-onClick="appLink">APPAREL &amp; ACCESSORIES</a>
+				<a class="navLink" href="#!category?navcat=.shop_by_type.street" data-onClick="appLink">APPAREL &amp; MORE</a>
 				<div data-sac="dropdownContent" class="dropdownContent apparel">
 					<div class="dropdownList floatLeft">
 						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
@@ -643,6 +643,13 @@ don't modify the 'data-templateid' unless you are changing template names and up
 <form id="filterListTemplate">
 	<input type="hidden" data-sac="filterBase" data-bind="var:filter(base); format:assignData; extension:store_sac; attribute:filter-base;"></input>
 	
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.videoid); format:showIfSet;">
+		<input type="checkbox" name="videoid" data-filter-index="videoid" data-filter-type="hasAttribute"/> Has Video
+	</h5>
+	<h5 class="displayNone highlightText" data-bind="var:filter(options.prod_360_viewer_id); format:showIfSet;">
+		<input type="checkbox" name="prod_360_viewer_id" data-filter-index="prod_360_viewer_id" data-filter-type="hasAttribute"/> Has 360 View
+	</h5>
+	
 	<h5 class="displayNone highlightText" data-bind="var:filter(options.app_brand); format:showIfSet;">Brand:</h5>
 	<div data-bind="var:filter(options); index:app_brand; 			format:filterCheckboxList; extension:store_sac;"></div>
 	
@@ -866,15 +873,21 @@ remember to NOT put the button inside the 'onclick' container or two events will
 SANITY -> if you change the height and width of this image, change the .minimalMode .searchResultsProduct in qs_styles.css to match
 -->
 <li id='productListTemplateResults' class='loadingBG searchResultsProduct ' >
-	<div onClick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" class='pointer'>
-		<div class='prodThumbContainer'>
-		<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='232' height='232' />
+	<div data-bind="var:product(prod_name); format:assignAttribute; attribute:title;">
+		<div onClick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" class='pointer'>
+			<div class='prodThumbContainer'>
+			<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='232' height='232' />
+			</div>
+
+			<h5 class='name' data-bind='var: product(prod_name); format:truncText; numCharacters:54;'></h5>
+
+			<h4 class='price' data-bind='var: product(base_price); format:money; isElastic:1; currencySign: $;  hideZero:true;'></h4>
+			
 		</div>
-
-		<h5 class='name' data-bind='var: product(prod_name); format:text;'></h5>
-
-		<h4 class='price' data-bind='var: product(base_price); format:money; isElastic:1; currencySign: $;  hideZero:true;'></h4>
 	</div>
+	<img class="tag freeshipTag "  src="images/shipfree.jpg"data-bind="var:product(tags); format:showIfShipFree; extension:store_sac;"/>
+	<img class="tag imajizeTag " src="images/360tag.png" data-bind="var:product(tags); format:showIfSet;"/>
+	<img class="tag videoTag " src="images/videotag.png"  data-bind="var:product(tags); format:showIfSet;"/>
 </li>
 
 <li id='productListTemplateResultsNoPreview' class='loadingBG searchResultsProduct ' >

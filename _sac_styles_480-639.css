@@ -58,7 +58,7 @@
 #header #headerBanners #minicart {width: 124px; height: 100%;}
 
 #header #searchBar {width: 277px;}
-
+#header #nav > div {font-size: .95em;}
 #filterContainer {left:-69px; top:0px;}
 #filterContainer #showFilterBtn { width: 69px; height:266px; background:url(images/show_filter_btn_69x266.png) no-repeat;}
 

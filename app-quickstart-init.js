@@ -16,7 +16,7 @@ app.rq.push(['extension',0,'store_crm','extensions/store_crm.js']);
 app.rq.push(['extension',0,'myRIA','app-quickstart.js','startMyProgram']);
 
 app.rq.push(['extension',0,'store_sac','extensions/_store_sac.js']);
-app.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.js']); 
+app.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.min.js']); 
 app.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
 app.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);
 app.rq.push(['extension',0,'partner_addthis','extensions/partner_addthis.js']);

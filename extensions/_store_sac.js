@@ -56,7 +56,7 @@ var store_sac = function() {
 								"items" : { "visible" : 3},
 								"prev" : { "button" : $('#homepageFeaturesCarouselPrev') },
 								"next" : { "button" : $('#homepageFeaturesCarouselNext') }
-								},{"debug" : true});
+								},{"debug" : false});
 							},1000);
 						}
 					
@@ -137,7 +137,7 @@ var store_sac = function() {
 			// },
 			assignData : function($tag, data){
 				$tag.data(data.bindData.attribute, data.value);
-				app.u.dump($tag.data(data.bindData.attribute));
+				//app.u.dump($tag.data(data.bindData.attribute));
 				},
 			prodChildOption: function($tag, data){
 				$tag.val(data.value.pid);
@@ -153,8 +153,8 @@ var store_sac = function() {
 				$tag.attr('src',src);
 				},
 			imageSrcset : function($tag, data){
-				app.u.dump(data.bindData.dims);
-				app.u.dump(data.bindData.dims.split(" "));
+				//app.u.dump(data.bindData.dims);
+				//app.u.dump(data.bindData.dims.split(" "));
 				var dims = data.bindData.dims.split(" ");
 				var srcset = "";
 				for(var i = 0; i < dims.length; i++){
@@ -205,7 +205,9 @@ var store_sac = function() {
 							$slideshow.append($banner);
 							}
 						$slideshow.append($(app.ext.store_sac.vars.bannerJSON.pagerHTML));
-						$slideshow.addClass('slideshowRendered').cycle(app.ext.store_sac.vars.bannerJSON.cycleOptions);
+						cycleOptions = app.ext.store_sac.vars.bannerJSON.cycleOptions;
+						cycleOptions.log = false;
+						$slideshow.addClass('slideshowRendered').cycle(cycleOptions);
 						}
 					}
 				else {
@@ -307,9 +309,22 @@ var store_sac = function() {
 						elasticsearch.filter.and.push(filter);
 						}
 					});
+				
+				$('#filterList [data-filter-type=hasAttribute]').each(function(){
+					if($(this).is(":checked")){
+						elasticsearch.filter.and.push({
+							"not" : {
+								"missing" : {
+									"field" : $(this).attr('data-filter-index')
+									}
+								}
+							});
+						}
+					});
+				
 				app.u.dump(elasticsearch);
 				var es = app.ext.store_search.u.buildElasticRaw(elasticsearch);
-				es.size = 50;
+				es.size = 60;
 				app.ext.store_search.u.updateDataOnListElement($('[data-sac=output]', $context),es,1);
 				app.ext.store_search.calls.appPublicSearch.init(es, {'callback':'handleElasticResults', 'datapointer':'appFilteredSearch','extension':'store_search','templateID':'productListTemplateResults','list':$('[data-sac=output]', $context)});
 				app.model.dispatchThis();
@@ -357,13 +372,14 @@ var store_sac = function() {
 		// It can be assumed that if a navcat is used as a key here, (ie typeof app.ext.store_sac.filters[navcat] !== "undefined") 
 		// then the app should use the filtered search template for it
 		filters : {
-			".burly_test" : {
+			".motorcycle-helmets" : {
 				"base" : {
 					"term" : {
 							"helmet_type" : "full_face"
 						}
 					},
 				"options" : {
+					"videoid" : 1,
 					"primary_color" : [
 							{
 								"p" : "Black",

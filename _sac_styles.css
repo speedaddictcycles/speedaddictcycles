@@ -231,8 +231,14 @@ HOMEPAGE STYLES
 CATEGORY PAGE STYLES
 
 *********************************************************/
-.searchResultsProduct .name {color: #142069;}
+.searchResultsProduct .name {color: #142069; height:32px;}
 .searchResultsProduct .price {color: #f75400;}
+
+.searchResultsProduct {position:relative;}
+.searchResultsProduct .tag {position:absolute;}
+.searchResultsProduct .freeshipTag {bottom:0px; left:0px;}
+.searchResultsProduct .imajizeTag,
+.searchResultsProduct .videoTag {bottom:0px; right:0px;}
 /*********************************************************
 
 PRODUCT PAGE STYLES
