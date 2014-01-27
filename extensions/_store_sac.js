@@ -95,7 +95,21 @@ var store_sac = function() {
 ////////////////////////////////////   ACTION    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		a : {
-
+			showYoutubeVideo : function(videoid, title){
+				var $modal = $('<div id="ytModal"><div class="overlay"></div></div>');
+				var $ytContainer = $('<div class="ytContainer"></div>');
+				var $btn = $('<button></button>');
+				$btn.button({
+					icons : {"primary" : "ui-icon-closethick"},
+					text : false
+					});
+				$btn.on('click', function(){$modal.empty().remove();})
+				$ytContainer.append($btn);
+				$ytContainer.append("<iframe style='z-index:1;' src='https://www.youtube.com/embed/"+videoid+"?autoplay=1&wmode=transparent' frameborder='0' allowfullscreen></iframe>");
+				$modal.append($ytContainer);
+				
+				$('body').append($modal);
+				}
 			}, //Actions
 
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -129,6 +143,16 @@ var store_sac = function() {
 			showIfShipFree : function($tag, data){
 				if($.inArray("IS_SHIPFREE", data.value) >= 0){
 					$tag.show();
+					}
+				},
+			youtubeModalLink : function($tag, data){
+				app.u.dump(data.value);
+				if(data.value['%attribs']['youtube:videoid']){
+					$tag.show();
+					$tag.on('click',function(){
+						app.ext.store_sac.a.showYoutubeVideo(data.value['%attribs']['youtube:videoid'], data.value['%attribs']['zoovy:prod_name']);
+						return false;
+						});
 					}
 				},
 			prodChildOption: function($tag, data){

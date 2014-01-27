@@ -147,6 +147,7 @@ PRODUCT PAGE STYLES
 .prodViewerContainer .prodThumb img{ width:54px; height:40px;}
 
 .prodSummaryContainer{width: 235px; padding-left:15px;}
+#ytModal .ytContainer {width: 700px; height: 420px; margin-left: -350px; margin-top: -210px;}
 
 /*********************************************************
 

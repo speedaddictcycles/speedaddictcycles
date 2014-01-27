@@ -985,7 +985,7 @@ this will likely become more flexible in the future. ###
 				</div>
 
 				<div data-bind='var:product(pid);format:assignAttribute; attribute:data-pid;' class='prodThumbs highlightGradientBG'>
-					<a href="#" class="icon floatLeft">
+					<a href="#" data-bind="useParentData:true; format: youtubeModalLink; extension:store_sac;" class="icon displayNone floatLeft">
 						<img src="images/videoicon_22x20.png" class="video" srcset="images/videoicon_22x20.png 639w, images/videoicon_31x29.png 767w, images/videoicon_37x35.png" />
 					</a>
 					<a class="prodThumb" href="#" data-bind="useParentData:true; format: lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image2; groupingAttr:pid; groupingPrefix:prodPage_;">

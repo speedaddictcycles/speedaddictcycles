@@ -139,6 +139,7 @@ PRODUCT PAGE STYLES
 
 .prodSummaryContainer{width: 186px; padding-left: 10px;}
 .prodSummaryContainer h1{font-size: 1.5em;}
+#ytModal .ytContainer {width: 450px; height: 270px; margin-left: -225px; margin-top: -135px;}
 
 /*********************************************************
 
