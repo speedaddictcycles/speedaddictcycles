@@ -235,6 +235,7 @@ CATEGORY PAGE STYLES
 .searchResultsProduct .price {color: #f75400;}
 
 .searchResultsProduct {position:relative;}
+.searchResultsProduct iframe{border:none;}
 .searchResultsProduct .tag {position:absolute;}
 .searchResultsProduct .freeshipTag {bottom:0px; left:0px;}
 .searchResultsProduct .imajizeTag,

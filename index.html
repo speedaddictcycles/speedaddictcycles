@@ -899,10 +899,12 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 	
 	<div data-bind="var:product(pid); format:assignAttribute; attribute:data-pid;">
 		<div onClick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" data-bind="var:product(prod_name); format:assignAttribute; attribute:data-pid;"class='pointer'>
-			<div class='prodThumbContainer'>
-			<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='232' height='232' />
+			<div data-bind="var:product(prod_360_viewer_id); format:hideIfSet;" class='prodThumbContainer'>
+				<img src='blank.gif' class='prodThumb' alt='' data-bind='var: product(images); format:imageURL;isElastic:1;bgcolor:ffffff;' width='232' height='232' />
 			</div>
-
+			<div class="displayNone" data-bind="var:product(prod_360_viewer_id); format:showIfSet;">
+				<iframe data-bind="var:product(prod_360_viewer_id); format:imajize360; extension:store_sac;" class="prodThumb"></iframe>
+			</div>
 			<h5 class='name' data-bind='var: product(prod_name); format:truncText; numCharacters:54;'></h5>
 
 			<h4 class='price' data-bind='var: product(base_price); format:money; isElastic:1; currencySign: $;  hideZero:true;'></h4>
