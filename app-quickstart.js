@@ -1078,7 +1078,7 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 					app.u.dump("WARNING! in showContent and no parentID is set for the element being translated.");
 					}
 
-
+				$(document).trigger('renderFinish');
 				return false; //always return false so the default action (href) is cancelled. hashstate will address the change.
 				}, //showContent
 
