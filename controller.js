@@ -21,6 +21,9 @@
 
 
 var zController = function(params) {
+	if(this.u.getParameterByName('quiet')){
+		this.u.dump = function(){};
+	}
 	this.u.dump('Welcome fellow developer!\nThis project was built with an open-source MVC which can be found here:\nhttps://github.com/zoovy/AnyCommerce-Development','greet');
 	if(typeof Prototype == 'object')	{
 		alert("Oh No! you appear to have the prototype ajax library installed. This library is not compatible. Please change to a non-prototype theme (2011 series).");
