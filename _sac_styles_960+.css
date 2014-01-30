@@ -67,7 +67,7 @@
 .dropdownContent.showDropDown.apparel {height: 490px;}
 
 .dropdownContent .featBrands a {line-height: 70px; height: 70px; padding-top: 10px; margin-left: 10px;}
-.dropdownContent .featBrands img { border: 3px solid #36393e; margin-right: 10px; }
+.dropdownContent .featBrands img { border: 3px solid #36393e;}
 
 .dropdownContent .dropdownList a {line-height: 70px; height: 70px; padding-top: 10px; margin-left: 10px;}
 .dropdownContent .dropdownList img { border: 3px solid #36393e; margin-right: 10px; }
