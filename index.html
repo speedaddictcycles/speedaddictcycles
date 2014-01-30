@@ -21,7 +21,7 @@ var _gaq = _gaq || {'push':function(){}} //here for testing. REPLACE BEFORE DEPL
 var myCreole;
 
 var app = {vars:{
-	"release":"20140128093300",  //increment this with each change. should solve caching issues. format: YYYYMMDDHHMMSS
+	"release":"20140129081900",  //increment this with each change. should solve caching issues. format: YYYYMMDDHHMMSS
 	"_clientid":"1pc", //zmvc for store app, 1pc for one page checkout.
 	"baseURL":"", //used in non-local mode.
 	"checkoutAuthMode" : "active",//can be passive, active or required
@@ -189,123 +189,127 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 			</div>
 		<div id="nav" class="clear sourceSans">
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderRight_320 navOptionBorderBottom_320">
-				<a class="navLink" href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" >HELMETS</a>
+				<a class="navLink" href="#!category?navcat=.motorcycle-helmets" data-onClick="appLink" >HELMETS</a>
 				<div data-sac="dropdownContent" class="dropdownContent helmets">
 					<div class="dropdownList floatLeft">
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.full-face" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Full Face</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.dirt-bike" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/dirt_airoh_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Dirt</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.modular" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/modular_shoei2_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Modular</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.dual-sport" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/dual_suomy2_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Dual Sport</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.three-quarter" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/three_quarter_shoei_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Three Quarter</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.half-shell" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/half_shell_thh_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Half Shell</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
+						<a href="#!category?navcat=.motorcycle-helmets.accessories" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/helmet_accessories_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Helmet Accessories</h3>
 						</a>
 					</div>
 					<div class="featBrands floatRight">
 						<h2>Featured Brands:</h2>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" >
+						<a href="#!category?navcat=.brands.suomy.helmet" data-onClick="appLink" >
 							<h3>Suomy</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.arai.helmets" data-onClick="appLink">
 							<h3>Arai</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.thh.helmet" data-onClick="appLink">
 							<h3>THH</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.airoh.helmets" data-onClick="appLink">
 							<h3>Airoh</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.hjc.helmets" data-onClick="appLink">
 							<h3>HJC</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.shoei.helmets" data-onClick="appLink">
 							<h3>Shoei</h3>
 						</a>
 						
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.skid-lid.helmets" data-onClick="appLink">
 							<h3>SkidLid</h3>
 						</a>
 					</div>
 				</div>
 			</div>
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderBottom_320">
-				<a class="navLink" href="#!category?navcat=.shop_by_type.dirt" data-onClick="appLink" >PARTS</a>
+				<a class="navLink" href="#!category?navcat=.motorcycle-parts" data-onClick="appLink" >PARTS</a>
 				<div data-sac="dropdownContent" class="dropdownContent parts">
 					<div class="dropdownList floatLeft">
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
+						<a href="#!category?navcat=.motorcycle-parts.exhaust" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/exhaust_leovince_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Exhaust</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
+						<a href="#!category?navcat=.motorcycle-parts.intake" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/intake_bmc_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Intake</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
-							<h3 class="floatLeft">Drive</h3>
+						<a href="#!category?navcat=.motorcycle-parts.chain" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/chain_rk_64x64.jpg" class="floatLeft"/>
+							<h3 class="floatLeft">Chain</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
+						<a href="#!category?navcat=.motorcycle-parts.chain-and-sprocket-kits" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/drive_rk_64x64.jpg" class="floatLeft"/>
+							<h3 class="floatLeft">Chain Kits</h3>
+						</a>
+						<a href="#!category?navcat=.motorcycle-parts.suspension" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/suspension_progressive_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Suspension</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
+						<a href="#!category?navcat=.motorcycle-parts.brakes" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/brakes_ebc_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Brakes</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
-							<img src="images/dropdown/helmet_icon_64x64.jpg" class="floatLeft"/>
+						<a href="#!category?navcat=.motorcycle-parts.electrical" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/electric_yuasa_64x64.jpg" class="floatLeft"/>
 							<h3 class="floatLeft">Electrical</h3>
 						</a>
 					</div>
 					<div class="featBrands floatRight">
 						<h2>Featured Brands:</h2>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.leovince.exhaust" data-onClick="appLink">
 							<h3>LeoVince</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.bmc.air-filters" data-onClick="appLink">
 							<h3>BMC</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.rk.chain" data-onClick="appLink">
 							<h3>RK</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.progressive.suspsension" data-onClick="appLink">
 							<h3>Progressive</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.ebc.brakes" data-onClick="appLink">
 							<h3>EBC</h3>
 						</a>
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.yuasa.batteries" data-onClick="appLink">
 							<h3>Yuasa</h3>
 						</a>
 						
-						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink">
+						<a href="#!category?navcat=.brands.jardine.exhaust" data-onClick="appLink">
 							<h3>Jardine</h3>
 						</a>
 					</div>
 				</div>
 			</div>
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderRight_320">
-				<a class="navLink" href="#!category?navcat=.shop_by_type.street" data-onClick="appLink">APPAREL &amp; MORE</a>
+				<a class="navLink" href="#!category?navcat=.motorcycle-apparel" data-onClick="appLink">APPAREL &amp; MORE</a>
 				<div data-sac="dropdownContent" class="dropdownContent apparel">
 					<div class="dropdownList floatLeft">
 						<a href="#!category?navcat=.shop_by_type.cruiser" data-onClick="appLink" class="block clear">
