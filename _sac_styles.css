@@ -206,10 +206,12 @@ HOMEPAGE STYLES
 #homepageSlideshow .pager{position:absolute; bottom:10px; left:10px; z-index:999; border-radius:5px; background: rgba(45,45,45,.65);}
 #homepageSlideshow .pagerSpan{overflow:hidden; width: 35px; height:35px; border-radius:2px; border: 1px solid grey; margin: 10px; display:block; float: left;}
 
-#homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4); text-decoration: none;}
-#homepageFeatures360s .imajizeContainer .title{ color: #ffff00; text-decoration: none;}
-#homepageFeatures360s .imajizeContainer .price{ color: white; text-decoration: none;}
+#homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4);}
+#homepageFeatures360s .imajizeContainer .title{ color: #ffff00;}
+#homepageFeatures360s .imajizeContainer .price{ color: white;}
 #homepageFeatures360s .imajizeContainer iframe { border: none; }
+
+.imajizeContainer a
 
 #homepageFeaturesCarouselPrev,
 #homepageFeaturesCarouselNext { background: #cc4300;}
