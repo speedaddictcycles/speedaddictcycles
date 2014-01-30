@@ -552,7 +552,6 @@ var store_sac = function() {
 					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
 					}
 				},
-			}
 			".brands.airoh.helmets" : {
 				"base" : {"and" : [{"term" : {"app_brand" : "airoh"}},{"term" : {"prod_is_general":"helmet"}}]},
 				"options" : {
