@@ -558,6 +558,10 @@ var store_sac = function() {
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
+			".brands.ancra.tie-downs" : {
+				"base" : {"term" : {"app_brand" : "ancra"}},
+				"options" : {}
+				},
 			}
 		} //r object.
 	return r;
