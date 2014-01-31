@@ -562,6 +562,12 @@ var store_sac = function() {
 				"base" : {"term" : {"app_brand" : "ancra"}},
 				"options" : {}
 				},
+			".brands.answer.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "answer"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
 			}
 		} //r object.
 	return r;
