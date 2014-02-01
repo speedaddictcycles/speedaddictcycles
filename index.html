@@ -239,6 +239,9 @@ app.u.loadScript(app.vars.baseURL+"app-quickstart-init.js");
 						<a href="#!category?navcat=.brands.hjc.helmets" data-onClick="appLink" class="block clear">
 							<img src="images/dropdown/brands/hjc_helmets_64x150.jpg" class="floatLeft"/>
 						</a>
+						<a href="#!category?navcat=.brands.speed-and-strength.helmets" data-onClick="appLink" class="block clear">
+							<img src="images/dropdown/brands/speed_and_strength_64x150.jpg" class="floatLeft"/>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -662,6 +665,10 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<div class="marginBottom">
 		<h5 class="displayNone highlightText" data-bind="var:filter(options.part_type); format:showIfSet;">Part Type:</h5>
 		<div data-bind="var:filter(options); index:part_type; 			format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.part_helper); format:showIfSet;">Part Type:</h5>
+		<div data-bind="var:filter(options); index:part_helper; 			format:filterCheckboxList; extension:store_sac;"></div>
 	</div>
 	<div class="marginBottom">
 		<h5 class="displayNone highlightText" data-bind="var:filter(options.apparel_accessories); format:showIfSet;">Apparel or Accessory Type:</h5>
