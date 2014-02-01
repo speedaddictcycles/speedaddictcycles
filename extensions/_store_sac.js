@@ -568,6 +568,33 @@ var store_sac = function() {
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
+			".brands.arai.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "arai"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"arai_model":[{"p":"Corsair V","v":"corsair_v"},{"p":"RX Q","v":"rx_q"},{"p":"Signet Q","v":"signet_q"},{"p":"Defiant","v":"defiant"},{"p":"Vector 2","v":"vector_2"},{"p":"CT Z","v":"ct_z"},{"p":"XC","v":"xc"},{"p":"VX Pro3","v":"vx_pro3"},{"p":"XD4","v":"xd4"}],
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
+			".brands.msr.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "msr"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
+			".brands.skid-lid.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "skid_lid"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}]
+					}
+				},
+			".brands.thh.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "thh"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
 			}
 		} //r object.
 	return r;
