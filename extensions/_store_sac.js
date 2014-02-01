@@ -595,6 +595,24 @@ var store_sac = function() {
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
+			".brands.suomy.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "suomy"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"suomy_model":[{"p":"SR Sport","v":"sr_sport"},{"p":"Apex","v":"apex"},{"p":"Vandal","v":"vandal"},{"p":"D20","v":"d20"},{"p":"3logy","v":"3logy"},{"p":"Mr Jump","v":"mr_jump"},{"p":"MX Tour","v":"mx_tour"}],
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
+					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}	
+				},
+			".brands.speed-and-strength.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "speed_and_strength"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"sas_model":[{"p":"SS1100","v":"ss1100"},{"p":"SS1300","v":"ss1300"},{"p":"SS1500","v":"ss1500"},{"p":"SS1700","v":"ss1700"},{"p":"SS2000","v":"ss2000"},{"p":"SS2200","v":"ss2200"},{"p":"SS2500","v":"ss2500"},{"p":"SS300","v":"ss300"},{"p":"SS400","v":"ss400"},{"p":"SS600","v":"ss600"},{"p":"SS700","v":"ss700"}],
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
+					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
 			}
 		} //r object.
 	return r;
