@@ -571,8 +571,8 @@ var store_sac = function() {
 			".brands.arai.helmets" : {
 				"base" : {"and" : [{"term" : {"app_brand" : "arai"}},{"term" : {"prod_is_general":"helmet"}}]},
 				"options" : {
-					"arai_model":[{"p":"Corsair V","v":"corsair_v"},{"p":"RX Q","v":"rx_q"},{"p":"Signet Q","v":"signet_q"},{"p":"Defiant","v":"defiant"},{"p":"Vector 2","v":"vector_2"},{"p":"CT Z","v":"ct_z"},{"p":"XC","v":"xc"},{"p":"VX Pro3","v":"vx_pro3"},{"p":"XD4","v":"xd4"}],
 					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
+					"arai_model":[{"p":"Corsair V","v":"corsair_v"},{"p":"RX Q","v":"rx_q"},{"p":"Signet Q","v":"signet_q"},{"p":"Defiant","v":"defiant"},{"p":"Vector 2","v":"vector_2"},{"p":"CT Z","v":"ct_z"},{"p":"XC","v":"xc"},{"p":"VX Pro3","v":"vx_pro3"},{"p":"XD4","v":"xd4"}],
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
@@ -598,8 +598,8 @@ var store_sac = function() {
 			".brands.suomy.helmets" : {
 				"base" : {"and" : [{"term" : {"app_brand" : "suomy"}},{"term" : {"prod_is_general":"helmet"}}]},
 				"options" : {
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"}],
 					"suomy_model":[{"p":"SR Sport","v":"sr_sport"},{"p":"Apex","v":"apex"},{"p":"Vandal","v":"vandal"},{"p":"D20","v":"d20"},{"p":"3logy","v":"3logy"},{"p":"Mr Jump","v":"mr_jump"},{"p":"MX Tour","v":"mx_tour"}],
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
 					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}	
@@ -607,10 +607,36 @@ var store_sac = function() {
 			".brands.speed-and-strength.helmets" : {
 				"base" : {"and" : [{"term" : {"app_brand" : "speed_and_strength"}},{"term" : {"prod_is_general":"helmet"}}]},
 				"options" : {
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"}],
 					"sas_model":[{"p":"SS1100","v":"ss1100"},{"p":"SS1300","v":"ss1300"},{"p":"SS1500","v":"ss1500"},{"p":"SS1700","v":"ss1700"},{"p":"SS2000","v":"ss2000"},{"p":"SS2200","v":"ss2200"},{"p":"SS2500","v":"ss2500"},{"p":"SS300","v":"ss300"},{"p":"SS400","v":"ss400"},{"p":"SS600","v":"ss600"},{"p":"SS700","v":"ss700"}],
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
 					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
+			".brands.shoei.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "shoei"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"}],
+					"shoei_model":[{"p":"X Twelve","v":"x_twelve"},{"p":"RF 1200","v":"rf_1200"},{"p":"RF 1100","v":"rf_1100"},{"p":"Qwest","v":"qwest"},{"p":"GT Air","v":"gt_air"},{"p":"Neotec","v":"neotec"},{"p":"Hornet DS","v":"hornet_ds"},{"p":"VFX W","v":"vfx_w"},{"p":"J Cruise","v":"j_cruise"},{"p":"RJ Platinum R","v":"rj_platinum_r"}],
+					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
+			".brands.leovince.exhaust" : {
+				"base" : {"term" : {"app_brand" : "leo_vince"}},
+				"options" : {
+					"make":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}],
+					"exhaust_type":[{"p":"Full System","v":"full_system"},{"p":"Slip On","v":"slip_on"},{"p":"Accessory","v":"accessory"}],
+					"finish":[{"p":"Aluminium","v":"aluminium"},{"p":"Black","v":"black"},{"p":"Carbon","v":"carbon"},{"p":"Stainless","v":"stainless"},{"p":"Titanium","v":"titanium"}]
+					}
+				},
+			".brands.rk.chain" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "rk"}},{"term" : {"part_type":"chain"}}]},
+				"options" : {
+					"chain_pitch":[{"p":"420","v":"420"},{"p":"428","v":"428"},{"p":"428H","v":"428h"},{"p":"520","v":"520"},{"p":"520H","v":"520h"},{"p":"525","v":"525"},{"p":"525H","v":"525h"},{"p":"530","v":"530"},{"p":"530H","v":"530h"},{"p":"532","v":"532"},{"p":"630","v":"630"}],
+					"chain_type":[{"p":"Standard","v":"standard"},{"p":"Heavy Duty","v":"heavy_duty"},{"p":"O-Ring","v":"o_ring"},{"p":"RX-Ring","v":"rx_ring"},{"p":"UW-Ring","v":"uw_ring"},{"p":"XW-Ring","v":"xw_ring"}],
+					"chain_links":[{"p":"64","v":"64"},{"p":"70","v":"70"},{"p":"82","v":"82"},{"p":"84","v":"84"},{"p":"86","v":"86"},{"p":"88","v":"88"},{"p":"90","v":"90"},{"p":"92","v":"92"},{"p":"94","v":"94"},{"p":"96","v":"96"},{"p":"98","v":"98"},{"p":"100","v":"100"},{"p":"102","v":"102"},{"p":"104","v":"104"},{"p":"106","v":"106"},{"p":"108","v":"108"},{"p":"110","v":"110"},{"p":"112","v":"112"},{"p":"114","v":"114"},{"p":"116","v":"116"},{"p":"118","v":"118"},{"p":"120","v":"120"},{"p":"122","v":"122"},{"p":"124","v":"124"},{"p":"126","v":"126"},{"p":"128","v":"128"},{"p":"130","v":"130"},{"p":"132","v":"132"},{"p":"134","v":"134"},{"p":"136","v":"136"},{"p":"138","v":"138"},{"p":"140","v":"140"},{"p":"150","v":"150"},{"p":"160","v":"160"},{"p":"170","v":"170"}],
+					"chain_color":[{"p":"Black","v":"black"},{"p":"Gold","v":"gold"}]
 					}
 				},
 			}

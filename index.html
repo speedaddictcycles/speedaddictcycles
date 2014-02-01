@@ -692,6 +692,22 @@ don't modify the 'data-templateid' unless you are changing template names and up
 		<div data-bind="var:filter(options); index:chain_kit_gearing; 	format:filterCheckboxList; extension:store_sac;"></div>
 	</div>
 	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_pitch); format:showIfSet;">Chain Pitch:</h5>
+		<div data-bind="var:filter(options); index:chain_pitch; 	format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_type); format:showIfSet;">Chain Type:</h5>
+		<div data-bind="var:filter(options); index:chain_type; 	format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_links); format:showIfSet;">Chain Links:</h5>
+		<div data-bind="var:filter(options); index:chain_links; 	format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_color); format:showIfSet;">Chain Color:</h5>
+		<div data-bind="var:filter(options); index:chain_color; 	format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	<div class="marginBottom">
 		<h5 class="displayNone highlightText" data-bind="var:filter(options.progressive_model); format:showIfSet;">Progressive Model:</h5>
 		<div data-bind="var:filter(options); index:progressive_model; 	format:filterCheckboxList; extension:store_sac;"></div>
 	</div>
