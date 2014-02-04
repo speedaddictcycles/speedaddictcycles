@@ -641,7 +641,7 @@ var store_sac = function() {
 				"base" : {"term" : {"app_brand" : "bmc"}},
 				"options" : {
 					"part_helper":[{"p":"Standard","v":"standard"},{"p":"Race","v":"race"},{"p":"Track","v":"track"}],
-					"make":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}]
+					"make":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Breva","v":"breva"},{"p":"Ducati","v":"ducati"},{"p":"Honda","v":"honda"},{"p":"Hyosung","v":"hyosung"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Norton","v":"norton"},{"p":"Suzuki","v":"suzuki"},{"p":"Triumph","v":"triumph"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"},{"p":"Universal","v":"universal"}]
 					}
 				},
 			".brands.olympia.gloves" : {
