@@ -526,7 +526,9 @@ var store_sac = function() {
 				},
 			".motorcycle-parts.electrical" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"electrical"}}]},
-				"options" : {}
+				"options" : {
+					"part_sub_type":[{"p":"Batteries","v":"batteries"},{"p":"Battery Chargers","v":"battery_chargers"}]
+					}
 				},
 			".motorcycle-parts.exhaust" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"exhaust"}}]},
@@ -649,6 +651,12 @@ var store_sac = function() {
 				"options" : {
 					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"}],
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
+			".brands.yuasa.batteries" : {
+				"base" : {"term" : {"app_brand" : "yuasa"}},
+				"options" : {
+					"part_sub_type":[{"p":"Batteries","v":"batteries"},{"p":"Battery Chargers","v":"battery_chargers"}],
 					}
 				},
 			}
