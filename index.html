@@ -750,6 +750,11 @@ don't modify the 'data-templateid' unless you are changing template names and up
 		<h5 class="displayNone highlightText" data-bind="var:filter(options.finish); format:showIfSet;">Finish:</h5>
 		<div data-bind="var:filter(options); index:finish; 				format:filterCheckboxList; extension:store_sac;"></div>
 	</div>
+	<div class="marginBottom">
+		<h5 class="displayNone highlightText" data-bind="var:filter(options.measures); format:showIfSet;">Shock Length:</h5>
+		<div data-bind="var:filter(options); index:measures; 				format:filterCheckboxList; extension:store_sac;"></div>
+	</div>
+	
 	
 	<!--
 	<select data-bind="var:filter(options); index:primary_color; format:filterSelect; extension:store_sac;"></select>

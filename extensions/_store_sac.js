@@ -548,7 +548,7 @@ var store_sac = function() {
 			".motorcycle-parts.suspension" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"suspension"}}]},
 				"options" : {
-					"progressive_model":[{"p":"12-13-14 Series","v":"12-13-14_series"},{"p":"412 Series","v":"412_series"},{"p":"416 Series","v":"416_series"},{"p":"425 Series","v":"425_series"},{"p":"430 Series","v":"430_series"},{"p":"444 Series","v":"444_series"},{"p":"465 Series","v":"465_series"},{"p":"944 Series","v":"944_series"},{"p":"970 Series","v":"970_series"},{"p":"Fork Lowering Kits","v":"fork_lowering_kits"},{"p":"Fork Springs","v":"fork_springs"},{"p":"Monotube Fork Kits","v":"monotube_fork_kits"},{"p":"Tools","v":"tools"},{"p":"Touring Links","v":"touring_links"}],
+					"progressive_model":[{"p":"12 13 14 16 Series","v":"12_13_14_16_series"},{"p":"412 Series","v":"412_series"},{"p":"413 Series","v":"413_series"},{"p":"416 Series","v":"416_series"},{"p":"425 Series","v":"425_series"},{"p":"428 Series","v":"428_series"},{"p":"435 Series","v":"435_series"},{"p":"430 Series","v":"430_series"},{"p":"444 Series","v":"444_series"},{"p":"465 Series","v":"465_series"},{"p":"512 Series","v":"512_series"},{"p":"944 Series","v":"944_series"},{"p":"970 Series","v":"970_series"},{"p":"Fork Lowering Kits","v":"fork_lowering_kits"},{"p":"Fork Springs","v":"fork_springs"},{"p":"Monotube Fork Kits","v":"monotube_fork_kits"},{"p":"Touring Links","v":"touring_links"},{"p":"Accessories","v":"accessories"}],
 					"burly_model":[{"p":"Lowered Fork Springs","v":"lowered_fork_springs"},{"p":"Lowered Shocks","v":"lowered_shocks"},{"p":"Lowering Block Kits","v":"lowering_block_kits"},{"p":"Lowering Bolt Kits","v":"lowering_bolt_kits"},{"p":"Slammer Kits","v":"slammer_kits"},{"p":"Stiletto Shocks","v":"stiletto_shocks"}],
 					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
 					}
@@ -657,6 +657,15 @@ var store_sac = function() {
 				"base" : {"term" : {"app_brand" : "yuasa"}},
 				"options" : {
 					"part_sub_type":[{"p":"Batteries","v":"batteries"},{"p":"Battery Chargers","v":"battery_chargers"}],
+					}
+				},
+			".brands.progressive.suspsension" : {
+				"base" : {"term" : {"app_brand" : "progressive"}},
+				"options" : {
+					"progressive_model":[{"p":"12 13 14 16 Series","v":"12_13_14_16_series"},{"p":"412 Series","v":"412_series"},{"p":"413 Series","v":"413_series"},{"p":"416 Series","v":"416_series"},{"p":"425 Series","v":"425_series"},{"p":"428 Series","v":"428_series"},{"p":"435 Series","v":"435_series"},{"p":"430 Series","v":"430_series"},{"p":"444 Series","v":"444_series"},{"p":"465 Series","v":"465_series"},{"p":"512 Series","v":"512_series"},{"p":"944 Series","v":"944_series"},{"p":"970 Series","v":"970_series"},{"p":"Fork Lowering Kits","v":"fork_lowering_kits"},{"p":"Fork Springs","v":"fork_springs"},{"p":"Monotube Fork Kits","v":"monotube_fork_kits"},{"p":"Touring Links","v":"touring_links"},{"p":"Accessories","v":"accessories"}],
+					"make_key":[{"p":"American Eagle","v":"ae"},{"p":"AJS","v":"ajs"},{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"BSA","v":"bsa"},{"p":"Buell","v":"buell"},{"p":"Bultaco","v":"bultaco"},{"p":"Can-Am","v":"can_am"},{"p":"Carabela","v":"carabela"},{"p":"Cooper Islo","v":"cooper_islo"},{"p":"CZ","v":"cz"},{"p":"DKW","v":"dkw"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Hodaka","v":"hodaka"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"Kawasaki","v":"kawasaki"},{"p":"Laverda","v":"laverda"},{"p":"Maico","v":"maico"},{"p":"Monarch","v":"monarch"},{"p":"Montesa","v":"montesa"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Norton","v":"norton"},{"p":"Ossa","v":"ossa"},{"p":"Polaris","v":"polaris"},{"p":"Puch","v":"Puch"},{"p":"Suzuki","v":"suzuki"},{"p":"Rickman","v":"rickman"},{"p":"Rokon","v":"rokon"},{"p":"Triumph","v":"triumph"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"},{"p":"Other","v":"other"},{"p":"Universal","v":"universal"}],
+					"measures":[{"p":"11","v":"11"},{"p":"11.5","v":"11.5"},{"p":"12","v":"12"},{"p":"12.5","v":"12.5"},{"p":"12.6","v":"12.6"},{"p":"13","v":"13"},{"p":"13.2","v":"13.2"},{"p":"13.5","v":"13.5"},{"p":"13.6","v":"13.6"},{"p":"14","v":"14"},{"p":"14.2","v":"14.2"},{"p":"14.25","v":"14.25"},{"p":"14.3","v":"14.3"},{"p":"14.5","v":"14.5"},{"p":"15","v":"15"},{"p":"15.5","v":"15.5"},{"p":"15.7","v":"15.7"},{"p":"15.75","v":"15.75"},{"p":"16","v":"16"},{"p":"16.25","v":"16.25"},{"p":"16.5","v":"16.5"},{"p":"17","v":"17"},{"p":"17.5","v":"17.5"},{"p":"17.7","v":"17.7"},{"p":"18.5","v":"18.5"},{"p":"Adjustable","v":"adjustable"},{"p":"Other","v":"other"}],
+					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
 					}
 				},
 			}
