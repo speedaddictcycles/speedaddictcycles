@@ -395,8 +395,8 @@ var store_sac = function() {
 			".motorcycle-apparel.gloves" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"gloves"}}]},
 				"options" : {
-					"glove_style" : [{"p":"Classic","v":"classic"},{"p":"Dirt","v":"dirt"},{"p":"Sport","v":"sport"},{"p":"Winter","v":"winter"}],
-					"primary_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"},{"p":"Liners","v":"liners"}],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
 			".motorcycle-apparel.grips" : {
@@ -649,7 +649,7 @@ var store_sac = function() {
 			".brands.olympia.gloves" : {
 				"base" : {"term" : {"app_brand" : "olympia"}},
 				"options" : {
-					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"}],
+					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"},{"p":"Liners","v":"liners"}],
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
@@ -667,6 +667,14 @@ var store_sac = function() {
 					"measures":[{"p":"11","v":"11"},{"p":"11.5","v":"11.5"},{"p":"12","v":"12"},{"p":"12.5","v":"12.5"},{"p":"12.6","v":"12.6"},{"p":"13","v":"13"},{"p":"13.2","v":"13.2"},{"p":"13.5","v":"13.5"},{"p":"13.6","v":"13.6"},{"p":"14","v":"14"},{"p":"14.2","v":"14.2"},{"p":"14.25","v":"14.25"},{"p":"14.3","v":"14.3"},{"p":"14.5","v":"14.5"},{"p":"15","v":"15"},{"p":"15.5","v":"15.5"},{"p":"15.7","v":"15.7"},{"p":"15.75","v":"15.75"},{"p":"16","v":"16"},{"p":"16.25","v":"16.25"},{"p":"16.5","v":"16.5"},{"p":"17","v":"17"},{"p":"17.5","v":"17.5"},{"p":"17.7","v":"17.7"},{"p":"18.5","v":"18.5"},{"p":"Adjustable","v":"adjustable"},{"p":"Other","v":"other"}],
 					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
 					}
+				},
+			".brands.factory-racing.products" : {
+				"base" : {"term" : {"app_brand" : "factory_racing"}},
+				"options" : {}
+				},
+			".brands.racepro" : {
+				"base" : {"term" : {"app_brand" : "racepro"}},
+				"options" : {}
 				},
 			}
 		} //r object.
