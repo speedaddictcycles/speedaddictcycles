@@ -417,7 +417,9 @@ var store_sac = function() {
 				},
 			".motorcycle-apparel.security" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"security"}}]},
-				"options" : {}
+				"options" : {
+					"lock_type" : [{"p":"Chain Locks","v":"chain"},{"p":"Armored Locks","v":"armored"},{"p":"Cable Locks","v":"cable"},{"p":"Disc Locks","v":"disc"},{"p":"U-Locks","v":"ulock"}],
+					}
 				},
 			".motorcycle-apparel.tank-pads" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"tank_pads"}}]},
@@ -681,6 +683,12 @@ var store_sac = function() {
 				"base" : {"term" : {"app_brand" : "giant_loop"}},
 				"options" : {
 					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Pouches","v":"pouches"},{"p":"Accessories","v":"accessories"}],
+					}
+				},
+			".brands.onguard.locks" : {
+				"base" : {"term" : {"app_brand" : "on_guard"}},
+				"options" : {
+					"lock_type" : [{"p":"Chain Locks","v":"chain"},{"p":"Armored Locks","v":"armored"},{"p":"Cable Locks","v":"cable"},{"p":"Disc Locks","v":"disc"},{"p":"U-Locks","v":"ulock"}],
 					}
 				},
 			}
