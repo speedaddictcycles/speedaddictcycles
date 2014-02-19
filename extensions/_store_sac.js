@@ -410,8 +410,9 @@ var store_sac = function() {
 			".motorcycle-apparel.luggage" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"luggage"}}]},
 				"options" : {
-					"riding_style" : [{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},{"p":"Street","v":"street"}],
-					"primary_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					"app_brand" : [{"p":"Giant Loop","v":"giant_loop"},{"p":"Factory Racing","v":"factory_racing"},{"p":"Dowco","v":"dowco"},{"p":"Willie and Max","v":"willie_and_max"}],
+					"riding_style" : [{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},{"p":"Street","v":"street"}],
+					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Tail Trunks","v":"tail_trunks"},{"p":"Pouches","v":"pouches"},{"p":"Helmet Bags","v":"helmet_bags"},{"p":"Accessories","v":"accessories"}]
 					}
 				},
 			".motorcycle-apparel.security" : {
