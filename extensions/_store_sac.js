@@ -412,7 +412,7 @@ var store_sac = function() {
 				"options" : {
 					"app_brand" : [{"p":"Giant Loop","v":"giant_loop"},{"p":"Factory Racing","v":"factory_racing"},{"p":"Dowco","v":"dowco"},{"p":"Willie and Max","v":"willie_and_max"}],
 					"riding_style" : [{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},{"p":"Street","v":"street"}],
-					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Tail Trunks","v":"tail_trunks"},{"p":"Pouches","v":"pouches"},{"p":"Helmet Bags","v":"helmet_bags"},{"p":"Accessories","v":"accessories"}]
+					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Tail Trunks","v":"tail_trunks"},{"p":"Pouches","v":"pouches"},{"p":"Helmet Bags","v":"helmet_bags"},{"p":"MX Gear Bags","v":"gearbag"},{"p":"Accessories","v":"accessories"}]
 					}
 				},
 			".motorcycle-apparel.security" : {
@@ -676,6 +676,12 @@ var store_sac = function() {
 			".brands.racepro" : {
 				"base" : {"term" : {"app_brand" : "racepro"}},
 				"options" : {}
+				},
+			".brands.giant-loop.luggage" : {
+				"base" : {"term" : {"app_brand" : "giant_loop"}},
+				"options" : {
+					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Pouches","v":"pouches"},{"p":"Accessories","v":"accessories"}],
+					}
 				},
 			}
 		} //r object.
