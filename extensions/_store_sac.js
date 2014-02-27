@@ -501,7 +501,9 @@ var store_sac = function() {
 			".motorcycle-parts.body" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"body"}}]},
 				"options" : {
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}]
+					"part_sub_type":[{"p":"Mirrors","v":"mirrors"},{"p":"Carbon Fiber","v":"carbon_fiber"},{"p":"Fender Kits","v":"fender_kits"}],
+					"make_key":[{"p":"Honda","v":"honda"},{"p":"Kawasaki","v":"kawasaki"},{"p":"Suzuki","v":"suzuki"},{"p":"Yamaha","v":"yamaha"},{"p":"Universal","v":"universal"}],
+					"finish":[{"p":"Aluminium","v":"aluminium"},{"p":"Black","v":"black"},{"p":"Carbon","v":"carbon"},{"p":"Chrome","v":"chrome"},{"p":"White","v":"white"},{"p":"Green","v":"green"}]
 					}
 				},
 			".motorcycle-parts.chain" : {
