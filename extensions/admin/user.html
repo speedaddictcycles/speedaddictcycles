@@ -8,7 +8,7 @@
 		<td class='hideInDetailMode' data-bind="var: user(fullname); format:text;"></td>
 		<td class='hideInDetailMode' data-bind="var: user(email); format:text;"></td>
 		<td><ul data-bind="var: user(@roles); format:array2ListItems; extension:admin;" class='ulAsCSV'></ul></td>
-		<td class='hideInDetailMode' data-bind="var: user(created_gmt); format:unix2mdy;"></td>
+		<td class='hideInDetailMode' data-bind="var: user(created_gmt); format:epoch2mdy;"></td>
 		<td class='alignRight'>
 		<button data-app-click="admin_user|bossUserDeleteConfirm" class='marginLeft applyButton' data-text='false' data-icon-primary='ui-icon-trash'>delete</button>
 		<button data-app-click="admin_user|bossUserDetailShow" class='applyButton' data-text='false' data-icon-primary='ui-icon-pencil'>edit</button>
@@ -17,7 +17,10 @@
 
 	<tr id='userManagerRoleRowTemplate'>
 		<td><input type='checkbox' name='' data-bind='var:role(id);format:assignAttribute; attribute:name;' /></td>
-		<td data-bind="var: role(title); format:text;"></td>
+		<td>
+			<span data-bind="var: role(title); format:text;"></span>
+			<span data-bind='var:role(detail);format:assignAttribute; attribute:title;' class='toolTip'>?</span>
+		</td>
 		<td class='roleDetail' data-bind="var: role(detail); format:text;"></td>
 		<td data-bind="var: role(id); format:text;"></td>
 		<td class='width1'>

@@ -5,6 +5,93 @@
 
 Any time you are upgrading to a new version of the MVC, you should create a new branch.
 
+
+201402
+
+GLOBAL
+	introduction of a new templating language, data-tlc. Data-bind will be supported for another few versions.
+
+ADMIN
+	new email manager interface.
+	new email send interface.
+
+QUICKSTART
+	update to the new TLC template language.
+	search ul's no longer require an ID.
+	prodsearch render format now supports listcomplete, run after the list is done (whether it has product or not).
+	prodlist render format 'complete' event changed to 'listcomplete'.
+
+
+201401
+
+GLOBAL
+	The default storage for data was changed from 'local' to 'session'. This means a browser close/open will clear most data from storage.
+	store_cart and store_checkout extensions removed (haven't been used in store for some time). admin now references cco (cart_checkout_order extension)
+	reduce # of domains used for remotely loaded files (more friendly w/ some ff security plugins)
+	clean up of non-used plugins/libraries.
+	The init process changed substantially, as well as what var the app is saved to (store is myApp and admin is adminApp)
+	lots of 'calls' removed from the controller. use addDispatchToQ
+
+ADMIN
+	enhancement - several pages moved to a delegated events model, improving performance/memory consumption. including (but not limited to):
+		- reports
+		- review manager
+		- tax config
+		- batch manager
+		- rss
+		- flexedit manager
+	bug - store variations > search by variation ID fixed.
+	change - UPS option for 'perform rule processing' has been removed. If rules are present, they'll be applied.
+	bug - rss feeds can now be deleted.
+	bug - user roles now saving.
+	bug - coupon expirations now saving correctly on create.
+	bug - reports > inventory > quick reports > recent changes link now works.
+	enhancement - batch job status dialog will now auto-refresh and is no longer a modal (can be shrunk and left on screen).
+	enhancement - ability to save powertool jobs for easy re-execution later.
+	bug - suppliers can be edited again.
+	deprecate - setup > projects
+	enhancements - domain config is now domain and app config. includes projects (these are all related right now).
+	enhancement - updated order create interface.
+		- uses most recent 1PC extension
+		- better support for existing customers, including re-order.
+		- an order can be started, abandoned, and returned to later (from same computer)
+	bug - usps was saving, but UI not updating properly for international ship methods.
+	enhancement - utilities > support utilities > logs now supports 'filtering'.
+	enhancement - utitilies and setup pages are now responsive.
+	enhancement - new ui 'theme'.
+	new - product editor now has 'competition' tab.
+	enhancement - utilities > reviews manager.  Export now available.
+	enhancement - general UI cleanup, including 'hiding' inputs where an enable is required (ex: shipping > insurance > flat, weight or price)
+	enhancement - new html editor for templates (campaign, ebay and site). site editor got UI update.
+	new - cart manager (interact w/ client carts)
+	new - interface for order create received overhaul. supports multiple carts (order in progress).
+	new - all new help doc. click 'help' in header.
+	new - file attachment for ticket is new. This method will replace what is used elsewhere (csv, media lib, etc).
+	enhancement - flexedit manager
+		now has a 'filter' at the top to make it easier to find attributes.
+		boolean and keyword list now supported in the editor.
+
+Checkout/1PC
+	payment methods now hidden/not required if balance is zero.
+
+CONTROLLER
+	unixNow renamed to epochNow (utility)
+	unix2Pretty renamed to epoch2Pretty (utility)
+	unix2mdy renamed to epoch2mdy (render format)
+	New router feature for defining what hash tags should do.
+	
+
+QUICKSTART (and store related updates)
+	Product lists now support a 'complete' event, triggered after all product have loaded.
+	Cart template is now responsive.
+	New method for creating carts for easy update. Uses delegated events (data-app-click).
+	fixed bug in add to buyer list.
+	fixed bug in remove from buyer list.
+	init,complete and depart events now handled through data-app-EVENTTYPE and/or on('complete').
+	set app.vars.apptimizer to true to disable popstate (required for pure-app environment)
+
+
+
 201346
 ADMIN
 	enhancement - updated users interface. faster and more memory efficient for browser.

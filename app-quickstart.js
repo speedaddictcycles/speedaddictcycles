@@ -20,7 +20,7 @@
 
 
 
-var myRIA = function() {
+var quickstart = function(_app) {
 	var r = {
 		
 	vars : {
@@ -89,215 +89,247 @@ var myRIA = function() {
 		init : {
 			onSuccess : function()	{
 				var r = true; //return false if extension won't load for some reason (account config, dependencies, etc).
-//This will create the arrays for the template[templateID].onCompletes and onInits
-				app.ext.myRIA.u.createTemplateFunctions(); //should happen early so that the myRIA.template object exists, specifically for app.u..appInitComplete
 				return r;
 				},
 			onError : function()	{
 //errors will get reported for this callback as part of the extensions loading.  This is here for extra error handling purposes.
 //you may or may not need it.
-//				app.u.dump('BEGIN app.ext.myRIA.callbacks.init.onError');
+//				dump('BEGIN _app.ext.quickstart.callbacks.init.onError');
 				}
 			},
 
 		startMyProgram : {
 			onSuccess : function()	{
-//			app.u.dump("BEGIN myRIA.callback.startMyProgram");
-//			app.u.dump(" -> window.onpopstate: "+typeof window.onpopstate);
-//			app.u.dump(" -> window.history.pushState: "+typeof window.history.pushState);
+//			dump("BEGIN quickstart.callback.startMyProgram");
+//			dump(" -> window.onpopstate: "+typeof window.onpopstate);
+//			dump(" -> window.history.pushState: "+typeof window.history.pushState);
 
-				
+//handle the cart. It could be passed in via _app.vars.cartID, as a URI param, localStorage or may not exist yet.
+				var cartID;
+				if(_app.vars.cartID)	{
+					dump(" -> cartID was passed in via _app.vars.cartID");
+					cartID = _app.vars.cartID;
+					delete _app.vars.cartID; //leaving this here will just add confusion.
+					}
+				else if(cartID = _app.u.getParameterByName('cartID'))	{
+					dump(' -> cart id was specified on the URI');
+					}
+				else if(cartID = _app.model.fetchCartID())	{
+					dump(" -> cartID obtained from fetchCartID. cartid: "+cartID);
+					//no need to add this cartID to the session/vars.carts, because that's where fetch gets it from.
+					}
+				else	{}
+
+				if(_app.vars.apptimizer === true) {$.support.onpopstate = false} //disable uri rewrite and rely on hashChange
+
+				if(cartID)	{
+					dump(" -> cartID is set, validate.");
+					// the addCart2CM uses the 'appCartExists' datapointer. if it changes here, update the callback.
+					_app.model.addDispatchToQ({"_cmd":"appCartExists",_cartid:cartID,"_tag":{"datapointer":"appCartExists","cartid":cartID,"callback":"addCart2CM","extension":"quickstart"}},"mutable");
+					//do not set cart ID in session until it validates.
+					}
+				else	{
+					dump(" -> no cart found. create a new one");
+					_app.calls.appCartCreate.init({'callback':"addCart2CM","extension":'quickstart'},'mutable');
+					}
+
+//technically, a session lasts until the browser is closed. if fresh data is desired on refresh, uncomment the following few lines.
+//if($.support.sessionStorage)	{
+//	window.sessionStorage.clear();
+//	}
+
+_app.u.addEventDelegation($(document.body)); //if perfomance issues are noticed from adding this to the body instead of to each template, please report them.
+
 //if ?debug=anything is on URI, show all elements with a class of debug.
-if(app.u.getParameterByName('debug'))	{
-	$('.debug').show().append("<div class='clearfix'>Model Version: "+app.model.version+" and release: "+app.vars.release+"</div>");
+if(_app.u.getParameterByName('debug'))	{
+	$('.debug').show().append("<div class='clearfix'>Model Version: "+_app.model.version+" and release: "+_app.vars.release+"</div>");
 	$('.debugQuickLinks','.debug').menu().css({'width':'150px'});
 	$('button','.debug').button();
-	app.ext.myRIA.u.bindAppViewForms('.debug');
-	app.ext.myRIA.u.bindNav('.debug .bindByAnchor');
+
+	_app.ext.quickstart.u.bindNav('.debug .bindByAnchor');
 	$('body').css('padding-bottom',$('.debug').last().height());
 	}
 
 //attach an event to the window that will execute code on 'back' some history has been added to the history.
-if(typeof window.onpopstate == 'object')	{
+if($.support.onpopstate)	{
 	window.onpopstate = function(event) { 
-		app.ext.myRIA.u.handlePopState(event.state);
+		_app.ext.quickstart.u.handlePopState(event.state);
 		}
 	}
 //if popstate isn't supporeted, hashchange will use the anchor.
-else if ("onhashchange" in window)	{ // does the browser support the hashchange event?
+else if ($.support.onhashchange)	{ // does the browser support the hashchange event?
 	_ignoreHashChange = false; //global var. when hash is changed from JS, set to true. see handleHashState for more info on this.
 	window.onhashchange = function () {
-		app.ext.myRIA.u.handleHashState();
+		_app.ext.quickstart.u.handleHashState();
 		}
 	}
 else	{
 	$('#globalMessaging').anyMessage({'message':"You appear to be running a very old browser. Our app will run, but may not be an optimal experience.",'persistent':true});
 	// wow. upgrade your browser. should only get here if older than:
 	// Google Chrome 5, Safari 5, Opera 10.60, Firefox 3.6 and Internet Explorer 8
-	//NOTE: does not trigger in IE9 running IE7 or IE8 standards mode
 	}
 
 
 document.write = function(v){
-	app.u.dump("document.write was executed. That's bad mojo. Rewritten to $('body').append();",'warn');
+	dump("document.write was executed. That's bad mojo. Rewritten to $('body').append();",'warn');
 	$("body").append(v);
 	}
 
+				window.showContent = _app.ext.quickstart.a.showContent; //a shortcut for easy execution.
+				window.quickView = _app.ext.quickstart.a.quickView; //a shortcut for easy execution.
 
 
 //The request for appCategoryList is needed early for both the homepage list of cats and tier1.
 //piggyback a few other necessary requests here to reduce # of requests
-				app.ext.store_navcats.calls.appCategoryList.init(zGlobals.appSettings.rootcat,{"callback":"showRootCategories","extension":"myRIA"},'mutable');
-				app.calls.appProfileInfo.init({'domain':zGlobals.appSettings.domain_only},{callback : function(rd){
-					if(app.model.responseHasErrors(rd)){
-						$('#globalMessaging').anymessage({'message':rd});
-						}
-					else	{
-						$('.logo','#appView').each(function(){
-							var $logo = $(this);
-							if($logo.is('img') || $('img',$logo).length)	{} //the element with the logo class already has an image. do nothing.
-							else if(app.data[rd.datapointer]['zoovy:logo_website'])	{
-								$logo.append(app.u.makeImage({'tag':true,'m':false,'b':'TTTTTT','w':$logo.width(),'h':$logo.height(),'alt':app.data[rd.datapointer]['zoovy:company_name'] || "",'name':app.data[rd.datapointer]['zoovy:logo_website']}))
-								}
-							else	{} //logo field not set.
-							});
-						}
-					}},'mutable');
-				app.model.dispatchThis(); //this dispatch needs to occur prior to handleAppInit being executed.
-
-				var page = app.ext.myRIA.u.handleAppInit(); //checks url and will load appropriate page content. returns object {pageType,pageInfo}
-
-//get some info to have handy for when needed (cart, profile, etc)
-				
-
-				if(page.pageType == 'cart' || page.pageType == 'checkout')	{
-//if the page type is determined to be the cart or checkout onload, no need to request cart data. It'll be requested as part of showContent
-					}
-				else	{
-					app.calls.refreshCart.init({'callback':'updateMCLineItems','extension':'myRIA'},'passive');
-					app.ext.store_cart.calls.cartShippingMethods.init({},'passive');
-					}
-
-				app.model.dispatchThis('passive');
-
-//adds submit functionality to search form. keeps dom clean to do it here.
-				app.ext.myRIA.u.bindAppViewForms('#appView'); //added the selector on 20121026. was blank before.
-				app.ext.myRIA.vars.mcSetInterval = setInterval(function(){app.ext.myRIA.u.handleMinicartUpdate({'datapointer':'cartDetail'})},4000); //make sure minicart stays up to date.
-				
-				window.showContent = app.ext.myRIA.a.showContent; //a shortcut for easy execution.
-				window.quickView = app.ext.myRIA.a.quickView; //a shortcut for easy execution.
-				
-				app.ext.myRIA.u.bindNav('#appView .bindByAnchor');
-				if(typeof app.u.appInitComplete == 'function'){app.u.appInitComplete(page)}; //gets run after app has been init
-				
-				app.ext.myRIA.u.bindAppNav(); //adds click handlers for the next/previous buttons (product/category feature).
-
+				_app.ext.store_navcats.calls.appCategoryList.init(zGlobals.appSettings.rootcat,{"callback":"showRootCategories","extension":"quickstart"},'mutable');
+				_app.model.dispatchThis('mutable');
 				}
 			}, //startMyProgram 
 
-			
+		addCart2CM : {
+			onSuccess : function(_rtag){
+				var cartID = false;
+//				_app.u.dump("BEGIN quickstart.callbacks.addCart2CM.onSuccess");
+				if(_rtag.datapointer == 'appCartExists' && _app.data[_rtag.datapointer].exists)	{
+					_app.u.dump(" -> existing cart is valid. add to cart manager");
+					if($('#cartMessenger').length)	{
+						cartID = _rtag.cartid;
+						_app.model.addCart2Session(cartID); //this function updates _app.vars.carts
+						_app.ext.cart_message.u.initCartMessenger(cartID,$('#cartMessenger')); //starts the cart message polling
+						}
+					else	{
+						dump("#cartMessenger does NOT exist. That means the cart messaging extension won't work right.","warn");
+						}
+					}
+				else if(_rtag.datapointer == 'appCartExists')	{
+					_app.u.dump(" -> existing cart was NOT valid. Fetch a new cartid");
+					_app.model.removeCartFromSession(_rtag.cartid); //this will ensure the cart isn't used again.
+					_app.calls.appCartCreate.init({'callback':"addCart2CM","extension":'quickstart'},'mutable');//The cart that was passed was exired in invalid.
+					}
+				else	{
+					_app.u.dump(" -> cart has been created.");
+					//this was a appCartCreate.
+					if($('#cartMessenger').length)	{
+						cartID = _app.model.fetchCartID();
+						_app.ext.cart_message.u.initCartMessenger(cartID,$('#cartMessenger')); //starts the cart message polling
+						}
+					else	{
+						dump("#cartMessenger does NOT exist. That means the cart messaging extension won't work right.","warn");
+						}
+					}
+				
+				
+				if(cartID)	{
+					_app.model.addDispatchToQ({"_cmd":"whoAmI",_cartid : cartID, "_tag":{"datapointer":"whoAmI",callback:function(rd){
+						var page = _app.ext.quickstart.u.handleAppInit(); //checks url and will load appropriate page content. returns object {pageType,pageInfo}
+		
+						if(page.pageType == 'cart' || page.pageType == 'checkout')	{
+		//if the page type is determined to be the cart or checkout onload, no need to request cart data. It'll be requested as part of showContent
+							}
+						else if(cartID)	{
+							_app.calls.refreshCart.init({'callback':'updateMCLineItems','extension':'quickstart'},'mutable');
+							_app.model.dispatchThis('mutable');
+							}
+						else	{} //no cart to go get. cartCreate already been added to Q by now.
+						
+						_app.ext.quickstart.u.bindNav('#appView .bindByAnchor');
+						_app.ext.quickstart.u.bindAppNav(); //adds click handlers for the next/previous buttons (product/category feature).
+	
+						if(typeof _app.u.appInitComplete == 'function'){_app.u.appInitComplete(page)}; //gets run after app has been init
+						_app.ext.quickstart.thirdParty.init();
+						
+						}}},"mutable"); //used to determine if user is logged in or not.
+					_app.model.dispatchThis('mutable');
+					}
+				
+				}
+			},
+		
+		
 //optional callback  for appCategoryList in app init which will display the root level categories in element w/ id: tier1categories 
 		showRootCategories : {
 			onSuccess : function()	{
-//				app.u.dump('BEGIN app.ext.myRIA.callbacks.showCategories.onSuccess');
+//				dump('BEGIN _app.ext.quickstart.callbacks.showCategories.onSuccess');
 				var tagObj = {};
 //we always get the tier 1 cats so they're handy, but we only do something with them out of the get if necessary (tier1categories is defined)
 				if($('#tier1categories').length)	{
-//					app.u.dump("#tier1categories is set. fetch tier1 cat data.");
-					app.ext.store_navcats.u.getChildDataOf(zGlobals.appSettings.rootcat,{'parentID':'tier1categories','callback':'addCatToDom','templateID':'categoryListTemplateRootCats','extension':'store_navcats'},'appNavcatDetailMax');  //generate nav for 'browse'. doing a 'max' because the page will use that anway.
-					app.model.dispatchThis();
+//					dump("#tier1categories is set. fetch tier1 cat data.");
+					_app.ext.store_navcats.u.getChildDataOf(zGlobals.appSettings.rootcat,{'parentID':'tier1categories','callback':'addCatToDom','templateID':'categoryListTemplateRootCats','extension':'store_navcats'},'max');  //generate nav for 'browse'. doing a 'max' because the page will use that anway.
+					_app.model.dispatchThis();
 					}
 				}
 			}, //showRootCategories
+
+
+
+
 
 //used for callback on showCartInModal function
 //
 		handleCart : 	{
 			onSuccess : function(tagObj)	{
-//				app.u.dump("BEGIN myRIA.callbacks.handleCart.onSuccess");
-//				app.u.dump(" -> tagObj: ");	app.u.dump(tagObj);
-				app.ext.myRIA.u.handleMinicartUpdate(tagObj);
+//				dump("BEGIN quickstart.callbacks.handleCart.onSuccess");
+//				dump(" -> tagObj: ");	dump(tagObj);
+				_app.ext.quickstart.u.handleMinicartUpdate(tagObj);
 				//empty is to get rid of loading gfx.
-				$('#'+tagObj.parentID).empty().append(app.renderFunctions.transmogrify('modalCartContents',tagObj.templateID,app.data[tagObj.datapointer]));
-				tagObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(tagObj);
+				var $cart = tagObj.jqObj || $(_app.u.jqSelector('#',tagObj.parentID));
+// * 201401 ->	removing all references to renderFunctions in favor of tlc.
+//				$cart.empty().append(_app.renderFunctions.transmogrify('modalCartContents',tagObj.templateID,_app.data[tagObj.datapointer]));
+				$cart.empty().tlc(tagObj)				
+				tagObj.state = 'complete'; //needed for handleTemplateEvents.
+				_app.renderFunctions.handleTemplateEvents($cart,tagObj);
 				}
 			}, //updateMCLineItems
 
 //used in init.
 		updateMCLineItems : 	{
 			onSuccess : function(tagObj)	{
-//				app.u.dump("BEGIN myRIA.callbacks.updateMCLineItems");
-				app.ext.myRIA.u.handleMinicartUpdate(tagObj);
+//				dump("BEGIN quickstart.callbacks.updateMCLineItems");
+				_app.ext.quickstart.u.handleMinicartUpdate(tagObj);
 				}
 			}, //updateMCLineItems
 
 		showProd : 	{
 			onSuccess : function(tagObj)	{
-//				app.u.dump("BEGIN myRIA.callbacks.showProd");
-//				app.u.dump(tagObj);
-				var tmp = app.data[tagObj.datapointer];
-				var pid = app.data[tagObj.datapointer].pid;
-				tmp.session = app.ext.myRIA.vars.session;
-				if(typeof app.data['appReviewsList|'+pid] == 'object')	{
-					tmp['reviews'] = app.ext.store_product.u.summarizeReviews(pid); //generates a summary object (total, average)
-					tmp['reviews']['@reviews'] = app.data['appReviewsList|'+pid]['@reviews']
+//				dump("BEGIN quickstart.callbacks.showProd");
+//				dump(tagObj);
+				var tmp = _app.data[tagObj.datapointer];
+				var pid = _app.data[tagObj.datapointer].pid;
+				tmp.session = _app.ext.quickstart.vars.session;
+				if(typeof _app.data['appReviewsList|'+pid] == 'object')	{
+					tmp['reviews'] = _app.ext.store_product.u.summarizeReviews(pid); //generates a summary object (total, average)
+					tmp['reviews']['@reviews'] = _app.data['appReviewsList|'+pid]['@reviews']
 					}
-//				if(pid == 'AXA-TEST-B2')	{app.u.dump(tmp)}
-//				app.u.dump("Rendering product template for: "+pid);
-				app.renderFunctions.translateTemplate(tmp,tagObj.parentID);
+//				dump("Rendering product template for: "+pid);
+				tagObj.jqObj.tlc({'verb':'translate','dataset':tmp});
 				tagObj.pid = pid;
-				app.ext.myRIA.u.buildQueriesFromTemplate(tagObj);
-				app.model.dispatchThis();
+				//build queries will validate the namespaces used AND also fetch the parent product if this item is a child.
+				_app.ext.quickstart.u.buildQueriesFromTemplate(tagObj);
+				_app.model.dispatchThis();
 				
-// SANITY - handleTemplateFunctions does not get called here. It'll get executed as part of showPageContent callback, which is executed in buildQueriesFromTemplate.
+// SANITY - handleTemplateEvents does not get called here. It'll get executed as part of showPageContent callback, which is executed in buildQueriesFromTemplate.
 				},
 			onError : function(responseData,uuid)	{
-//				app.u.dump(responseData);
+//				dump(responseData);
 //				$('#mainContentArea').empty();
-				app.u.throwMessage(responseData);
+				_app.u.throwMessage(responseData);
 				}
 			}, //showProd 
 
-/*
-*** 201346 -> content for these pages is no longer dynamic. It should be hard coded into the template OR allow to be set thru a wizard.
-		showCompany : 	{
-			onSuccess : function(tagObj)	{
-				app.renderFunctions.translateTemplate(app.data[tagObj.datapointer],tagObj.parentID);
-				app.ext.myRIA.u.bindNav('#companyNav a');
-				if(app.ext.myRIA.u.showArticle(tagObj.infoObj))	{
-					if(!tagObj.infoObj.templateID)	{
-						if(tagObj.infoObj.templateID){} //use existing value
-						else if(tagObj.templateID)	{tagObj.infoObj.templateID = 'companyTemplate'}
-						else	{tagObj.infoObj.templateID = 'companyTemplate'}
-						}
-					tagObj.infoObj.state = 'onCompletes';
-					app.ext.myRIA.u.handleTemplateFunctions(tagObj.infoObj);
-					}
-				else	{
-					//showArticle will handle the error display.
-					}
-				}
-			}, //showCompany 
-*/
-
-
-
 		handleBuyerAddressUpdate : 	{
 			onSuccess : function(tagObj)	{
-				app.u.dump("BEGIN myRIA.callbacks.handleBuyerAddressUpdate");
-//				app.u.dump(tagObj);
+				dump("BEGIN quickstart.callbacks.handleBuyerAddressUpdate");
+//				dump(tagObj);
 				$parent = $('#'+tagObj.parentID);
 				$('button',$parent).removeAttr('disabled').removeClass('ui-state-disabled');
 				$('.changeLog',$parent).empty().append('Changes Saved');
 				$('.edited',$parent).removeClass('edited'); //if the save button is clicked before 'exiting' the input, the edited class wasn't being removed.
 				$('.buttonMenu',$parent).find('.offMenu').show();
 				$('.buttonMenu',$parent).find('.onMenu').hide();
-				app.ext.myRIA.u.destroyEditable($parent);
 				},
 			onError : function(responseData,uuid)	{
 				var $parent = $('#'+tagObj.parentID);
-				$('.changeLog',$parent).append(app.u.formatResponseErrors(responseData))
+				$('.changeLog',$parent).append(_app.u.formatResponseErrors(responseData))
 				$('button',$parent).removeAttr('disabled').removeClass('ui-state-disabled');
 				}
 			}, //handleBuyerAddressUpdate
@@ -306,8 +338,8 @@ document.write = function(v){
 		showAddresses : {
 			onSuccess : function(_tag)	{
 				var $myAccountPage = $('#myaccountArticle');
-				$myAccountPage.anycontent({'data':app.data.buyerAddressList});
-				app.u.handleAppEvents($myAccountPage);
+				$myAccountPage.tlc({'dataset':_app.data.buyerAddressList});
+				_app.u.handleButtons($myAccountPage);
 				}
 			}, //showAddresses
 
@@ -316,24 +348,16 @@ document.write = function(v){
 			onSuccess : function(tagObj)	{
 				var catSafeID = tagObj.datapointer.split('|')[1];
 				tagObj.navcat = catSafeID;
-/*
-*** 201318 -> passing in unsanitized tagObj caused an issue with showPageContent
-				app.ext.myRIA.u.buildQueriesFromTemplate(tagObj);
-*/
-/*
-				app.ext.myRIA.u.buildQueriesFromTemplate({
-					'templateID':tagObj.templateID,
-					'parentID':tagObj.parentID,
-					'navcat':tagObj.navcat,
-					'datapointer':tagObj.datapointer});
-*/
-				app.ext.myRIA.u.buildQueriesFromTemplate($.extend(true, {}, tagObj));
-				app.model.dispatchThis();
+
+// passing in unsanitized tagObj caused an issue with showPageContent
+				_app.ext.quickstart.u.buildQueriesFromTemplate($.extend(true, {}, tagObj));
+				dump(" ----> queries were just built");
+				_app.model.dispatchThis();
 				},
 			onError : function(responseData)	{
-				app.u.throwMessage(responseData);
+				_app.u.throwMessage(responseData);
 				$('.loadingBG',$('#mainContentArea')).removeClass('loadingBG'); //nuke all loading gfx.
-				app.ext.myRIA.u.changeCursor('auto'); //revert cursor so app doesn't appear to be in waiting mode.
+				_app.ext.quickstart.u.changeCursor('auto'); //revert cursor so app doesn't appear to be in waiting mode.
 				}
 			}, //fetchPageContent
 
@@ -341,91 +365,88 @@ document.write = function(v){
 //used as part of showContent for the home and category pages. Will display the data retrieved from fetch.
 		showPageContent : {
 			onSuccess : function(tagObj)	{
+				dump(" BEGIN quickstart.callbacks.onSuccess.showPageContent");
 //when translating a template, only 1 dataset can be passed in, so detail and page are merged and passed in together.
-				var tmp = {};
 
 //cat page handling.
 				if(tagObj.navcat)	{
-//					app.u.dump("BEGIN myRIA.callbacks.showPageContent ["+tagObj.navcat+"]");
-//					app.u.dump(" -> tagObj: "); app.u.dump(tagObj);
+//					dump("BEGIN quickstart.callbacks.showPageContent ["+tagObj.navcat+"]");
+					tagObj.dataset = {};
+					//if no %page vars were requested, this datapointer won't be set and this would error.
+					if(_app.u.thisNestedExists("data.appPageGet|"+tagObj.navcat+".%page",_app))	{
+						tagObj.dataset = {'%page' : _app.data['appPageGet|'+tagObj.navcat]['%page']};
+						}
+					//deep extend so any non-duplicates in %page are preserved.
+					$.extend(true,tagObj.dataset,_app.data['appNavcatDetail|'+tagObj.navcat],{'session':_app.ext.quickstart.vars.session});
+					delete tagObj.datapointer; //delete this so tlc doesn't do an unnecessary extend (data is already merged)
+					tagObj.verb = 'translate';
+//					dump(" -> tagObj: "); dump(tagObj);
 
-					if(typeof app.data['appNavcatDetail|'+tagObj.navcat] == 'object' && !$.isEmptyObject(app.data['appNavcatDetail|'+tagObj.navcat]))	{
-						tmp = app.data['appNavcatDetail|'+tagObj.navcat]
-						}
-					if(typeof app.data['appPageGet|'+tagObj.navcat] == 'object' && typeof app.data['appPageGet|'+tagObj.navcat]['%page'] == 'object' && !$.isEmptyObject(app.data['appPageGet|'+tagObj.navcat]['%page']))	{
-						tmp['%page'] = app.data['appPageGet|'+tagObj.navcat]['%page'];
-						}
-					if(tagObj.lists.length)	{
+					if(tagObj.lists && tagObj.lists.length)	{
 						var L = tagObj.lists.length;
 						for(var i = 0; i < L; i += 1)	{
-							tmp[tagObj.lists[i]] = app.data['appNavcatDetail|'+tagObj.lists[i]];
+							tagObj.dataset[tagObj.lists[i]] = _app.data['appNavcatDetail|'+tagObj.lists[i]];
 							}
 						}
-					tmp.session = app.ext.myRIA.vars.session;
+
 //a category page gets translated. A product page does not because the bulk of the product data has already been output. prodlists are being handled via buildProdlist
-					app.renderFunctions.translateTemplate(tmp,tagObj.parentID);
+//					_app.renderFunctions.translateTemplate(tmp,tagObj.parentID); // * 201401 ->	removing all references to renderFunctions in favor of tlc.
+					tagObj.jqObj.tlc(tagObj);
 					}
 //product page handline
 				else if(tagObj.pid)	{
 // the bulk of the product translation has already occured by now (attribs, reviews and session) via callbacks.showProd.
 // product lists are being handled through 'buildProductList'.
-					var pData = app.data['appProductGet|'+tagObj.pid] //shortcut.
+					var pData = _app.data['appProductGet|'+tagObj.pid] //shortcut.
 					if(pData && pData['%attribs'] && pData['%attribs']['zoovy:grp_type'] == 'CHILD')	{
-						if(pData['%attribs']['zoovy:grp_parent'] && app.data['appProductGet|'+pData['%attribs']['zoovy:grp_parent']])	{
-							app.u.dump(" -> this is a child product and the parent prod is available. Fetch child data for siblings.");
-							$("[data-app-role='childrenSiblingsContainer']",$(app.u.jqSelector('#',tagObj.parentID))).show().anycontent({'data':app.data['appProductGet|'+pData['%attribs']['zoovy:grp_parent']]});
+						if(pData['%attribs']['zoovy:grp_parent'] && _app.data['appProductGet|'+pData['%attribs']['zoovy:grp_parent']])	{
+							dump(" -> this is a child product and the parent prod is available. Fetch child data for siblings.");
+							$("[data-app-role='childrenSiblingsContainer']",$(_app.u.jqSelector('#',tagObj.parentID))).show().tlc({'dataset':_app.data['appProductGet|'+pData['%attribs']['zoovy:grp_parent']]});
 							}
 						else if(!pData['%attribs']['zoovy:grp_parent']) 	{
-							app.u.dump("WARNING! this item is a child, but no parent is set. Not a critical error.");
+							dump("WARNING! this item is a child, but no parent is set. Not a critical error.");
 							}
 						else	{
-							app.u.dump("WARNING! Got into showPageContent callback for a CHILD item, but PARENT ["+pData['%attribs']['zoovy:grp_parent']+"] data not in memory.");
+							dump("WARNING! Got into showPageContent callback for a CHILD item, but PARENT ["+pData['%attribs']['zoovy:grp_parent']+"] data not in memory.");
 							}
 						}
 					else 	{} //not a child.
 					}
 				else	{
-					app.u.dump("WARNING! showPageContent has no pid or navcat defined");
+					dump("WARNING! showPageContent has no pid or navcat defined");
 					}
 
-				var L = tagObj.searchArray.length;
-				var $parent;
-				for(var i = 0; i < L; i += 1)	{
-//** 201318 -> better approach for handling selector.
-					$parent = $(app.u.jqSelector('#',tagObj.searchArray[i].split('|')[1]));
-					app.ext.myRIA.renderFormats.productSearch($parent,{value:app.data[tagObj.searchArray[i]]});
-					}
-				tagObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(tagObj);
+				tagObj.state = 'complete'; //needed for handleTemplateEvents.
 
+				_app.renderFunctions.handleTemplateEvents((tagObj.jqObj || $(_app.u.jqSelector('#',tagObj.parentID))),tagObj);
 				},
 			onError : function(responseData,uuid)	{
 				$('#mainContentArea').removeClass('loadingBG')
-				app.u.throwMessage(responseData);
+				_app.u.throwMessage(responseData);
 				}
 			}, //showPageContent
 
 //this is used for showing a customer list of product, such as wish or forget me lists
 		showBuyerLists : {
 			onSuccess : function(tagObj)	{
-//				app.u.dump('BEGIN app.ext.myRIA.showList.onSuccess ');
+//				dump('BEGIN _app.ext.quickstart.showList.onSuccess ');
 var $parent = $('#'+tagObj.parentID).removeClass('loadingBG');
 //if the page gets reloaded, de-tab so that running tabs() later re-inits properly.
 if($parent.hasClass("ui-tabs"))	{
 	$parent.anytabs('destroy').empty();
 	}
-if(app.data[tagObj.datapointer]['@lists'].length > 0)	{
-	var $ul = app.ext.store_crm.u.getBuyerListsAsUL(tagObj.datapointer);
+if(_app.data[tagObj.datapointer]['@lists'].length > 0)	{
+	var $ul = _app.ext.store_crm.u.getBuyerListsAsUL(tagObj.datapointer);
 	var numRequests = 0;
 	$ul.children().each(function(){
 		var $li = $(this);
 		var listID = $li.data('buyerlistid');
 		$li.wrapInner("<a href='#"+listID+"Contents'></a>"); //adds href for tab selection
 		$parent.append($("<div>").attr({'data-anytab-content':listID+'Contents','data-buyerlistid':listID}).append($("<ul>").addClass('listStyleNone clearfix noPadOrMargin lineItemProdlist').attr('id','prodlistBuyerList_'+listID))); //containers for list contents and ul for productlist
-		numRequests += app.calls.buyerProductListDetail.init(listID,{'callback':'buyerListAsProdlist','extension':'myRIA','parentID':'prodlistBuyerList_'+listID})
+		numRequests += _app.calls.buyerProductListDetail.init(listID,{'callback':'buyerListAsProdlist','extension':'quickstart','parentID':'prodlistBuyerList_'+listID})
 		});
 	$parent.prepend($ul).anytabs();
-	app.model.dispatchThis('mutable');
+	_app.model.dispatchThis('mutable');
 	}
 else	{
 	$parent.append("You have no lists at this time. Add an item to your wishlist to get started...");
@@ -439,17 +460,17 @@ else	{
 //formerly showlist
 		buyerListAsProdlist : {
 			onSuccess : function(tagObj)	{
-//				app.u.dump('BEGIN app.ext.myRIA.showList.onSuccess ');
+//				dump('BEGIN _app.ext.quickstart.showList.onSuccess ');
 				var listID = tagObj.datapointer.split('|')[1];
-				var prods = app.ext.store_crm.u.getSkusFromBuyerList(listID);
+				var prods = _app.ext.store_crm.u.getSkusFromBuyerList(listID);
 				if(prods.length < 1)	{
 //list is empty.
-					$(app.u.jqSelector('#',tagObj.parentID)).anymessage({'message':'This list ('+listID+') appears to be empty.'});
+					$(_app.u.jqSelector('#',tagObj.parentID)).anymessage({'message':'This list ('+listID+') appears to be empty.'});
 					}
 				else	{
-//					app.u.dump(prods);
-					app.ext.store_prodlist.u.buildProductList({"loadsTemplate":"productListTemplateBuyerList","withInventory":1,"withVariations":1,"parentID":tagObj.parentID,"csv":prods,"hide_summary":1,"hide_pagination":1},$(app.u.jqSelector('#',tagObj.parentID)));
-					app.model.dispatchThis();
+//					dump(prods);
+					_app.ext.store_prodlist.u.buildProductList({"loadsTemplate":"productListTemplateBuyerList","withInventory":1,"withVariations":1,"parentID":tagObj.parentID,"csv":prods,"hide_summary":1,"hide_pagination":1},$(_app.u.jqSelector('#',tagObj.parentID)));
+					_app.model.dispatchThis();
 					}
 				}
 			}, //showList
@@ -458,26 +479,26 @@ else	{
 //requires templateID and targetID to be passed on the tag object.
 		showProdList : {
 			onSuccess : function(tagObj)	{
-//				app.u.dump("BEGIN myRIA.callbacks.showProdList");
-//				app.u.dump(app.data[tagObj.datapointer]);
-				if(app.data[tagObj.datapointer]['@products'].length < 1)	{
+//				dump("BEGIN quickstart.callbacks.showProdList");
+//				dump(_app.data[tagObj.datapointer]);
+				if(_app.data[tagObj.datapointer]['@products'].length < 1)	{
 					$('#'+tagObj.targetID).anymessage({'message':'This list ('+listID+') appears to be empty.'});
 					}
 				else	{
-					app.ext.store_prodlist.u.buildProductList({"templateID":tagObj.templateID,"parentID":tagObj.targetID,"csv":app.data[tagObj.datapointer]['@products']})
-					app.model.dispatchThis();
+					_app.ext.store_prodlist.u.buildProductList({"templateID":tagObj.templateID,"parentID":tagObj.targetID,"csv":_app.data[tagObj.datapointer]['@products']})
+					_app.model.dispatchThis();
 					}
 				}
 			}, //showList
 
 		authenticateBuyer : {
 			onSuccess : function(tagObj)	{
-				app.vars.cid = app.data[tagObj.datapointer].cid; //save to a quickly referencable location.
+				_app.vars.cid = _app.data[tagObj.datapointer].cid; //save to a quickly referencable location.
 				$('#loginSuccessContainer').show(); //contains 'continue' button.
 				$('#loginMessaging').empty().show().append("Thank you, you are now logged in."); //used for success and fail messaging.
 				$('#loginFormContainer').hide(); //contains actual form.
 				$('#recoverPasswordContainer').hide(); //contains password recovery form.
-				app.ext.myRIA.u.handleLoginActions();
+				_app.ext.quickstart.u.handleLoginActions();
 				}
 			} //authenticateBuyer
 
@@ -540,6 +561,21 @@ need to be customized on a per-ria basis.
 				}
 			}, //pageTransition
 
+
+
+		tlcFormats : {
+			
+			searchbytag : function(data,thisTLC)	{
+				var argObj = thisTLC.args2obj(data.command.args,data.globals); //this creates an object of the args
+				var query = {"size":(argObj.size || 4),"mode":"elastic-native","filter":{"term":{"tags":argObj.tag}}};
+				_app.ext.store_search.calls.appPublicProductSearch.init(query,$.extend({'datapointer':'appPublicSearch|tag|'+argObj.tag,'templateID':argObj.templateid,'extension':'store_search','callback':'handleElasticResults','list':data.globals.tags[data.globals.focusTag]},argObj));
+				_app.model.dispatchThis('mutable');
+				return false; //in this case, we're off to do an ajax request. so we don't continue the statement.
+				}
+
+			},
+
+
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
@@ -549,41 +585,66 @@ need to be customized on a per-ria basis.
 //This function works in conjuction with the showContent/showPage and buildQueriesFromTemplate functions.
 //the parent and subcategory data (appNavcatDetail) must be in memory already for this to work right.
 //data.value is the category object. data.bindData is the bindData obj.
-			subcategoryList : function($tag,data)	{
-//				app.u.dump("BEGIN control.renderFormats.subcats");
-//				app.u.dump(data.value);
+			subcategorylist : function($tag,data)	{
+//				dump("BEGIN control.renderFormats.subcats");
+//				dump(data.value);
 				var L = data.value.length;
 				var thisCatSafeID; //used in the loop below to store the cat id during each iteration
-	//			app.u.dump(data);
+	//			dump(data);
 				for(var i = 0; i < L; i += 1)	{
 					thisCatSafeID = data.value[i].id;
 					if(data.value[i].id[1] == '$')	{
 						//ignore 'lists', which start with .$
-//						app.u.dump(" -> list! "+data.value[i].id);
+//						dump(" -> list! "+data.value[i].id);
 						}
 					else if(!data.value[i].pretty || data.value[i].pretty.charAt(0) == '!')	{
 						//categories that start with ! are 'hidden' and should not be displayed.
 						}
-					else if(!$.isEmptyObject(app.data['appNavcatDetail|'+thisCatSafeID]))	{
-						$tag.append(app.renderFunctions.transmogrify({'id':thisCatSafeID,'catsafeid':thisCatSafeID},data.bindData.loadsTemplate,app.data['appNavcatDetail|'+thisCatSafeID]));
+					else if(!$.isEmptyObject(_app.data['appNavcatDetail|'+thisCatSafeID]))	{
+//						$tag.append(_app.renderFunctions.transmogrify({'id':thisCatSafeID,'catsafeid':thisCatSafeID},data.bindData.loadsTemplate,_app.data['appNavcatDetail|'+thisCatSafeID]));
+						$tag.tlc({
+							dataAttribs : {'id':thisCatSafeID,'catsafeid':thisCatSafeID},
+							dataset : _app.data['appNavcatDetail|'+thisCatSafeID],
+							templateid : data.bindData.loadsTemplate
+							})
 						}
 					else	{
-						app.u.dump("WARNING - subcategoryList reference to appNavcatDetail|"+thisCatSafeID+" was an empty object.");
+						dump("WARNING - subcategoryList reference to appNavcatDetail|"+thisCatSafeID+" was an empty object.");
 						}
 					}
 				}, //subcategoryList
 
+//set bind-data to val: product(zoovy:prod_is_tags) which is a comma separated list
+//used for displaying a  series of tags, such as on the product detail page. Will show any tag enabled.
+//on bind-data, set maxTagsShown to 1 to show only 1 tag
+		tags : function($tag,data)	{
+			var whitelist = new Array('IS_PREORDER','IS_DISCONTINUED','IS_SPECIALORDER','IS_SALE','IS_CLEARANCE','IS_NEWARRIVAL','IS_BESTSELLER','IS_USER1','IS_USER2','IS_USER3','IS_USER4','IS_USER5','IS_USER6','IS_USER7','IS_USER8','IS_USER9','IS_FRESH','IS_SHIPFREE');
+//			var csv = data.value.split(',');
+			var L = whitelist.length;
+			var tagsDisplayed = 0;
+			var maxTagsShown = _app.u.isSet(data.bindData.maxTagsShown) ? data.bindData.maxTagsShown : whitelist.length; //default to showing all enabled tags.
+			var spans = ""; //1 or more span tags w/ appropriate tag class applied
+			for(var i = 0; i < L; i += 1)	{
+				if(data.value.indexOf(whitelist[i]) >= 0 && (tagsDisplayed <= maxTagsShown))	{
+					spans += "<span class='tagSprite "+whitelist[i].toLowerCase()+"'><\/span>";
+					tagsDisplayed += 1;
+					}
+				if(tagsDisplayed >= maxTagsShown)	{break;} //exit early once enough tags are displayed.
+				}
+			$tag.append(spans);
+			}, //tags
+
 //if first char is a !, hide that char, then render as text. used in breadcrumb
 //likely to be used in prodcats if/when it's built.s
 //here, on 'could' disable the display if they didn't want hidden cats to show in the breadcrumb.
-			catText : function($tag,data)	{
-//				app.u.dump(data.value);
+			cattext : function($tag,data)	{
+//				dump(" -> value: "); dump(data.value);
 				if(data.value[0] == '!')	{data.value = data.value.substring(1)}
-				app.renderFormats.text($tag,data)
+				_app.renderFormats.text($tag,data);
 				},
 
 //### later, we could make this more advanced to actually search the attribute. add something like elasticAttr:prod_mfg and if set, key off that.
-			searchLink : function($tag,data){
+			searchlink : function($tag,data){
 				var keywords = data.value.replace(/ /g,"+"),
 				infoObj = {'KEYWORDS':keywords}
 				if(data.bindData.elasticAttr){
@@ -594,7 +655,7 @@ need to be customized on a per-ria basis.
 					});
 				}, //searchLink
 
-			cpsiaWarning : function($tag,data)	{
+			cpsiawarning : function($tag,data)	{
 
 				var warnings = {
 					'choking_hazard_balloon' : 'Choking Hazard Balloon',
@@ -614,24 +675,24 @@ need to be customized on a per-ria basis.
 
 				},
 
-			addPicSlider : function($tag,data)	{
-//				app.u.dump("BEGIN myRIA.renderFormats.addPicSlider: "+data.value);
-				if(typeof app.data['appProductGet|'+data.value] == 'object')	{
-					var pdata = app.data['appProductGet|'+data.value]['%attribs'];
+			addpicslider : function($tag,data)	{
+//				dump("BEGIN quickstart.renderFormats.addPicSlider: "+data.value);
+				if(typeof _app.data['appProductGet|'+data.value] == 'object')	{
+					var pdata = _app.data['appProductGet|'+data.value]['%attribs'];
 //if image 1 or 2 isn't set, likely there are no secondary images. stop.
-					if(app.u.isSet(pdata['zoovy:prod_image1']) && app.u.isSet(pdata['zoovy:prod_image2']))	{
+					if(_app.u.isSet(pdata['zoovy:prod_image1']) && _app.u.isSet(pdata['zoovy:prod_image2']))	{
 						$tag.attr('data-pid',data.value); //no params are passed into picSlider function, so pid is added to tag for easy ref.
-//						app.u.dump(" -> image1 ["+pdata['zoovy:prod_image1']+"] and image2 ["+pdata['zoovy:prod_image2']+"] both are set.");
+//						dump(" -> image1 ["+pdata['zoovy:prod_image1']+"] and image2 ["+pdata['zoovy:prod_image2']+"] both are set.");
 //adding this as part of mouseenter means pics won't be downloaded till/unless needed.
 // no anonymous function in mouseenter. We'll need this fixed to ensure no double add (most likely) if template re-rendered.
 //							$tag.unbind('mouseenter.myslider'); // ensure event is only binded once.
-							$tag.bind('mouseenter.myslider',app.ext.myRIA.u.addPicSlider2UL).bind('mouseleave',function(){window.slider.kill()})
+							$tag.bind('mouseenter.myslider',_app.ext.quickstart.u.addPicSlider2UL).bind('mouseleave',function(){window.slider.kill()})
 						}
 					}
 				},
 
 //no click event is added to this. do that on a parent element so that this can be recycled.
-			youtubeThumbnail : function($tag,data)	{
+			youtubethumbnail : function($tag,data)	{
 				$tag.attr('src',"https://i3.ytimg.com/vi/"+data.value+"/default.jpg");
 				return true;
 				}, //youtubeThumbnail
@@ -639,11 +700,11 @@ need to be customized on a per-ria basis.
 // used for a product list of an elastic search results set. a results object and category page product list array are structured differently.
 // when using @products in a categoryDetail object, use productList as the renderFormat
 // this function gets executed after the request has been made, in the showPageContent response. for this reason it should NOT BE MOVED to store_search
-// ## this needs to be upgraded to use app.ext.store_search.u.getElasticResultsAsJQObject
-			productSearch : function($tag,data)	{
-//				app.u.dump("BEGIN myRIA.renderFormats.productSearch");
-				data.bindData = app.renderFunctions.parseDataBind($tag.attr('data-bind'));
-//				app.u.dump(data);
+// ## this needs to be upgraded to use _app.ext.store_search.u.getElasticResultsAsJQObject
+			productsearch : function($tag,data)	{
+//				dump("BEGIN quickstart.renderFormats.productSearch");
+				data.bindData = _app.renderFunctions.parseDataBind($tag.attr('data-bind'));
+//				dump(data);
 				if(data.value)	{
 					var parentID = $tag.attr('id');
 
@@ -653,7 +714,12 @@ need to be customized on a per-ria basis.
 					if(data.value.hits.total)	{
 						for(var i = 0; i < L; i += 1)	{
 							pid = data.value.hits.hits[i]['_id'];
-							$tag.append(app.renderFunctions.transmogrify({'id':parentID+'_'+pid,'pid':pid},templateID,data.value.hits.hits[i]['_source']));
+//							$tag.append(_app.renderFunctions.transmogrify({'id':parentID+'_'+pid,'pid':pid},templateID,data.value.hits.hits[i]['_source']));
+							$tag.tlc({
+								dataAttribs : {'id':parentID+'_'+pid,'pid':pid},
+								templateid : templateID,
+								dataset : data.value.hits.hits[i]['_source']
+								});
 							}
 						
 						if(data.bindData.before) {$tag.before(data.bindData.before)} //used for html
@@ -672,22 +738,22 @@ fallback is to just output the value.
 */
 
 			banner : function($tag, data)	{
-//				app.u.dump("begin myRIA.renderFormats.banner");
-				var obj = app.u.kvp2Array(data.value), //returns an object LINK, ALT and IMG
+//				dump("begin quickstart.renderFormats.banner");
+				var obj = _app.u.kvp2Array(data.value), //returns an object LINK, ALT and IMG
 				hash, //used to store the href value in hash syntax. ex: #company?show=return
 				pageInfo = {};
 				
 //if value starts with a #, then most likely the hash syntax is being used.
 				if(obj.LINK && obj.LINK.indexOf('#') == 0)	{
 					hash = obj.LINK;
-					pageInfo = app.ext.myRIA.u.getPageInfoFromHash(hash);
+					pageInfo = _app.ext.quickstart.u.getPageInfoFromHash(hash);
 					}
 // Initially attempted to do some sort of validating to see if this was likely to be a intra-store link.
 //  && data.value.indexOf('/') == -1 || data.value.indexOf('http') == -1 || data.value.indexOf('www') > -1
 				else if(obj.LINK)	{
-					pageInfo = app.ext.myRIA.u.detectRelevantInfoToPage(obj.LINK);
+					pageInfo = _app.ext.quickstart.u.detectRelevantInfoToPage(obj.LINK);
 					if(pageInfo.pageType)	{
-						hash = app.ext.myRIA.u.getHashFromPageInfo(pageInfo);
+						hash = _app.ext.quickstart.u.getHashFromPageInfo(pageInfo);
 						}
 					else	{
 						hash = obj.LINK
@@ -696,13 +762,13 @@ fallback is to just output the value.
 				else	{
 					//obj.link is not set
 					}
-				if(!app.u.isSet(obj.IMG))	{$tag.remove()} //if the image isn't set, don't show the banner. if a banner is set, then unset, val may = ALT=&IMG=&LINK=
+				if(!_app.u.isSet(obj.IMG))	{$tag.remove()} //if the image isn't set, don't show the banner. if a banner is set, then unset, val may = ALT=&IMG=&LINK=
  				else	{
 //if we don't have a valid pageInfo object AND a valid hash, then we'll default to what's in the obj.LINK value.
 					$tag.attr('alt',obj.ALT);
 //if the link isn't set, no href is added. This is better because no 'pointer' is then on the image which isn't linked.
 					if(obj.LINK)	{
-//						app.u.dump(" -> obj.LINK is set: "+obj.LINK);
+//						dump(" -> obj.LINK is set: "+obj.LINK);
 						var $a = $("<a />").addClass('bannerBind').attr({'href':hash,'title':obj.ALT});
 						if(pageInfo && pageInfo.pageType)	{
 							$a.click(function(){
@@ -712,34 +778,34 @@ fallback is to just output the value.
 						$tag.wrap($a);
 						}
 					data.value = obj.IMG; //this will enable the image itself to be rendered by the default image handler. recycling is good.
-					app.renderFormats.imageURL($tag,data);
+					_app.renderFormats.imageURL($tag,data);
 					}
 				}, //banner
 				
 //could be used for some legacy upgrades that used the old textbox/image element combo to create a banner.
-			legacyURLToRIA : function($tag,data)	{
+			legacyurltoria : function($tag,data)	{
 				if(data.value == '#')	{
 					$tag.removeClass('pointer');
 					}
 				else	{
-					var pageInfo = app.ext.myRIA.u.detectRelevantInfoToPage(data.value);
+					var pageInfo = _app.ext.quickstart.u.detectRelevantInfoToPage(data.value);
 					pageInfo.back = 0;
 					$tag.addClass('pointer').click(function(){
-						return app.ext.myRIA.a.showContent('',pageInfo);
+						return _app.ext.quickstart.a.showContent('',pageInfo);
 						});
 					}
 				}, //legacyURLToRIA
 
 //use in a cart item spec.  When clicked, button will first add the item to the wishlist and then, if that's succesful, remove the item from the cart.
 // render format will also hide the button if the user is not logged in.
-			moveToWishlistButton : function($tag,data)	{
+			movetowishlistbutton : function($tag,data)	{
 //nuke remove button for coupons.
 				if(data.value.stid[0] == '%')	{$tag.remove()} //coupon.
 				else if(data.value.asm_master)	{$tag.remove()} //assembly 'child'.
-				else if(app.u.buyerIsAuthenticated())	{
+				else if(_app.u.buyerIsAuthenticated())	{
 					$tag.show().button({icons: {primary: "ui-icon-heart"},text: false});
 					$tag.off('click.moveToWishlist').on('click.moveToWishList',function(){
-						app.ext.myRIA.a.moveItemFromCartToWishlist(data.value);
+						_app.ext.quickstart.a.moveItemFromCartToWishlist(data.value);
 						});
 					}
 				else	{$tag.hide();}
@@ -748,20 +814,20 @@ fallback is to just output the value.
 
 //This is for use on a category or search results page.
 //changes the text on the button based on certain attributes.
-//app.ext.myRIA.u.handleAddToCart($(this),{'action':'modal'});
-			addToCartButton : function($tag,data)	{
-//				app.u.dump("BEGIN store_product.renderFunctions.addToCartButton");
+//_app.ext.quickstart.u.handleAddToCart($(this),{'action':'modal'});
+			addtocartbutton : function($tag,data)	{
+//				dump("BEGIN store_product.renderFunctions.addtocartbutton");
 
 //if price is not set, item isn't purchaseable. buttonState is set to 'disabled' if item isn't purchaseable or is out of stock.
 				
 				var className, price, buttonState, buttonText = 'Add to Cart',
 				pid = data.value.pid, //...pid set in both elastic and appProductGet
-				inv = app.ext.store_product.u.getProductInventory(pid),
+				inv = _app.ext.store_product.u.getProductInventory(pid),
 				$form = $tag.closest('form');
 				
-//				app.u.dump(" -> $form.length: "+$form.length);
+//				dump(" -> $form.length: "+$form.length);
 				
-//				if(app.model.fetchData('appProductGet|'+pid))	{}
+//				if(_app.model.fetchData('appProductGet|'+pid))	{}
 				if(data.bindData.isElastic)	{
 					price = data.value.base_price;
 // ** 201332 indexOf changed to $.inArray for IE8 compatibility, since IE8 only supports the indexOf method on Strings
@@ -798,10 +864,11 @@ fallback is to just output the value.
 				if(!price)	{
 					buttonState = 'disable';
 					}
-				else if(inv && inv <= 0)	{buttonState = 'disable';}
+//*** 201352 original inventory check - if(inv...) -was short circuiting on 0/false inventory, meaning that prods with no inventory were not getting this button disabled. -mc
+				else if(typeof inv !== "undefined" && (!inv || inv <= 0))	{buttonState = 'disable';}
 				else{}
 				
-//				app.u.dump(" -> inv: "+inv);
+//				dump(" -> inv: "+inv);
 				$tag.addClass(className).text(buttonText);
 				$tag.button();
 				if(buttonState)	{$tag.button(buttonState)}
@@ -819,19 +886,19 @@ fallback is to just output the value.
 							})
 						}
 					}
-//				app.u.dump(" -> ID at end: "+$tag.attr('id'));
-				}, //addToCartButton
+//				dump(" -> ID at end: "+$tag.attr('id'));
+				}, //addtocartbutton
 
 //pass in the sku for the bindata.value so that the original data object can be referenced for additional fields.
 // will show price, then if the msrp is MORE than the price, it'll show that and the savings/percentage.
-			priceRetailSavingsDifference : function($tag,data)	{
+			priceretailsavingsdifference : function($tag,data)	{
 				var o; //output generated.
-				var pData = app.data['appProductGet|'+data.value]['%attribs'];
+				var pData = data.value;
 	//use original pdata vars for display of price/msrp. use parseInts for savings computation only.
 				var price = Number(pData['zoovy:base_price']);
 				var msrp = Number(pData['zoovy:prod_msrp']);
 				if(price > 0 && (msrp - price > 0))	{
-					o = app.u.formatMoney(msrp-price,'$',2,true)
+					o = _app.u.formatMoney(msrp-price,'$',2,true)
 					$tag.append(o);
 					}
 				else	{
@@ -842,9 +909,9 @@ fallback is to just output the value.
 
 //pass in the sku for the bindata.value so that the original data object can be referenced for additional fields.
 // will show price, then if the msrp is MORE than the price, it'll show that and the savings/percentage.
-			priceRetailSavingsPercentage : function($tag,data)	{
+			priceretailsavingspercentage : function($tag,data)	{
 				var o; //output generated.
-				var pData = app.data['appProductGet|'+data.value]['%attribs'];
+				var pData = data.value;
 	//use original pdata vars for display of price/msrp. use parseInts for savings computation only.
 				var price = Number(pData['zoovy:base_price']);
 				var msrp = Number(pData['zoovy:prod_msrp']);
@@ -871,145 +938,150 @@ fallback is to just output the value.
 // and a page info: catSafeID, sku, customer admin page (ex: newsletter) or 'returns' (respectively to the line above.
 // myria.vars.session is where some user experience data is stored, such as recent searches or recently viewed items.
 // -> unshift is used in the case of 'recent' so that the 0 spot always holds the most recent and also so the length can be maintained (kept to a reasonable #).
+// infoObj.back can be set to 0 to skip a URI update (will skip both hash state and popstate.) 
 			showContent : function(pageType,infoObj)	{
-//				app.u.dump("BEGIN showContent ["+pageType+"]."); app.u.dump(infoObj);
+//				dump("BEGIN showContent ["+pageType+"]."); dump(infoObj);
+				infoObj = infoObj || {}; //could be empty for a cart or checkout
 /*
 what is returned. is set to true if pop/pushState NOT supported. 
 if the onclick is set to return showContent(... then it will return false for browser that support push/pop state but true
 for legacy browsers. That means old browsers will use the anchor to retain 'back' button functionality.
 */
-				var r = false;
-				var $old = $("#mainContentArea :visible:first"); //used for transition (actual and validation).
+				var
+					r = false,
+					$old = $("#mainContentArea :visible:first"),  //used for transition (actual and validation).
+					$new;  //a jquery object returned by the 'show' functions (ex: showProd).
+
 //clicking to links (two product, for example) in a short period of time was rendering both pages at the same time.
 //this will fix that and only show the last clicked item. state of the world render this code obsolete.
 				if($old.length)	{
 					$old.siblings().hide(); //make sure only one 'page' is visible.
 					}
-				app.ext.myRIA.u.closeAllModals();  //important cuz a 'showpage' could get executed via wiki in a modal window.
-
-				if(typeof infoObj != 'object')	{infoObj = {}} //could be empty for a cart or checkout
+				_app.ext.quickstart.u.closeAllModals();  //important cuz a 'showpage' could get executed via wiki in a modal window.
 
 //if pageType isn't passed in, we're likely in a popState, so look in infoObj.
 				if(pageType){infoObj.pageType = pageType} //pageType
 				else if(pageType == '')	{pageType = infoObj.pageType}
 
-				app.ext.myRIA.u.handleSearchInput(pageType);
+				_app.ext.quickstart.u.handleSearchInput(pageType); //will clear keyword searches when on a non-search page, to avoid confusion.
 
 //set some defaults.
 				infoObj.back = infoObj.back == 0 ? infoObj.back : -1; //0 is no 'back' action. -1 will add a pushState or hash change.
-				infoObj.performTransition = infoObj.performTransition || app.ext.myRIA.u.showtransition(infoObj,$old); //specific instances skip transition.
-				infoObj.state = 'onInits'; //needed for handleTemplateFunctions.
+				infoObj.performTransition = infoObj.performTransition || _app.ext.quickstart.u.showtransition(infoObj,$old); //specific instances skip transition.
+				infoObj.state = 'init'; //needed for handleTemplateEvents.
 
 //if there's history (all pages loads after first, execute the onDeparts functions.
 //must be run before handleSandHOTW or history[0] will be this infoObj, not the last one.
-				if(!$.isEmptyObject(app.ext.myRIA.vars.hotw[0]))	{
-					app.ext.myRIA.u.handleTemplateFunctions($.extend(app.ext.myRIA.vars.hotw[0],{"state":"onDeparts"}))
+				if(!$.isEmptyObject(_app.ext.quickstart.vars.hotw[0]))	{
+					_app.renderFunctions.handleTemplateEvents($old,$.extend(_app.ext.quickstart.vars.hotw[0],{"state":"depart"}))
 					}
 					
-				app.ext.myRIA.u.handleSandHOTW(infoObj);
+				_app.ext.quickstart.u.handleSandHOTW(infoObj);
 //handles the appnav. the ...data function must be run first because the display function uses params set by the function.
-				app.ext.myRIA.u.handleAppNavData(infoObj);
-				app.ext.myRIA.u.handleAppNavDisplay(infoObj);
+				_app.ext.quickstart.u.handleAppNavData(infoObj);
+				_app.ext.quickstart.u.handleAppNavDisplay(infoObj);
 
-//				app.u.dump("showContent.infoObj: "); app.u.dump(infoObj);
 				switch(pageType)	{
 
 					case 'product':
 	//add item to recently viewed list IF it is not already in the list.				
-						if($.inArray(infoObj.pid,app.ext.myRIA.vars.session.recentlyViewedItems) < 0)	{
-							app.ext.myRIA.vars.session.recentlyViewedItems.unshift(infoObj.pid);
+						if($.inArray(infoObj.pid,_app.ext.quickstart.vars.session.recentlyViewedItems) < 0)	{
+							_app.ext.quickstart.vars.session.recentlyViewedItems.unshift(infoObj.pid);
 							}
 						else	{
 // ** 201332 indexOf changed to $.inArray for IE8 compatibility, since IE8 only supports the indexOf method on Strings
 							//the item is already in the list. move it to the front.
-							app.ext.myRIA.vars.session.recentlyViewedItems.splice(0, 0, app.ext.myRIA.vars.session.recentlyViewedItems.splice($.inArray(infoObj.pid, app.ext.myRIA.vars.session.recentlyViewedItems), 1)[0]);
+							_app.ext.quickstart.vars.session.recentlyViewedItems.splice(0, 0, _app.ext.quickstart.vars.session.recentlyViewedItems.splice($.inArray(infoObj.pid, _app.ext.quickstart.vars.session.recentlyViewedItems), 1)[0]);
 							}
-						infoObj.parentID = app.ext.myRIA.u.showProd(infoObj);
+						$new = _app.ext.quickstart.u.showProd(infoObj);
 						break;
 	
 					case 'homepage':
 						infoObj.pageType = 'homepage';
 						infoObj.navcat = zGlobals.appSettings.rootcat;
-						infoObj.parentID = app.ext.myRIA.u.showPage(infoObj);
+						$new = _app.ext.quickstart.u.showPage(infoObj);
 						break;
 
 					case 'category':
 //add item to recently viewed list IF it is not already the most recent in the list.				
-//Originally, used: 						if($.inArray(infoObj.navcat,app.ext.myRIA.vars.session.recentCategories) < 0)
+//Originally, used: 						if($.inArray(infoObj.navcat,_app.ext.quickstart.vars.session.recentCategories) < 0)
 //bad mojo because spot 0 in array isn't necessarily the most recently viewed category, which it should be.
-						if(app.ext.myRIA.vars.session.recentCategories[0] != infoObj.navcat)	{
-							app.ext.myRIA.vars.session.recentCategories.unshift(infoObj.navcat);
+						if(_app.ext.quickstart.vars.session.recentCategories[0] != infoObj.navcat)	{
+							_app.ext.quickstart.vars.session.recentCategories.unshift(infoObj.navcat);
 							}
 						
-						infoObj.parentID = app.ext.myRIA.u.showPage(infoObj); //### look into having showPage return infoObj instead of just parentID.
+						$new = _app.ext.quickstart.u.showPage(infoObj); //### look into having showPage return infoObj instead of just parentID.
 						break;
 	
 					case 'search':
-	//					app.u.dump(" -> Got to search case.");	
-						app.ext.myRIA.u.showSearch(infoObj);
-						infoObj.parentID = 'mainContentArea_search';
+	//					dump(" -> Got to search case.");	
+						_app.ext.quickstart.u.showSearch(infoObj);
+						$new = 'mainContentArea_search';
 						break;
 	
 					case 'customer':
 						if('file:' == document.location.protocol || 'https:' == document.location.protocol)	{
-							var performJumpToTop = app.ext.myRIA.u.showCustomer(infoObj);
-							infoObj.performJumpToTop = infoObj.performJumpToTop || performJumpToTop;
+							 //perform jump can be forced on. authenticate/require login indicate a login dialog is going to show and a jump should NOT occur so that the dialog is not off screen after the jump.
+							if(!infoObj.performJumpToTop && !_app.u.buyerIsAuthenticated() && _app.ext.quickstart.u.thisArticleRequiresLogin(infoObj))	{
+								infoObj.performJumpToTop = false;
+								}
+							else	{
+								infoObj.performJumpToTop = true;
+								}
+							$new = _app.ext.quickstart.u.showCustomer(infoObj);
 							}
 						else	{
 //							$('#mainContentArea').empty().addClass('loadingBG').html("<h1>Transferring to Secure Login...</h1>");
 // * changed from 'empty' to showLoading because empty could be a heavy operation if mainContentArea has a lot of content.
 							$('body').showLoading({'message':'Transferring to secure login'});							
-							var SSLlocation = app.vars.secureURL+"?cartID="+app.vars.cartID;
+							var SSLlocation = _app.vars.secureURL+"?cartID="+_app.model.fetchCartID();
 							SSLlocation += "#customer?show="+infoObj.show
 							_gaq.push(['_link', SSLlocation]); //for cross domain tracking.
-							document.location = SSLlocation; //redir to secure url
+							document.location = SSLlocation; //redir to secure url.
 							}
-						infoObj.parentID = 'mainContentArea_customer';
 						break;
-	
+
 					case 'checkout':
-//						app.u.dump("PROTOCOL: "+document.location.protocol);
+//						dump("PROTOCOL: "+document.location.protocol);
 						infoObj.parentID = 'checkoutContainer'; //parent gets created within checkout. that id is hard coded in the checkout extensions.
 						infoObj.templateID = 'checkoutTemplate'
-						infoObj.state = 'onInits'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+						infoObj.state = 'init'; //needed for handleTemplateEvents.
+						var $checkoutContainer = $("#checkoutContainer");
+						$new = $checkoutContainer;
+						_app.renderFunctions.handleTemplateEvents($checkoutContainer,infoObj);
 
-//for local, don't jump to secure. ### this may have to change for a native app. what's the protocol? is there one?
+//for local, don't jump to secure. ### this may have to change for a native _app. what's the protocol? is there one?
 						if('http:' == document.location.protocol)	{
-							app.u.dump(" -> nonsecure session. switch to secure for checkout.");
+							dump(" -> nonsecure session. switch to secure for checkout.");
 // if we redirect to ssl for checkout, it's a new url and a pushstate isn't needed, so a param is added to the url.
 // * use showloading instead of .html (which could be heavy)
 //							$('#mainContentArea').addClass('loadingBG').html("<h1>Transferring you to a secure session for checkout.<\/h1><h2>Our app will reload shortly...<\/h2>");
 							$('body').showLoading({'message':'Transferring you to a secure session for checkout'});
-							var SSLlocation = zGlobals.appSettings.https_app_url+"?cartID="+app.vars.cartID+"&_session="+app.vars._session+"#checkout?show=checkout";
+							var SSLlocation = zGlobals.appSettings.https_app_url+"?cartID="+_app.model.fetchCartID()+"&_session="+_app.vars._session+"#checkout?show=checkout";
 							_gaq.push(['_link', SSLlocation]); //for cross domain tracking.
 							document.location = SSLlocation;
 							}
 						else	{
 // * checkout was emptying mainContentArea and that was heavy. This solution is faster and doesn't nuke templates already rendered.
-							var $checkoutContainer = $("#checkoutContainer");
 							if(!$checkoutContainer.length)	{
 								$checkoutContainer = $("<div \/>",{'id':'checkoutContainer'});
 								$('#mainContentArea').append($checkoutContainer );
 								}
-							app.ext.orderCreate.a.startCheckout($checkoutContainer);
+							_app.ext.order_create.a.startCheckout($checkoutContainer,_app.model.fetchCartID());
 							}
-						infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+						infoObj.state = 'complete'; //needed for handleTemplateEvents.
+						_app.renderFunctions.handleTemplateEvents($checkoutContainer,infoObj);
 
 						break;
 	
 					case 'company':
-						infoObj.parentID = 'mainContentArea_company';
-						app.ext.myRIA.u.showCompany(infoObj);
+						$new = $('#mainContentArea_company');
+						_app.ext.quickstart.u.showCompany(infoObj);
 						break;
 	
 					case 'cart':
-//						infoObj.mode = 'modal';
-						infoObj.back = 0; //no popstate or hash change since it's opening in a modal.
-						infoObj.performJumpToTop = false; //dont jump to top.
-//						app.ext.myRIA.u.showPage('.'); //commented out.
-						app.ext.myRIA.u.showCart(infoObj);
+						infoObj.performJumpToTop = (infoObj.show === 'inline' ? true : false); //dont jump to top.
+						$new = _app.ext.quickstart.u.showCart(infoObj);
 						break;
 
 					case '404': 	//no specific code. shared w/ default, however a case is present because it is a recognized pageType.
@@ -1017,36 +1089,45 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 						infoObj.pageType = '404';
 						infoObj.back = 0;
 						infoObj.templateID = 'pageNotFoundTemplate'
-						infoObj.state = 'onInits'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-
-						$('#mainContentArea').append(app.renderFunctions.transmogrify('page404',infoObj.templateID,infoObj));
-						
-						infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+						infoObj.state = 'init'; //needed for handleTemplateEvents.
+//						var $fourOhFour = _app.renderFunctions.transmogrify('page404',infoObj.templateID,infoObj);
+						$new = $("<div \/>").tlc({
+							dataAttribs : {'id':'page404'},
+							templateid : infoObj.templateID,
+							dataset : infoObj
+							});
+						_app.renderFunctions.handleTemplateEvents($new,infoObj);
+						$('#mainContentArea').append($new);
+						infoObj.state = 'complete'; //needed for handleTemplateEvents.
+						_app.renderFunctions.handleTemplateEvents($new,infoObj);
 					}
 //this is low so that the individual 'shows' above can set a different default and if nothing is set, it'll default to true here.
 				infoObj.performJumpToTop = (infoObj.performJumpToTop === false) ? false : true; //specific instances jump to top. these are passed in (usually related to modals).
 
-//				app.u.dump(" -> infoObj.performJumpToTop: "+infoObj.performJumpToTop);
-				r = app.ext.myRIA.u.addPushState(infoObj);
+//if back is set to zero, no push state or hash state change is desired.  This is used in cases where a dialog is displaying the data.
+				if(infoObj.back === 0)	{
+					r = false;
+					}
+				else	{
+					r = _app.ext.quickstart.u.addPushState(infoObj);
+					}
 				
 //r will = true if pushState isn't working (IE or local). so the hash is updated instead.
-//				app.u.dump(" -> R: "+r+" and infoObj.back: "+infoObj.back);
+//				dump(" -> R: "+r+" and infoObj.back: "+infoObj.back);
 				if(r == true && infoObj.back == -1)	{
-					var hash = app.ext.myRIA.u.getHashFromPageInfo(infoObj);
-//					app.u.dump(" -> hash from infoObj: "+hash);
+					var hash = _app.ext.quickstart.u.getHashFromPageInfo(infoObj);
+//					dump(" -> hash from infoObj: "+hash);
 //see if hash on URI matches what it should be and if not, change. This will only impact browsers w/out push/pop state support.
 					if(hash != window.location.hash)	{
 						_ignoreHashChange = true; //make sure changing the hash doesn't execute our hashChange code.
-						window.location.hash = hash;
+						//window.location.hash = hash;
 						}
 					}
 
 				if(infoObj.performJumpToTop)	{$('html, body').animate({scrollTop : 0},1000)} //new page content loading. scroll to top.				
 //transition appPreView out on init.
 				if($('#appPreView').is(':visible'))	{
-//					app.ext.myRIA.pageTransition($('#appPreView'),$('#appView'));
+//					_app.ext.quickstart.pageTransition($('#appPreView'),$('#appView'));
 //appPreViewBG is an optional element used to create a layer between the preView and the view when the preView is loaded 'over' the view.
 					var $bg = $('#appPreViewBG');
 					if($bg.length)	{
@@ -1054,82 +1135,104 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 						}
 
 					$('#appPreView').slideUp(1000,function(){
-						$('#'+infoObj.parentID).show(); //have to show content area here because the slideDown will only make the parent visible
+						$new.show(); //have to show content area here because the slideDown will only make the parent visible
 						$('#appView').slideDown(3000);
 						});
 					}
 				else if(infoObj.performTransition == false)	{
 					
 					}
-				else if(infoObj.parentID && typeof app.ext.myRIA.pageTransition == 'function')	{
-
-app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
-//					
-//					$("#mainContentArea :visible:first").slideUp(2000,function(){
-//						$('#'+infoObj.parentID,'#mainContentArea').slideDown(2000); //hide currently visible content area.
-//						}); //hide currently visible content area.
+				else if(typeof _app.ext.quickstart.pageTransition == 'function')	{
+//					dump(" -> parentID.length: "+$(_app.u.jqSelector('#',infoObj.parentID)).length);
+					_app.ext.quickstart.pageTransition($old,$new);
 					}
-				else if(infoObj.parentID)	{
+				else if($new instanceof jQuery)	{
 //no page transition specified. hide old content, show new. fancy schmancy.
 					$("#mainContentArea :visible:first").hide();
-					$('#'+infoObj.parentID).show();
+					$new.show();
 					}
 				else	{
-					app.u.dump("WARNING! in showContent and no parentID is set for the element being translated.");
+					dump("WARNING! in showContent and no parentID is set for the element being translated.");
 					}
 
-				$(document).trigger('renderFinish');
+//NOT POSTING THIS MESSAGE AS ASYNC BEHAVIOR IS NOT CURRENTLY QUANTIFIABLE					
+				//Used by the SEO generation utility to signal that a page has finished loading. 
+				//parent.postMessage("renderFinished","*");
+				
 				return false; //always return false so the default action (href) is cancelled. hashstate will address the change.
 				}, //showContent
 
 
 
+/*
+app messaging ui is a mechanism for buyers and merchants to communicate in real-time.
+it also allows the merchant to update the cart, load product or categories, or a variety of other things.
+the ui also helps the buyer show the merchant what they're looking at and, optionally, where they've been
+ -> while it's possible to automatically send a lot of info to the merchant, please keep in mind buyer privacy.
+*/
+			showBuyerCMUI : function()	{
+				var $ui = $('#cartMessenger').data('cartid',_app.model.fetchCartID());
+				if($ui.hasClass('ui-dialog-content'))	{
+					//the help interface has been opened once already.
+					}
+				else	{
+					$ui.dialog({
+						'auto-open':'false'
+						});
+					// SANITY -> do not run a destroyCartMessenger on dialog close.  It will kill the polling.
+					_app.u.handleButtons($ui);
+					_app.u.handleCommonPlugins($ui);
+					_app.u.addEventDelegation($ui);
+					}
+				$ui.find('.show4ActiveChat').hide(); //hidden by default. will be activated once a chat starts.
+				//the information below is added to the dialog each time it's opened. that way it's up to date.
+				$ui.find('.stats').empty().end().append("<p class='hint stats'>domain: "+document.domain+"<br \/>release: "+_app.vars.release+"<br \/>cart id: "+_app.model.fetchCartID()+"<\/p>");
+				$ui.dialog('open');
+				return $ui;
+				},
+
 
 //context should be a container element that has 1 or more forms within it.
 //will look for inputs w/ qtyChanged class. Anything with that class is assumed to be an add to cart form and is treated as such.
-// the atcQuantityInput renderFormat in store_product will auto-add that class on change.
+// the atcquantityinput renderFormat in store_product will auto-add that class on change.
 			bulkAddItemsToCart : function($context,_tag)	{
 				if($context)	{
 					var $inputs = $(".qtyChanged",$context);
 					if($inputs.length)	{
 						$inputs.each(function(){
-							var obj = app.ext.store_product.u.buildCartItemAppendObj($(this).closest('form'));
+							var obj = _app.ext.store_product.u.buildCartItemAppendObj($(this).closest('form'));
 							if(obj)	{
-								app.calls.cartItemAppend.init(obj,{});
+								_app.ext.cco.calls.cartItemAppend.init(obj,{});
 								}
 							});
-						app.model.destroy('cartDetail',_tag);
-						app.calls.cartDetail.init({},'immutable');
-						app.model.dispatchThis('immutable');
+						_app.calls.refreshCart.init({},'immutable');
+						_app.model.dispatchThis('immutable');
 						}
 					else	{
 						$context.anymessage({'message':'Please set quantities before adding items to the cart.'});
 						}
 					}
 				else	{
-					$("#globalMessaging").anymessage({'message':'In myRIA.a.bulkAddItemsToCart, no $context passed.'});
+					$("#globalMessaging").anymessage({'message':'In quickstart.a.bulkAddItemsToCart, no $context passed.'});
 					}
 				},
-
-
 
 //each item in the cart has a UUID. The UUID is used (not the stid) to modify the cart
 			moveItemFromCartToWishlist : function(obj)	{
 				if(obj && obj.uuid && obj.stid)	{
-//					var sku = app.ext.store_cart.u.getSkuByUUID(obj.uuid);
 					//adds item to wishlist. cart removal ONLY occurs if this is successful.
 					$('#modalCartContents').showLoading({'message':'Moving item '+obj.stid+' from your cart to your wishlist'});
-					app.calls.buyerProductListAppendTo.init({sku:obj.stid,'listid':'wishlist'},{'callback':function(rd){
-						if(app.model.responseHasErrors(rd)){
+					_app.calls.buyerProductListAppendTo.init({sku:obj.stid,'listid':'wishlist'},{'callback':function(rd){
+						if(_app.model.responseHasErrors(rd)){
 							$('#modalCartContents').hideLoading(); //only close on error. otherwise leave for removal in subsequent call.
 							$('#cartMessaging').anymessage({'message':rd});
 							}
 						else	{
 							//by now, item has been added to wishlist. So remove it from the cart.
-							app.model.destroy('cartDetail');
-							app.calls.cartItemUpdate.init(obj.stid,0,{callback:function(rd){
+							
+							_app.ext.cco.calls.cartItemUpdate.init({'stid':obj.stid,'quantity':0},{callback:function(rd){
 								$('#modalCartContents').hideLoading();
-								if(app.model.responseHasErrors(rd)){
+								if(_app.model.responseHasErrors(rd)){
 									$('#cartMessaging').anymessage({'message':rd});
 									}
 								else	{
@@ -1137,15 +1240,15 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 									$('#cartMessaging').anymessage({'message':'Thank you. '+obj.stid+' has been added to your wishlist and removed from the cart.'}); //!!! need to make this a success message.
 									}
 								}});
-							app.calls.cartDetail.init({'callback':'handleCart','templateID':'cartTemplate','extension':'myRIA','parentID':'modalCartContents'},'immutable');
-							app.model.dispatchThis('immutable');
+							_app.calls.refreshCart.init({'callback':'handleCart','templateID':'cartTemplate','extension':'quickstart','parentID':'modalCartContents'},'immutable');
+							_app.model.dispatchThis('immutable');
 							}
 						}},'immutable'); 
-					app.model.dispatchThis('immutable');
+					_app.model.dispatchThis('immutable');
 					}
 				else	{
 					$('#cartMessaging').anymessage({'message':'myRiA.moveItemFromCartToWishlist missing either obj, obj.uuid or obj.stid','gMessage':true});
-					app.u.dump("moveItemFromCartToWishlist obj: "); app.u.dump(obj);
+					dump("moveItemFromCartToWishlist obj: "); dump(obj);
 					}
 				},
 
@@ -1158,22 +1261,22 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 
 				if(pageType && infoObj && infoObj.templateID)	{
 					if(pageType == 'product' && infoObj.pid)	{
-						app.ext.store_product.u.prodDataInModal(infoObj);
+						_app.ext.store_product.u.prodDataInModal(infoObj);
 						_gaq.push(['_trackEvent','Quickview','User Event','product',infoObj.pid]);
 						}
 						
 					else if(pageType == 'category' && infoObj.navcat)	{
-						app.ext.myRIA.u.showPageInDialog (infoObj)
+						_app.ext.quickstart.u.showPageInDialog (infoObj)
 						_gaq.push(['_trackEvent','Quickview','User Event','category',infoObj.navcat]);
 						}
 						
 					else	{
-						app.u.throwGMessage("Based on pageType, some other variable is required (ex: pid for pageType = product). infoObj follows: "); app.u.dump(infoObj);
+						_app.u.throwGMessage("Based on pageType, some other variable is required (ex: pid for pageType = product). infoObj follows: "); dump(infoObj);
 						}
 					
 					}
 				else	{
-					app.u.throwGMessage("quickView was missing either a pageType ["+pageType+"] or infoObj.templateID: "); app.u.dump(infoObj);
+					_app.u.throwGMessage("quickView was missing either a pageType ["+pageType+"] or infoObj.templateID: "); dump(infoObj);
 					}
 				return false;
 				},
@@ -1181,10 +1284,10 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 //use this when linking from one store to another when you want to share the cart.
 			linkToStore : function(url,type){
 
-				if(type == 'vstore') {window.open(url+'c='+app.vars.cartID+'/');}
-				else if(type == 'app') {window.open(url+'?cartID='+app.vars.cartID+'&_session='+app.vars._session);}
+				if(type == 'vstore') {window.open(url+'c='+_app.model.fetchCartID()+'/');}
+				else if(type == 'app') {window.open(url+'?cartID='+_app.model.fetchCartID()+'&_session='+_app.vars._session);}
 				else {
-					$('#globalMessage').anymessage({'message':'unknown type passed into myRIA.a.linkToStore.','gMessage':true});
+					$('#globalMessage').anymessage({'message':'unknown type passed into quickstart.a.linkToStore.','gMessage':true});
 					}
 
 				},
@@ -1216,7 +1319,7 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 					
 //button for turning off preview mode. returns li's to normal state and animates the two 'panes'.
 					$("<button \/>").button().text('close preview').on('click',function(event){
-						app.ext.myRIA.u.revertPageFromPreviewMode($parent);
+						_app.ext.quickstart.u.revertPageFromPreviewMode($parent);
 						}).prependTo($buttonBar);
 
 
@@ -1274,18 +1377,18 @@ app.ext.myRIA.pageTransition($old,$('#'+infoObj.parentID));
 	//disable 'previous' button if first item in list is active. same for handling last item and next. otherwise, always enable buttons.
 	/*				
 	*/
-					app.ext.store_product.calls.appProductGet.init(pid,{
+					_app.ext.store_product.calls.appProductGet.init(pid,{
 						'callback':function(rd){
 
-							if(app.model.responseHasErrors(rd)){
+							if(_app.model.responseHasErrors(rd)){
 								$detail.anymessage({'message':rd});
 								}
 							else	{
-								$detail.anycontent({'templateID':'productTemplateQuickView','data' : app.data[rd.datapointer]})
+								$detail.tlc({'templateID':'productTemplateQuickView','dataset' : _app.data[rd.datapointer]})
 								}
 
 //in a timeout to prevent a doubleclick on the buttons. if data in memory, doubleclick will load two templates.
-app.u.dump(" -> liIndex: "+liIndex)
+dump(" -> liIndex: "+liIndex)
 setTimeout(function(){
 	if(liIndex === 0)	{
 		$('.prevButton',$parent).button("option", "disabled", true);
@@ -1302,31 +1405,10 @@ setTimeout(function(){
 },300);
 							}
 						});
-					app.model.dispatchThis();
+					_app.model.dispatchThis();
 					}
 				}, //handleProdPreview
 
-
-
-/*
-required:
-P.stid
-P.listID (buyer list id)
-*/
-			removeItemFromBuyerList : function(P,tagObj)	{
-//				app.u.dump(P);
-				if(P.stid && P.listID)	{
-					app.calls.buyerProductListRemoveFrom.init(P.listID,P.stid,tagObj,'immutable');
-					app.calls.buyerProductListDetail.init(P.listID,{},'immutable'); //update list in memory
-					app.model.dispatchThis('immutable');
-					if(tagObj.parentID) {$('#'+tagObj.parentID).empty().remove();}
-					_gaq.push(['_trackEvent','Manage buyer list','User Event','item removed',P.stid]);
-					}
-				else	{
-					app.u.throwGMessage("ERROR! either stid ["+P.stid+"] or listID ["+P.listID+"] not passed into myRIA.a.removeItemFromBuyerList.",P.parentID)
-					}
-				},
-			
 //guts of this found here: http://www.dynamicdrive.com/dynamicindex9/addbook.htm
 			bookmarkThis : function()	{
 				var url = window.location;
@@ -1344,8 +1426,6 @@ P.listID (buyer list id)
 			
 				else if(document.all)// ie
 					window.external.AddFavorite(url, title);
-	
-				
 				},
 
 
@@ -1366,23 +1446,23 @@ P.listID (buyer list id)
 				return false;
 				},
 
-//P.listid and p.sku are required.
+//P.listid and P.sku are required.
 //optional params include: qty, priority, note, and replace. see API docs for explanation.
 			add2BuyerList : function(P){
-				app.u.dump("BEGIN myria.a.add2BuyerList: "+P.listid);
-				var authState = app.u.determineAuthentication();
-				app.u.dump("authState: "+authState);
+				dump("BEGIN myria.a.add2BuyerList: "+P.listid);
+				var authState = _app.u.determineAuthentication();
+				dump("authState: "+authState);
 				if(typeof P != 'object' || !P.sku || !P.listid)	{
-					app.u.throwMessage("Uh Oh! Something went wrong. Please try that again or contact the site administrator if error persists. err: required param for add2buyerList was missing. see console for details.");
-					app.u.dump("ERROR! params missing for add2BuyerList. listid and pid required. params: "); app.u.dump(P);
+					_app.u.throwMessage("Uh Oh! Something went wrong. Please try that again or contact the site administrator if error persists. err: required param for add2buyerList was missing. see console for details.");
+					dump("ERROR! params missing for add2BuyerList. listid and pid required. params: "); dump(P);
 					}
-				else if(authState && authState == 'none')	{
-					app.ext.myRIA.u.showLoginModal();
+				else if(authState && (authState == 'none' || authState == 'guest'))	{
+					_app.ext.quickstart.u.showLoginModal();
 					$('#loginSuccessContainer').empty(); //empty any existing login messaging (errors/warnings/etc)
 //this code is here instead of in showLoginModal (currently) because the 'showCustomer' code is bound to the 'close' on the modal.
 					$('<button>').addClass('stdMargin ui-state-default ui-corner-all  ui-state-active').attr('id','modalLoginContinueButton').text('Add Item to List').click(function(){
 						$('#loginFormForModal').dialog('close');
-						app.ext.myRIA.a.add2BuyerList(P) //will re-execute function so after successful login, item is actually submitted to list.
+						_app.ext.quickstart.a.add2BuyerList(P) //will re-execute function so after successful login, item is actually submitted to list.
 						}).appendTo($('#loginSuccessContainer'));	
 					}
 				else	{
@@ -1393,13 +1473,13 @@ P.listID (buyer list id)
 						$parent.dialog({'autoOpen':false});
 						}
 					$parent.dialog('open');
-					var msg = app.u.statusMsgObject('adding item '+P.sku+' to list: '+P.listid);
+					var msg = _app.u.statusMsgObject('adding item '+P.sku+' to list: '+P.listid);
 					msg.parentID = parentID;
-					app.u.throwMessage(msg);
-					app.model.destroy('buyerProductListDetail|'+P.listid);
-					app.calls.buyerProductListAppendTo.init(P,{'parentID':parentID,'callback':'showMessaging','message':'Item '+P.sku+' successfully added to list: '+P.listid},'immutable');
-					app.calls.buyerProductListDetail.init(P.listid,{},'immutable')
-					app.model.dispatchThis('immutable');
+					_app.u.throwMessage(msg);
+					_app.model.destroy('buyerProductListDetail|'+P.listid);
+					_app.calls.buyerProductListAppendTo.init(P,{'parentID':parentID,'callback':'showMessaging','message':'Item '+P.sku+' successfully added to list: '+P.listid},'immutable');
+					_app.calls.buyerProductListDetail.init(P.listid,{},'immutable')
+					_app.model.dispatchThis('immutable');
 					_gaq.push(['_trackEvent','Manage buyer list','User Event','item added',P.sku]);
 					}
 				},
@@ -1407,26 +1487,31 @@ P.listID (buyer list id)
 
 //assumes the faq are already in memory.
 			showFAQbyTopic : function(topicID)	{
-				app.u.dump("BEGIN showFAQbyTopic ["+topicID+"]");
+				dump("BEGIN showFAQbyTopic ["+topicID+"]");
 				var templateID = 'faqQnATemplate'
 				
 				if(!topicID)	{
-					app.u.throwMessage("Uh Oh. It seems an app error occured. Error: no topic id. see console for details.");
-					app.u.dump("a required parameter (topicID) was left blank for myRIA.a.showFAQbyTopic");
+					_app.u.throwMessage("Uh Oh. It seems an app error occured. Error: no topic id. see console for details.");
+					dump("a required parameter (topicID) was left blank for quickstart.a.showFAQbyTopic");
 					}
-				else if(!app.data['appFAQs'] || $.isEmptyObject(app.data['appFAQs']['@detail']))	{
-					app.u.dump(" -> No data is present");
+				else if(!_app.data['appFAQs'] || $.isEmptyObject(_app.data['appFAQs']['@detail']))	{
+					dump(" -> No data is present");
 					}
 				else	{
 					var $target = $('#faqDetails4Topic_'+topicID).toggle();
 					if($target.children().length)	{} //if children are present, this faq topic has been opened before or is empty. no need to re-render content.
 					else	{
-						var L = app.data['appFAQs']['@detail'].length;
-						app.u.dump(" -> total #faq: "+L);
+						var L = _app.data['appFAQs']['@detail'].length;
+						dump(" -> total #faq: "+L);
 						for(var i = 0; i < L; i += 1)	{
-							if(app.data['appFAQs']['@detail'][i]['TOPIC_ID'] == topicID)	{
-								app.u.dump(" -> faqid matches topic: "+app.data['appFAQs']['@detail'][i]['ID']);
-								$target.append(app.renderFunctions.transmogrify({'id':topicID+'_'+app.data['appFAQs']['@detail'][i]['ID'],'data-faqid':+app.data['appFAQs']['@detail'][i]['ID']},templateID,app.data['appFAQs']['@detail'][i]))
+							if(_app.data['appFAQs']['@detail'][i]['TOPIC_ID'] == topicID)	{
+								dump(" -> faqid matches topic: "+_app.data['appFAQs']['@detail'][i]['ID']);
+//								$target.append(_app.renderFunctions.transmogrify({'id':topicID+'_'+_app.data['appFAQs']['@detail'][i]['ID'],'data-faqid':+_app.data['appFAQs']['@detail'][i]['ID']},templateID,_app.data['appFAQs']['@detail'][i]))
+$target.tlc({
+	dataAttribs : {'id':topicID+'_'+_app.data['appFAQs']['@detail'][i]['ID'],'data-faqid':+_app.data['appFAQs']['@detail'][i]['ID']},
+	templateid : templateID,
+	dataset : _app.data['appFAQs']['@detail'][i]
+	})
 								}
 							}
 						}
@@ -1447,105 +1532,87 @@ P.listID (buyer list id)
 //executed when the app loads.  
 //sets a default behavior of loading homepage. Can be overridden by passing in infoObj.
 			handleAppInit : function(infoObj)	{
-//app.u.dump("BEGIN myRIA.u.handleAppInit");
-//!!! need to write/test this in IE7
-//				if(app.u.getBrowserInfo().indexOf('explorer') > -1)	{}
+//dump("BEGIN quickstart.u.handleAppInit");
 				
-				var L = app.rq.length-1;
+				var L = _app.rq.length-1;
 				for(var i = L; i >= 0; i -= 1)	{
-					app.u.loadResourceFile(app.rq[i]);
-					app.rq.splice(i, 1); //remove once handled.
+					_app.u.loadResourceFile(_app.rq[i]);
+					_app.rq.splice(i, 1); //remove once handled.
 					}
-				app.rq.push = app.u.loadResourceFile; //reassign push function to auto-add the resource.
+				
 				if(typeof infoObj != 'object')	{infoObj = {}}
 				infoObj = this.detectRelevantInfoToPage(window.location.href); 
 				infoObj.back = 0; //skip adding a pushState on initial page load.
 //getParams wants string to start w/ ? but doesn't need/want all the domain url crap.
-infoObj.uriParams = {};
-var ps = window.location.href; //param string. find a regex for this to clean it up.
-if(ps.indexOf('?') >= 1)	{
-	ps = ps.split('?')[1]; //ignore everything before the first questionmark.
-	if(ps.indexOf('#') >= 1)	{ps = ps.split('#')[0]} //uri params should be before the #
-//	app.u.dump(ps);
-	try {
-		infoObj.uriParams = app.u.kvp2Array(ps);
-	} catch(err){
-		//we lost the URI params to kvp2Array
-	}
-//	app.u.dump(uriParams);
-	}
-//app.u.dump("infoObj: "); app.u.dump(infoObj);
+				infoObj.uriParams = {};
+				var ps = window.location.href; //param string. find a regex for this to clean it up.
+				if(ps.indexOf('?') >= 1)	{
+					ps = ps.split('?')[1]; //ignore everything before the first questionmark.
+					if(ps.indexOf('#') >= 1)	{ps = ps.split('#')[0]} //uri params should be before the #
 
-//				app.u.dump(" -> infoObj.uriParams:"); app.u.dump(infoObj.uriParams);
+					try {
+						infoObj.uriParams = _app.u.kvp2Array(ps);
+						}
+					catch(err){
+//we lost the URI params to kvp2Array
+						}
+					}
+
+//				dump(" -> infoObj.uriParams:"); dump(infoObj.uriParams);
 				if(infoObj.uriParams.meta)	{
-					app.calls.cartSet.init({'want/refer':infoObj.uriParams.meta},{},'passive');
+					_app.ext.cco.calls.cartSet.init({'want/refer':infoObj.uriParams.meta},{},'passive');
 					}
 
 				if(infoObj.uriParams.meta_src)	{
-					app.calls.cartSet.init({'want/refer_src':infoObj.uriParams.meta_src},{},'passive');
+					_app.ext.cco.calls.cartSet.init({'want/refer_src':infoObj.uriParams.meta_src},{},'passive');
 					}
 
-				if(app.u.buyerIsAuthenticated())  {
-					app.ext.myRIA.u.handleLoginActions();
+				if(_app.u.buyerIsAuthenticated())  {
+					_app.ext.quickstart.u.handleLoginActions();
 					}
 
-//				app.u.dump(" -> infoObj follows:");
-//				app.u.dump(infoObj);
-				app.ext.myRIA.a.showContent('',infoObj);
+//				dump(" -> infoObj follows:");
+//				dump(infoObj);
+				_app.ext.quickstart.a.showContent('',infoObj);
 				return infoObj //returning this saves some additional looking up in the appInit
 				},
 
+
+
+//used in checkout to populate username: so either login or bill/email will work.
+//never use this to populate the value of an email form field because it may not be an email address.
+			getUsernameFromCart : function(cartID)	{
+	//			dump('BEGIN u.getUsernameFromCart');
+				var r = false;
+				if(_app.data['cartDetail|'+cartID] && _app.data['cartDetail|'+cartID].customer && _app.u.isSet(_app.data['cartDetail|'+cartID].customer.login))	{
+					r = _app.data['cartDetail|'+cartID].customer.login;
+	//				dump(' -> login was set. email = '+r);
+					}
+				else if(_app.data['cartDetail|'+cartID] && _app.data['cartDetail|'+cartID].bill && _app.u.isSet(_app.data['cartDetail|'+cartID].bill.email)){
+					r = _app.data['cartDetail|'+cartID].bill.email;
+	//				dump(' -> bill/email was set. email = '+r);
+					}
+				else if(!jQuery.isEmptyObject(_app.vars.fbUser))	{
+	//				dump(' -> user is logged in via facebook');
+					r = _app.vars.fbUser.email || false;
+					}
+				return r;
+				}, //getUsernameFromCart
+
+
 			handleLoginActions : function()  {
 				$('body').addClass('buyerLoggedIn');
-				if(app.u.getUsernameFromCart())	{
-					$('.username').text(app.u.getUsernameFromCart());
+				var login = _app.ext.quickstart.u.getUsernameFromCart(_app.model.fetchCartID());
+				if(login)	{
+					$('.username').text(login);
 					}
 				},
-			
-			
-			handleLogoutActions : function()  {
-				$('body').removeClass('buyerLoggedIn');
-				$('.username').empty();
-				app.u.logBuyerOut();
-				showContent('homepage',{});
-				},
-
-/*
-
-			fetchTimeInTransit : function($context,products)	{
-				if(typeof products == 'object' && $context)	{
-					if(app.data.cartDetail && app.data.cartDetail.ship && app.data.cartDetail.ship.postal)	{
-						app.calls.appShippingTransitEstimate.init({'@products':products,'ship_postal':app.data.cartDetail.ship.postal,'ship_country':app.data.cartDetail.ship.countrycode || 'US'},{'callback':function(rd){
-							if(app.model.responseHasErrors(rd)){
-								$context.anymessage({'message':rd});
-								}
-							else if(app.data[rd.datapointer]['@services'])	{
-								//show time in transit.
-//								$("[data-app-role='timeInTransit']",$context).anyContent({'templateID':'timeInTransitTemplate',datapointer:rd.datapointer});
-								}
-							else	{
-								//call succeeded, but no transit times provided.
-								}
-							}},'passive');
-						app.model.dispatchThis('passive');
-						//data-app-role='timeInTransit'
-						}
-					else	{
-						$context.anymessage({'message':'A time in transit estimate requires that a zip code be set'});
-						}
-					}
-				else	{
-					$('#globalMessaging').anymessage({'message':'In myRIA.u.fetchTimeInTransite, either products ['+typeof products+'] blank/not an array and/or $context ['+typeof $context+'] not passed.','gMessage':true});
-					}
-				},
-
-*/
 
 //will look at the thisPageIsPublic variable to see if the info/show in infoObj is a publicly viewable page.
 //used in B2B
 			thisPageIsViewable : function(infoObj)	{
 				var r = false, //what is returned. true if page IS viewable. false if not.
-				pvo = app.ext.myRIA.vars.thisPageIsPublic, //shortcut
+				pvo = _app.ext.quickstart.vars.thisPageIsPublic, //shortcut
 				ns; //namespace.  will = value of show, navcat or pid
 				
 				if(typeof infoObj === 'object')	{
@@ -1556,8 +1623,6 @@ if(ps.indexOf('?') >= 1)	{
 					if(infoObj.pageType && ns && pvo[infoObj.pageType] && pvo[infoObj.pageType].indexOf(infoObj[ns]) > -1)	{r = true}
 					}
 				else	{}
-				
-				
 				return r;
 				}, //thisPageIsViewable
 
@@ -1566,35 +1631,37 @@ if(ps.indexOf('?') >= 1)	{
 //will make sure history keeps only last 15 states.
 			handleSandHOTW : function(infoObj){
 				infoObj.dateObj = new Date(); //milliseconds timestamp
-				app.ext.myRIA.vars.sotw = infoObj;
-				app.ext.myRIA.vars.hotw.unshift(infoObj);
-				app.ext.myRIA.vars.hotw.pop(); //remove last entry in array. is created with array(15) so this will limit the size.
+				_app.ext.quickstart.vars.sotw = infoObj;
+				_app.ext.quickstart.vars.hotw.unshift(infoObj);
+				_app.ext.quickstart.vars.hotw.pop(); //remove last entry in array. is created with array(15) so this will limit the size.
 				},
-			
+
 			showtransition : function(infoObj,$old)	{
 				var r = true; //what is returned.
-//				app.u.dump(" -> $old.data('templateid'): "+$old.data('templateid'));
-//				app.u.dump(" -> infoObj: "); app.u.dump(infoObj);
-//				app.u.dump(" -> $old.data('catsafeid'): "+$old.data('catsafeid'));
-//				app.u.dump(" -> infoObj.navcat: "+infoObj.navcat);
+//				dump(" -> $old.data('templateid'): "+$old.data('templateid'));
+//				dump(" -> infoObj: "); dump(infoObj);
+//				dump(" -> $old.data('catsafeid'): "+$old.data('catsafeid'));
+//				dump(" -> infoObj.navcat: "+infoObj.navcat);
 //search, customer and company contain 'articles' (pages within pages) so when moving from one company to another company, skip the transition
 // or the content is likely to be hidden. execute scroll to top unless transition implicitly turned off (will happen with modals).
-				if(infoObj.pageType == 'cart' && infoObj.show != 'inline'){r = false; app.u.dump('fail 0');}
-				else if(infoObj.pageType == 'category' && $old.data('templateid') == 'categoryTemplate' && $old.data('catsafeid') == infoObj.navcat){r = false; app.u.dump("transition fail 1");}
-				else if(infoObj.pageType == 'category' && $old.data('templateid') == 'homepageTemplate' && $old.data('catsafeid') == infoObj.navcat){r = false; app.u.dump("transition fail 2");}
-				else if(infoObj.pageType == 'product' && $old.data('templateid') == 'productTemplate' && $old.data('pid') == infoObj.pid){r = false; app.u.dump("transition fail 3");}
-				else if($old.data('templateid') == 'companyTemplate' && infoObj.pageType == 'company')	{r = false; app.u.dump("transition fail 4");}
-				else if($old.data('templateid') == 'customerTemplate' && infoObj.pageType == 'customer')	{r = false; app.u.dump("transition fail 5");}
-				else if($old.data('templateid') == 'searchTemplate' && infoObj.pageType == 'search')	{r = false; app.u.dump("transition fail 6");}
-				else if(!app.u.determineAuthentication() && this.thisArticleRequiresLogin(infoObj))	{
+				if(infoObj.pageType == 'cart' && infoObj.show != 'inline'){r = false; dump('transition suppressed: showing modal cart.');}
+				else if(infoObj.pageType == 'category' && $old.data('templateid') == 'categoryTemplate' && $old.data('catsafeid') == infoObj.navcat){r = false; dump("transition suppressed: reloading same category.");}
+				else if(infoObj.pageType == 'category' && $old.data('templateid') == 'homepageTemplate' && $old.data('catsafeid') == infoObj.navcat){r = false; dump("transition suppressed: reloading homepage.");}
+				else if(infoObj.pageType == 'product' && $old.data('templateid') == 'productTemplate' && $old.data('pid') == infoObj.pid){r = false; dump("transition suppressed: reloading same product.");}
+				else if($old.data('templateid') == 'companyTemplate' && infoObj.pageType == 'company')	{r = false; dump("transition suppressed: changing company articles.");}
+				else if($old.data('templateid') == 'customerTemplate' && infoObj.pageType == 'customer')	{r = false; dump("transition suppressed: changing customer articles.");}
+				else if($old.data('templateid') == 'searchTemplate' && infoObj.pageType == 'search')	{r = false; dump("transition suppressed: new search from on search page.");}
+				else if(!_app.u.determineAuthentication() && this.thisArticleRequiresLogin(infoObj))	{
+					dump("transition suppressed: on a page that requires auth and buyer not authorized.");
 					r = false; //if the login modal is displayed, don't animate or it may show up off screen.
 					}
 				else	{
 
 					}
-//				app.u.dump(" -> R: "+r);
+//				dump(" -> R: "+r);
 				return r;
 				},
+
 //when changing pages, make sure keywords resets to the default to avoid confusion.
 			handleSearchInput : function(pageType)	{
 				if(pageType != 'search' && pageType != 'cart')	{
@@ -1606,25 +1673,23 @@ if(ps.indexOf('?') >= 1)	{
 				},
 				
 
-
-
 //obj is going to be the container around the img. probably a div.
 //the internal img tag gets nuked in favor of an ordered list.
 			addPicSlider2UL : function(){
-//				app.u.dump("BEGIN myRIA.u.addPicSlider2UL");
+//				dump("BEGIN quickstart.u.addPicSlider2UL");
 				
 				var $obj = $(this);
 				if($obj.data('slider') == 'rendered')	{
 					//do nothing. list has aready been generated.
-//					app.u.dump("the slideshow has already been rendered. re-init");
+//					dump("the slideshow has already been rendered. re-init");
 					window.slider.kill(); //make sure it was nuked.
 					window.slider = new imgSlider($('ul',$obj))
 					}
 				else	{
 					$obj.data('slider','rendered'); //used to determine if the ul contents have already been added.
 					var pid = $obj.attr('data-pid');
-//					app.u.dump(" -> pid: "+pid);
-					var data = app.data['appProductGet|'+pid]['%attribs'];
+//					dump(" -> pid: "+pid);
+					var data = _app.data['appProductGet|'+pid]['%attribs'];
 					var $img = $obj.find('img')
 					var width = $img.attr('width'); //using width() and height() here caused unusual results in the makeImage function below.
 					var height = $img.attr('height');
@@ -1634,7 +1699,7 @@ if(ps.indexOf('?') >= 1)	{
 					var $li; //recycled.
 					for(var i = 2; i <= 10; i += 1)	{
 						if(data['zoovy:prod_image'+i])	{
-							$li = $('<li>').append(app.u.makeImage({"name":data['zoovy:prod_image'+i],"w":width,"h":height,"b":"FFFFFF","tag":1}));
+							$li = $('<li>').append(_app.u.makeImage({"name":data['zoovy:prod_image'+i],"w":width,"h":height,"b":"FFFFFF","tag":1}));
 							$li.appendTo($ul);
 							}
 						else	{break} //end loop at first empty image spot.
@@ -1648,9 +1713,10 @@ if(ps.indexOf('?') >= 1)	{
 				},	
 				
 			changeCursor : function(style)	{
-//				app.u.dump("BEGIN myRIA.u.changeCursor ["+style+"]");
+//				dump("BEGIN quickstart.u.changeCursor ["+style+"]");
 				$('html, body').css('cursor',style);
 				},
+
 
 //used in results page if the preview mode feature is enabled.
 			revertPageFromPreviewMode : function($parent)	{
@@ -1665,7 +1731,7 @@ if(ps.indexOf('?') >= 1)	{
 					$(".buttonBar",$parent).remove(); //get rid of navigation
 					}
 				else	{
-					app.u.throwGMessage("In myRIA.u.revertPageFromPreviewMode, $parent not specified or not an object ["+typeof $parent+"].");
+					_app.u.throwGMessage("In quickstart.u.revertPageFromPreviewMode, $parent not specified or not an object ["+typeof $parent+"].");
 					}
 				},
 
@@ -1675,7 +1741,7 @@ if(ps.indexOf('?') >= 1)	{
 // if no page content can be determined based on the url, the hash is examined and if appropriately formed, used (ex: #company?show=contact or #category?navcat=.something)
 // should be renamed getPageInfoFromURL
 			detectRelevantInfoToPage : function(URL)	{
-//				app.u.dump("BEGIN myRIA.u.detectRelevantInfoToPage. url: "+URL);
+//				dump("BEGIN quickstart.u.detectRelevantInfoToPage. url: "+URL);
 				var r = {}; //what is returned. r.pageInfo and r.navcat or r.show or r.pid
 				var url = URL; //leave original intact.
 				var hashObj;
@@ -1730,9 +1796,9 @@ if(ps.indexOf('?') >= 1)	{
 					r.navcat = zGlobals.appSettings.rootcat; //left with category.safe.id or category.safe.id/
 					}
 				else if(url.indexOf('app-quickstart.html') > -1)	{
-					var msg = app.u.errMsgObject('Rename this file as index.html to decrease the likelyhood of accidentally saving over it.',"MVC-INIT-MYRIA_1000")
+					var msg = _app.u.errMsgObject('Rename this file as index.html to decrease the likelyhood of accidentally saving over it.',"MVC-INIT-MYRIA_1000")
 					msg.persistent = true;
-					app.u.throwMessage(msg);
+					_app.u.throwMessage(msg);
 					r.pageType = 'homepage';
 					}
 //the url in the domain may or may not have a slash at the end. Check for both
@@ -1752,8 +1818,8 @@ if(ps.indexOf('?') >= 1)	{
 //					alert('Got to else case.');
 					r.pageType = '404';
 					}
-//				app.u.dump("detectRelevantInfoToPage = ");
-//				app.u.dump(r);
+//				dump("detectRelevantInfoToPage = ");
+//				dump(r);
 				return r;
 				},
 
@@ -1773,7 +1839,7 @@ if(ps.indexOf('?') >= 1)	{
 // if a valid hash can't be built, false is returned.
 
 			getHashFromPageInfo : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.getHashFromPageInfo");
+//				dump("BEGIN quickstart.u.getHashFromPageInfo");
 				var r = false; //what is returned. either false if no match or hash (#company?show=contact)
 				if(this.thisPageInfoIsValid(infoObj))	{
 					if(infoObj.pageType == 'product' && infoObj.pid)	{r = '#product?pid='+infoObj.pid}
@@ -1792,13 +1858,13 @@ if(ps.indexOf('?') >= 1)	{
 					else if(infoObj.pageType && infoObj.show)	{r = '#'+infoObj.pageType+'?show='+infoObj.show}
 					else	{
 						//shouldn't get here because pageInfo was already validated. but just in case...
-						app.u.dump("WARNING! invalid pageInfo object passed into getHashFromPageInfo. infoObj: ");
-						app.u.dump(infoObj);
+						dump("WARNING! invalid pageInfo object passed into getHashFromPageInfo. infoObj: ");
+						dump(infoObj);
 						}
 					}
 				else	{
-					app.u.dump("WARNING! invalid pageInfo object passed into getHashFromPageInfo. infoObj: ");
-					app.u.dump(infoObj);
+					dump("WARNING! invalid pageInfo object passed into getHashFromPageInfo. infoObj: ");
+					dump(infoObj);
 					}
 				return r;
 				},
@@ -1806,12 +1872,12 @@ if(ps.indexOf('?') >= 1)	{
 //will return a t/f based on whether or not the object passed in is a valid pageInfo object.
 //ex: category requires navcat. company requires show.
 			thisPageInfoIsValid : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.thisPageInfoIsValid. ");
-//				app.u.dump(" -> infoObj: "); app.u.dump(infoObj);
+//				dump("BEGIN quickstart.u.thisPageInfoIsValid. ");
+//				dump(" -> infoObj: "); dump(infoObj);
 				var r = false; //what is returned. boolean.
 				if($.isEmptyObject(infoObj))	{
 					//can't have an empty object.
-					app.u.dump("WARNING! thisPageInfoIsValid did not receive a valid object.");
+					dump("WARNING! thisPageInfoIsValid did not receive a valid object.");
 					}
 				else if(infoObj.pageType)	{
 					if(infoObj.pageType == 'product' && infoObj.pid)	{r = true}
@@ -1824,13 +1890,13 @@ if(ps.indexOf('?') >= 1)	{
 					else if(infoObj.pageType == 'company' && infoObj.show)	{r = true}
 					else	{
 						//no matching params for specified pageType
-						app.u.dump("WARNING! thisPageInfoIsValid had no matching params for specified pageType ["+infoObj.pageType+"]");
+						dump("WARNING! thisPageInfoIsValid had no matching params for specified pageType ["+infoObj.pageType+"]");
 						}
 					}
 				else{
-					app.u.dump("WARNING! thisPageInfoIsValid did not receive a pageType");
+					dump("WARNING! thisPageInfoIsValid did not receive a pageType");
 					}
-//				app.u.dump(" -> thisPageInfoIsValid.r = "+r);
+//				dump(" -> thisPageInfoIsValid.r = "+r);
 				return r;
 				},
 
@@ -1841,25 +1907,25 @@ if(ps.indexOf('?') >= 1)	{
 
 
 			getPageInfoFromHash : function(HASH)	{
-//				app.u.dump(" -> hash: "+HASH);
+//				dump(" -> hash: "+HASH);
 				var myHash = HASH;
 //make sure first character isn't a #. location.hash is used a lot and ie8 (maybe more) include # in value.
 				if(myHash.indexOf('#') == 0)	{myHash = myHash.substring(1);}
 				var infoObj = {}; //what is returned. infoObj.pageType and based on value of page type, infoObj.show or infoObj.pid or infoObj.navcat, etc
 				
 				var splits = myHash.split('?'); //array where 0 = 'company' or 'search' and 1 = show=returns or keywords=red
-//				app.u.dump(" -> splits: "); app.u.dump(splits);
+//				dump(" -> splits: "); dump(splits);
 				
 				
 				//Try to parse URI information
 				try {
 //*** 201344 	Need to do a check before calling kvp2Array; if there are no params then it will return false, and the pagetype will not get set. -mc
 //				This essentially breaks any page hash that requires no params, ie #homepage, #cart, #checkout
-//				No need to worry about #slide2 or another oblivious anchor affecting this code- app.ext.myRIA.u.thisPageInfoIsValid gets called to check that.
+//				No need to worry about #slide2 or another oblivious anchor affecting this code- _app.ext.quickstart.u.thisPageInfoIsValid gets called to check that.
 					if(splits.length > 1){
-						infoObj = app.u.kvp2Array(splits[1]); //will set infoObj.show=something or infoObj.pid=PID
+						infoObj = _app.u.kvp2Array(splits[1]); //will set infoObj.show=something or infoObj.pid=PID
 					}
-//					app.u.dump(" -> infoObj: "); app.u.dump(infoObj);
+//					dump(" -> infoObj: "); dump(infoObj);
 					infoObj.pageType = splits[0];
 					
 					//The below may not be necessary, depending on how the kvp2array function handles the parsing of the hash info with nested objects
@@ -1870,7 +1936,7 @@ if(ps.indexOf('?') >= 1)	{
 					//} 
 				} catch (err){
 					//Problem parsing info
-					app.u.dump("Error parsing Hash: "+err, 'warn');
+					dump("Error parsing Hash: "+err, 'warn');
 				}
 				
 				
@@ -1915,8 +1981,8 @@ if(ps.indexOf('?') >= 1)	{
 					break;
 
 				case 'search':
-//					app.u.dump("BUILDRELATIVEPATH");
-//					app.u.dump(infoObj.elasticsearch);
+//					dump("BUILDRELATIVEPATH");
+//					dump(infoObj.elasticsearch);
 					relativePath = '#search?elasticsearch=';
 					if(infoObj.KEYWORDS || infoObj.TAG)	{
 						relativePath += (infoObj.KEYWORDS) ? 'KEYWORDS='+infoObj.KEYWORDS : 'TAG='+infoObj.TAG;
@@ -1942,8 +2008,8 @@ if(ps.indexOf('?') >= 1)	{
 
 //a generic function for guessing what type of object is being dealt with. Check for common params.  
 			whatAmIFor : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.whatAmIFor");
-//				app.u.dump(infoObj);
+//				dump("BEGIN quickstart.u.whatAmIFor");
+//				dump(infoObj);
 				var r = false; //what is returned
 				if(infoObj.pid)	{r = 'product'}
 				else if(infoObj.catSafeID == zGlobals.appSettings.rootcat){r = 'homepage'}
@@ -1981,10 +2047,10 @@ if(ps.indexOf('?') >= 1)	{
 // ex: showContent changes hash state executed and location.hash doesn't match new pageInfo hash. but we don't want to retrigger showContent from the hash change.
 
 			handleHashState : function()	{
-//				app.u.dump("BEGIN myRIA.u.handleHashState");
+//				dump("BEGIN quickstart.u.handleHashState");
 				var hash = window.location.hash;
 				var pio = this.getPageInfoFromHash(hash); //if not valid pageInfo hash, false is returned
-//				app.u.dump(" -> hash: "+hash);
+//				dump(" -> hash: "+hash);
 				if(!$.isEmptyObject(pio) && _ignoreHashChange === false)	{
 					showContent('',pio);
 					}
@@ -1994,17 +2060,17 @@ if(ps.indexOf('?') >= 1)	{
 //infoObj is an object that gets passed into a pushState in 'addPushState'.  pageType and pageInfo are the only two params currently.
 //https://developer.mozilla.org/en/DOM/window.onpopstate
 			handlePopState : function(infoObj)	{
-//				app.u.dump("BEGIN handlePopState");
-//				app.u.dump(infoObj);
+//				dump("BEGIN handlePopState");
+//				dump(infoObj);
 
 //on initial load, infoObj will be blank.
 				if(infoObj)	{
 					infoObj.back = 0;
-					app.ext.myRIA.a.showContent('',infoObj);
-//					app.u.dump("POPSTATE Executed.  pageType = "+infoObj.pageType+" and pageInfo = "+infoObj.pageInfo);
+					_app.ext.quickstart.a.showContent('',infoObj);
+//					dump("POPSTATE Executed.  pageType = "+infoObj.pageType+" and pageInfo = "+infoObj.pageInfo);
 					}
 				else	{
-//					app.u.dump(" -> no event.state (infoObj) defined.");
+//					dump(" -> no event.state (infoObj) defined.");
 					}
 				},
 
@@ -2018,7 +2084,7 @@ if(ps.indexOf('?') >= 1)	{
 
 
 			addPushState : function(infoObj)	{
-//				app.u.dump("BEGIN addPushState. ");
+//				dump("BEGIN addPushState. ");
 				var useAnchor = false; //what is returned. set to true if pushState not supported
 				var title = infoObj.pageInfo;
 				var historyFunction = infoObj.back == 0 ? 'replaceState' : 'pushState'; //could be changed to replaceState if back == 0;
@@ -2034,7 +2100,7 @@ if(ps.indexOf('?') >= 1)	{
 					else	{
 						fullpath = zGlobals.appSettings.http_app_url;
 						}
-	//				app.u.dump(infoObj);
+	//				dump(infoObj);
 	//handle cases where the homepage is treated like a category page. happens in breadcrumb.
 					if(infoObj.navcat == '.')	{
 						infoObj.pageType = 'homepage'
@@ -2042,7 +2108,7 @@ if(ps.indexOf('?') >= 1)	{
 					else	{
 						fullpath += this.buildRelativePath(infoObj);
 						}
-					if(typeof infoObj.uriParams == 'string' && app.u.isSet(infoObj.uriParams) )	{fullpath += '?'+infoObj.uriParams.encodeURI()} //add params back on to url.
+					if(typeof infoObj.uriParams == 'string' && _app.u.isSet(infoObj.uriParams) )	{fullpath += '?'+infoObj.uriParams.encodeURI()} //add params back on to url.
 					else if(typeof infoObj.uriParams == 'object' && !$.isEmptyObject(infoObj.uriParams)) {
 //will convert uri param object into uri friendly key value pairs.						
 						fullpath += '?';
@@ -2054,9 +2120,11 @@ if(ps.indexOf('?') >= 1)	{
 					}
 //!!! need to find an IE8 friendly way of doing this.  This code caused a script error					
 //				document.getElementsByTagName('title')[0].innerHTML = fullpath; //doing this w/ jquery caused IE8 to error. test if changed.
-
+				
+// *** 201401 During search the infoObj.list jquery object was uncloneable, so the addPushState was failing and users could not use the back button to go back to search pages -mc
+				var obj = _app.u.getBlacklistedObject(infoObj, ["list"]);
 				try	{
-					window.history[historyFunction](infoObj, title, fullpath);
+					window.history[historyFunction](obj, title, fullpath);
 					}
 				catch(err)	{
 					//Handle errors here
@@ -2064,79 +2132,6 @@ if(ps.indexOf('?') >= 1)	{
 					}
 				return useAnchor;
 				},
-
-
-
-
-/*
-
-#########################################     FUNCTIONS FOR DEALING WITH EDITABLE
-
-*/
-
-
-			makeRegionEditable : function($parent){
-var r; //what is returned. # of editable elements.				
-//info on editable can be found here: https://github.com/tuupola/jquery_jeditable
-$parent.find('.editable').each(function(){
-	r += 1; //incremented for each editable element.
-	var $text = $(this)
-	if($text.attr('title'))	{
-		$text.before("<label><br />"+$text.attr('title')+": </label>"); //br is in label so on cancel when label is hidden, display returns to normal.
-		}
-	var defaultValue = $text.text(); //saved to data.defaultValue and used to compare the post-editing value to the original so that if no change occurs, .edited class not added. Also used for restoring default value
-//	app.u.dump(" -> defaultValue: "+defaultValue);
-	$text.addClass('editEnabled').data('defaultValue',defaultValue).editable(function(value,settings){
-//onSubmit code:
-		if(value == $(this).data('defaultValue'))	{
-			$(this).removeClass('editing');
-			app.u.dump("field edited. no change.")
-			}
-		else	{
-			$(this).addClass('edited').removeClass('editing');
-			app.u.dump("NOTE - this needs to update the change log");
-			}
-		return value;
-		}, {
-		  indicator : 'loading...', //can be img tag
-		  onblur : 'submit',
-		  type : 'text',
-		  style  : 'inherit'
-		  }); //editable
-	}); //each
-
-return r;
-				
-				
-				}, //makeRegionEditable
-
-
-
-//restore a series of elements from jeditable back to a normal html block.
-			destroyEditable : function($parent)	{
-				$('.edited',$parent).each(function(){
-					$(this).text($(this).data('defaultValue')).removeClass('edited'); //restore defaults
-					})
-				$('.editable',$parent).removeClass('editEnabled').editable('destroy');
-				$('label',$parent).empty().remove(); //removed so if edit is clicked again, duplicates aren't created.
-				}, //destroyEditable
-
-
-//This will get all the key value pairs from $parent, even if the value didn't change.
-//useful when all params in an update must be set, such as address update.
-			getAllDataFromEditable : function($parent)	{
-				var obj = {}; //what is returned. either an empty object or an assoc of key/value pairs where key = attribute and value = new value
-				$parent.find('[data-bind]').each(function(){
-					var bindData = app.renderFunctions.parseDataBind($(this).attr('data-bind'));
-					obj[app.renderFunctions.parseDataVar(bindData['var'])] = $(this).text();
-//in jeditable, if you edit then click 'save' directly, the .text() val hasn't been updated yet.
-//so this'll search for the input value. if additional (more than just text input) are supported later, this wil need to be updated.
-					if(!$(this).text())
-						obj[app.renderFunctions.parseDataVar(bindData['var'])] = $(this).find('input').val()
-					});
-				return obj;	
-				},
-
 
 
 
@@ -2151,14 +2146,14 @@ return r;
 effects the display of the nav buttons only. should be run just after the handleAppNavData function in showContent.
 */
 			handleAppNavDisplay : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.handleNavButtonsForDetailPage");
-//				app.u.dump(" -> history of the world: "); app.u.dump(app.ext.myRIA.vars.hotw[1]);
+//				dump("BEGIN quickstart.u.handleNavButtonsForDetailPage");
+//				dump(" -> history of the world: "); dump(_app.ext.quickstart.vars.hotw[1]);
 
 				var r = false, //what is returned. true if buttons are visible. false if not.
 				$nextBtn = $("[data-app-role='prodDetailNextItemButton']","#appNav"),
 				$prevBtn = $("[data-app-role='prodDetailPrevItemButton']","#appNav");
 				
-//				app.u.dump(" -> $prevBtn.data('datapointer'): "+$prevBtn.data('datapointer'));
+//				dump(" -> $prevBtn.data('datapointer'): "+$prevBtn.data('datapointer'));
 				
 //The buttons are only shown on product detail pages. if no datapointer is set, no reason to show the buttons because there's no reference for what product would be 'next'.		
 				if(infoObj.pageType == 'product' && $prevBtn.data('datapointer'))	{
@@ -2203,9 +2198,9 @@ effects the display of the nav buttons only. should be run just after the handle
 				
 				function step($btn,increment)	{
 					if($btn.data('datapointer').indexOf('appNavcatDetail') >= 0)	{
-						var csv = app.data[$btn.data('datapointer')]['@products'],
+						var csv = _app.data[$btn.data('datapointer')]['@products'],
 // ** 201332 indexOf changed to $.inArray for IE8 compatibility, since IE8 only supports the indexOf method on Strings
-						index = $.inArray(app.ext.myRIA.vars.hotw[0].pid, csv) + increment;
+						index = $.inArray(_app.ext.quickstart.vars.hotw[0].pid, csv) + increment;
 						
 						if(index < 0)	{index = csv.length - 1} //after first product, jump to last
 						else if(index >= csv.length)	{index = 0} //afer last item, jump to first.
@@ -2225,132 +2220,159 @@ effects the display of the nav buttons only. should be run just after the handle
 				},
 
 
+
+
 //rather than having all the params in the dom, just call this function. makes updating easier too.
 			showProd : function(infoObj)	{
 				var pid = infoObj.pid
 				var parentID = null; //what is returned. will be set to parent id if a pid is defined.
-//				app.u.dump("BEGIN myRIA.u.showProd ["+pid+"]");
-				if(!app.u.isSet(pid))	{
-					app.u.throwMessage("Uh Oh. It seems an app error occured. Error: no product id. see console for details.",true);
-					app.u.dump("ERROR! showProd had no infoObj.pid.  infoObj:"); app.u.dump(infoObj);
+//				dump("BEGIN quickstart.u.showProd ["+pid+"]");
+				if(!pid)	{
+					$('#globalMessaging').anymessage({'message':"Uh Oh. It seems an app error occured. Error: no product id. see console for details.",'gMessage':true});
+					dump("quickstart.u.showProd had no infoObj.pid, which is required. infoObj follows:",'error'); dump(infoObj);
 					}
 				else	{
 					infoObj.templateID = infoObj.templateID || 'productTemplate';
-					infoObj.state = 'onInits'
-					parentID = infoObj.templateID+"_"+app.u.makeSafeHTMLId(pid);
+					infoObj.state = 'init';
+					parentID = infoObj.templateID+"_"+pid;
 					infoObj.parentID = parentID;
-					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+					
+					var $product = $(_app.u.jqSelector('#',parentID));
+					
+					_app.renderFunctions.handleTemplateEvents($product,infoObj);
 	
 //no need to render template again.
-					if(!$('#'+parentID).length){
-						var $content = app.renderFunctions.createTemplateInstance(infoObj.templateID,{'id':parentID,'app-pagetype':'product'});
-						$content.addClass('displayNone'); //hidden by default for page transitions
-						$('#mainContentArea').append($content);
+					if(!$product.length){
+//						dump(" -> product is NOT on the DOM yet. Add it.");
+						var $tmp = $("<div \/>");
+						$tmp.tlc({templateid:infoObj.templateID,'verb':'template'});
+						$product = $tmp.children();
+						$product.attr('id',infoObj.parentID);
+						$product.addClass('displayNone').appendTo($('#mainContentArea')); //hidden by default for page transitions
+						_app.u.handleCommonPlugins($product);
+						var nd = 0; //Number of Dispatches.
 
 //need to obtain the breadcrumb info pretty early in the process as well.
-						if(app.ext.myRIA.vars.session.recentCategories.length > 0)	{
-							app.ext.store_navcats.u.addQueries4BreadcrumbToQ(app.ext.myRIA.vars.session.recentCategories[0])
+//the breadcrumb renderformat handles most of the heavy lifting, so datapointers are not necessary for callback. Just getting them into memory here.
+						if(_app.ext.quickstart.vars.session.recentCategories.length > 0)	{
+							nd += _app.ext.store_navcats.u.addQueries4BreadcrumbToQ(_app.ext.quickstart.vars.session.recentCategories[0]).length;
 							}
-						$.extend(infoObj, {'callback':'showProd','extension':'myRIA','parentID':parentID,'templateID':'productTemplate'});
-						app.ext.store_product.calls.appReviewsList.init(pid);  //store_product... appProductGet DOES get reviews. store_navcats...getProd does not.
-						app.ext.store_product.calls.appProductGet.init(pid,infoObj);
-						app.model.dispatchThis();
+						$.extend(infoObj, {'callback':'showProd','extension':'quickstart','jqObj':$product,'templateID':'productTemplate'});
+						nd += _app.ext.store_product.calls.appReviewsList.init(pid);  //store_product... appProductGet DOES get reviews. store_navcats...getProd does not.
+						//if a dispatch is going to occur, might as well get updated product info.
+						if(nd)	{
+							_app.model.destroy('appProductGet|'+pid);
+							}
+						_app.ext.store_product.calls.appProductGet.init(pid,infoObj);
+						_app.model.dispatchThis();
 						}
 					else	{
+						dump(" -> product is already on the DOM. bring it into focus");
 						infoObj.datapointer = 'appProductGet|'+infoObj.pid; //here so datapoitner is available in renderFunctions.
-//typically, the onCompletes get handled as part of the request callback, but the template has already been rendered so the callback won't get executed.
-						infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+//typically, the onComplete get handled as part of the request callback, but the template has already been rendered so the callback won't get executed.
+						infoObj.state = 'complete'; //needed for handleTemplateEvents.
+						_app.renderFunctions.handleTemplateEvents($product,infoObj);
 						}
 
 
 					}
-				return parentID;
+				return $product;
 				}, //showProd
 				
 				
 //Show one of the company pages. This function gets executed by showContent.
-//handleTemplateFunctions gets executed in showContent, which should always be used to execute this function.
+//handleTemplateEvents gets executed in showContent, which should always be used to execute this function.
 // ** 201346 -> The company navlinks are now generated based on what articles are present and not disabled. built to allow for wizard to easily add new pages.
 			showCompany : function(infoObj)	{
-				infoObj.show = infoObj.show ? infoObj.show : 'about'; //what page to put into focus. default to 'about us' page
-//				$('#mainContentArea').empty(); //clear Existing content.
+				infoObj.show = infoObj.show || 'about'; //what page to put into focus. default to 'about us' page
 				var parentID = 'mainContentArea_company'; //this is the id that will be assigned to the companyTemplate instance.
 				
 				infoObj.templateID = 'companyTemplate';
-				infoObj.state = 'onInits';
-				infoObj.parentID = parentID;
-	
-				if($('#mainContentArea_company').length)	{
+				infoObj.state = 'init';
+				infoObj.parentID = 'mainContentArea_company';
+				var $mcac = $('#mainContentArea_company');
+				
+				if($mcac.length)	{
 					//template has already been added to the DOM. likley moving between company pages.
 					}
 				else	{
-					var $content = app.renderFunctions.createTemplateInstance(infoObj.templateID,parentID);
-					$content.addClass("displayNone");
+//					var $content = _app.renderFunctions.createTemplateInstance(infoObj.templateID,parentID);
+//no interpolation takes place on the company pages (except faq). the content should be hard coded.
+					var $tmp = $("<div>").tlc({
+						templateid : infoObj.templateID,
+						verb : 'template'
+						});
+					$mcac = $tmp.children();
+					$mcac.attr('id',infoObj.parentID);
 
-					var $nav = $('#companyNav ul:first',$content);
+					var $nav = $('#companyNav ul:first',$mcac);
 //builds the nav menu.
-					$('.textContentArea',$content).not('.disabled').each(function(){
+					$('.textContentArea',$mcac).not('.disabled').each(function(){
 						$nav.append("<li><a href='#company?show="+$(this).attr('id').replace('Article','')+"'>"+($('h1:first',$(this)).text())+"</a></li>");
 						});
 
-					$('#mainContentArea').append($content);
-					app.ext.myRIA.u.bindNav('#companyNav a');
+					$('#mainContentArea').append($mcac);
+
+					_app.u.handleCommonPlugins($mcac);
+					_app.u.handleButtons($mcac);
+
+					_app.ext.quickstart.u.bindNav('#companyNav a');
 					}
 
-				if(app.ext.myRIA.u.showArticle(infoObj))	{
-					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-					infoObj.state = 'onCompletes';
-					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+				if(_app.ext.quickstart.u.showArticleIn($mcac,infoObj))	{
+					_app.renderFunctions.handleTemplateEvents($mcac,infoObj);
+					infoObj.state = 'complete';
+					_app.renderFunctions.handleTemplateEvents($mcac,infoObj);
 					}
 				else	{} //showArticle will handle displaying the error messaging.
 
-
+				return $mcac;
 				}, //showCompany
 				
 				
 			showSearch : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.showSearch. infoObj follows: ");
-//				app.u.dump(infoObj);
+//				dump("BEGIN quickstart.u.showSearch. infoObj follows: ");
+//				dump(infoObj);
 				infoObj.templateID = 'searchTemplate';
 				infoObj.parentID = 'mainContentArea_search';
-				infoObj.state = 'onInits';
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+				infoObj.state = 'init';
 				var $page = $('#'+infoObj.parentID),
 				elasticsearch = {};
 
+				_app.renderFunctions.handleTemplateEvents($page,infoObj);
+
 //only create instance once.
 				if($page.length)	{
-					app.ext.myRIA.u.revertPageFromPreviewMode($('#mainContentArea_search'));
+					_app.ext.quickstart.u.revertPageFromPreviewMode($('#mainContentArea_search'));
 					}
 				else	{
-					$('#mainContentArea').anycontent({'templateID':infoObj.templateID,'showLoading':false,'dataAttribs':{'id':'mainContentArea_search'}});
+					$('#mainContentArea').tlc({'templateID':infoObj.templateID,'showLoading':false,'dataAttribs':{'id':'mainContentArea_search'}});
 					$page = $('#mainContentArea_search');
 					}
 
 //add item to recently viewed list IF it is not already in the list.
-				if($.inArray(infoObj.KEYWORDS,app.ext.myRIA.vars.session.recentSearches) < 0)	{
-					app.ext.myRIA.vars.session.recentSearches.unshift(infoObj.KEYWORDS);
+				if($.inArray(infoObj.KEYWORDS,_app.ext.quickstart.vars.session.recentSearches) < 0)	{
+					_app.ext.quickstart.vars.session.recentSearches.unshift(infoObj.KEYWORDS);
 					}
 					
 //If raw elastic has been provided, use that.  Otherwise build a query.
 				var elasticsearch;
 				if(infoObj.elasticsearch){
-					elasticsearch = app.ext.store_search.u.buildElasticRaw(infoObj.elasticsearch);
+					elasticsearch = _app.ext.store_search.u.buildElasticRaw(infoObj.elasticsearch);
 					}
 				else if(infoObj.TAG)	{
 					elasticsearch = {"filter":{"term":{"tags":infoObj.TAG}}}
-					elasticsearch = app.ext.store_search.u.buildElasticRaw(elasticsearch);
+					elasticsearch = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
 					}
 				else if (infoObj.KEYWORDS) {
 					var qObj = {'query':infoObj.KEYWORDS} //what is submitted to the query generator.
 					if(infoObj.fields)	{qObj.fields = infoObj.fields}
-					elasticsearch = app.ext.store_search.u.buildElasticSimpleQuery(qObj);
+					elasticsearch = _app.ext.store_search.u.buildElasticSimpleQuery(qObj);
 					}
 				else	{
 					
 					}
-				//app.u.dump(elasticsearch);
+				//dump(elasticsearch);
 /*
 #####
 if you are going to override any of the defaults in the elasticsearch, such as size, do it here BEFORE the elasticsearch is added as data on teh $page.
@@ -2365,15 +2387,14 @@ elasticsearch.size = 50;
 				infoObj.elasticsearch = $.extend(true, {}, elasticsearch);
 				
 				
-				app.ext.store_search.u.updateDataOnListElement($('#resultsProductListContainer'),elasticsearch,1);
-//				app.ext.store_search.calls.appPublicSearch.init(elasticsearch,infoObj);
-				app.ext.store_search.calls.appPublicSearch.init(elasticsearch,$.extend(true,{},infoObj,{'callback':'handleElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'store_search','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')}));
-				app.model.dispatchThis();
-//				app.u.dump(" --------> execute onCompletes for searchTemplate");
-				infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+				_app.ext.store_search.u.updateDataOnListElement($('#resultsProductListContainer'),elasticsearch,1);
+//				_app.ext.store_search.calls.appPublicSearch.init(elasticsearch,infoObj);
+				_app.ext.store_search.calls.appPublicSearch.init(elasticsearch,$.extend(true,{},infoObj,{'callback':'handleElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'store_search','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')}));
+				_app.model.dispatchThis();
+				infoObj.state = 'complete'; //needed for handleTemplateEvents.
+				_app.renderFunctions.handleTemplateEvents($page,infoObj);
 
-
+				return $page;
 				}, //showSearch
 
 
@@ -2381,96 +2402,138 @@ elasticsearch.size = 50;
 //pio is PageInfo object
 //this showCart should only be run when no cart update is being run.
 //this is run from showContent.
-// when a cart update is run, the handleCart response also executes the handleTemplateFunctions
+// when a cart update is run, the handleCart response also executes the handleTemplateEvents
 			showCart : function(infoObj)	{
+//				dump("BEGIN quickstart.u.showCart"); dump(infoObj);
 				if(typeof infoObj != 'object'){var infoObj = {}}
-//				app.u.dump("BEGIN myRIA.u.showCart");
 				infoObj.templateID = 'cartTemplate';
 				infoObj.parentID = (infoObj.show == 'inline') ? 'mainContentArea_cart' : 'modalCart';
-				infoObj.state = 'onInits'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+				infoObj.back = (infoObj.show == 'inline') ? -1 : 0;
+				infoObj.state = 'init'; //needed for handleTemplateEvents.
+				
+				var $cart = $('#'+infoObj.parentID);
+				
+				_app.renderFunctions.handleTemplateEvents($cart,infoObj);
+
 				if(infoObj.show == 'inline')	{
 //only create instance once.
-					var $cart = $('#mainContentArea_cart')
+					$cart = $('#mainContentArea_cart');
 					if($cart.length)	{
 						//show cart
-						infoObj.state = 'onCompletes';
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+						$cart.hide().trigger('refresh');
+						infoObj.state = 'complete';
+						_app.renderFunctions.handleTemplateEvents($cart,infoObj);
 						}
 					else	{
-						$cart = $("<div \/>",{'id':'mainContentArea_cart'});
+						infoObj.cartid = _app.model.fetchCartID();
+						$cart = _app.ext.cco.a.getCartAsJqObj(infoObj);
+						$cart.hide().on('complete',function(){
+							$("[data-app-role='shipMethodsUL']",$(this)).find(":radio").each(function(){
+								$(this).attr('data-app-change','quickstart|cartShipMethodSelect');
+								});
+							});
+						$cart.attr({'id':infoObj.parentID});
 						$cart.appendTo("#mainContentArea");
 						}
-					$cart.showLoading({'message':'loading cart'});
 //This will load the cart from memory, if set. otherwise it will fetch it.
 //so if you need to update the cart, run a destroy prior to showCart.
-					app.calls.cartDetail.init({'callback':function(rd){
-						$cart.hideLoading();
-						if(app.model.responseHasErrors(rd)){
-							$cart.anymessage({'message':rd});
-							}
-						else	{
-//***201342 this will empty the cart before translating it, meaning it doesn't get duplicate content. -mc
-							$cart.intervaledEmpty();
-							$cart.anycontent({'templateID':infoObj.templateID,'datapointer':'cartDetail'});
-							}
-						}},'mutable');
-						app.model.dispatchThis();
+					$cart.trigger((_app.data.cartDetail ? 'refresh' : 'fetch'),{'Q':'mutable'});
+					_app.model.dispatchThis();
+					}
+				else	{
+					_app.ext.quickstart.u.showCartInModal(infoObj);
+					}
+				infoObj.state = 'complete'; //needed for handleTemplateEvents.
+				_app.renderFunctions.handleTemplateEvents($cart,infoObj);
+				return $cart;
+				}, //showCart
 
+/*
+This will open the cart in a modal. If an update is needed, that must be performed outside this function.
+assumes that cart is in memory before it's loaded.
+either templateID needs to be set OR showloading must be true. TemplateID will translate the template. showLoading will (you guessed it) show the loading class.
+ so you can execute showCartInModal with showLoading set to true, then dispatch a request for a cart and translate the parent ID in the callback.
+ can't think of a reason not to use the default parentID, but just in case, it can be set.
+*/
+			showCartInModal : function(P)	{
+
+				if(typeof P == 'object' && (P.templateID || P.showLoading === true)){
+					var $modal = $('#modalCart');
+//the modal opens as quick as possible so users know something is happening.
+//open if it's been opened before so old data is not displayed. placeholder content (including a loading graphic, if set) will be populated pretty quick.
+//the cart messaging is OUTSIDE the template. That way if the template is re-rendered, existing messaging is not lost.
+					if($modal.length)	{
+						$('#modalCartContents',$modal).empty(); //empty to remove any previous content.
+						$('.appMessaging',$modal).empty(); //errors are cleared because if the modal is closed before the default error animation occurs, errors become persistent.
+						$modal.dialog('open');
+						}
+					else	{
+						P.cartid = _app.model.fetchCartID();
+						$modal = _app.ext.cco.a.getCartAsJqObj(P).attr({"id":"modalCart","title":"Your Shopping Cart"}).appendTo('body');
+						$modal.on('complete',function(){
+							$("[data-app-role='shipMethodsUL']",$(this)).find(":radio").each(function(){
+								$(this).attr('data-app-change','quickstart|cartShipMethodSelect');
+								});
+							});
+						$modal.dialog({modal: true,width:'80%'});  //browser doesn't like percentage for height
+						}
+
+					if(P.showLoading === true)	{
+						$modal.showLoading(); //have to add child because the modal classes already have bg assigned
+						}
+					else	{
+						$modal.trigger('refresh');
+						}
 
 					}
 				else	{
-					app.ext.store_cart.u.showCartInModal(infoObj);
+					_app.u.throwGMessage("ERROR! no templateID passed into showCartInModal. P follows: ");
+					dump(P);
 					}
-				infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-				}, //showCart
-
+				}, //showCartInModal
 
 
 //Customer pages differ from company pages. In this case, special logic is needed to determine whether or not content can be displayed based on authentication.
 // plus, most of the articles require an API request for more data.
-//handleTemplateFunctions gets executed in showContent, which should always be used to execute this function.
+//handleTemplateEvents gets executed in showContent, which should always be used to execute this function.
 			showCustomer : function(infoObj)	{
-//				app.u.dump("BEGIN showCustomer. infoObj: "); app.u.dump(infoObj);
-				var r = true; //what is returned. set to false if content not shown (because use is not logged in)
-				if (infoObj.show)	{
-					//infoObj.show is already set.
-					}
-				else	{
-					infoObj.show = 'newsletter';
-					}
-
+//				dump("BEGIN showCustomer. infoObj: "); dump(infoObj);
+				infoObj = infoObj || {};
+				infoObj.show = infoObj.show || 'newsletter';
 				infoObj.parentID = 'mainContentArea_customer'; //used for templateFunctions
+				infoObj.templateID = 'customerTemplate';
+				var $customer = $('#'+infoObj.parentID);
 //only create instance once.
-				if($('#'+infoObj.parentID).length)	{}
+				if($customer.length)	{}
 				else	{
-					$('#mainContentArea').append(app.renderFunctions.createTemplateInstance('customerTemplate',infoObj.parentID))
-					app.ext.myRIA.u.bindNav('#customerNav a');
+//					$customer = _app.renderFunctions.createTemplateInstance('customerTemplate',infoObj.parentID);
+					var $tmp = $("<div>").tlc({templateid:infoObj.templateID,'verb':'template'});
+					$customer = $tmp.children();
+					$customer.attr({id:infoObj.parentID});
+					$('#mainContentArea').append($customer);
+					_app.ext.quickstart.u.bindNav('#customerNav a');
+					_app.u.handleCommonPlugins($customer);
+					_app.u.handleButtons($customer);
 					}
 
-				$('#mainContentArea .textContentArea').hide(); //hide all the articles by default and we'll show the one in focus later.
-				
-				infoObj.templateID = 'customerTemplate';
-				infoObj.state = 'onInits';
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+				$('.textContentArea',$customer).hide(); //hide all the articles by default and we'll show the one in focus later.
 
+				infoObj.state = 'init';
+				_app.renderFunctions.handleTemplateEvents($customer,infoObj);
 				
-				
-				if(!app.u.buyerIsAuthenticated() && this.thisArticleRequiresLogin(infoObj))	{
-					r = false; // don't scroll.
-					app.ext.myRIA.u.showLoginModal();
+				if(!_app.u.buyerIsAuthenticated() && this.thisArticleRequiresLogin(infoObj))	{
+					_app.ext.quickstart.u.showLoginModal();
 					$('#loginSuccessContainer').empty(); //empty any existing login messaging (errors/warnings/etc)
 //this code is here instead of in showLoginModal (currently) because the 'showCustomer' code is bound to the 'close' on the modal.
 					$('<button>').addClass('stdMargin ui-state-default ui-corner-all  ui-state-active').attr('id','modalLoginContinueButton').text('Continue').click(function(){
 						$('#loginFormForModal').dialog('close');
-						app.ext.myRIA.u.showCustomer(infoObj) //binding this will reload this 'page' and show the appropriate content.
+						_app.ext.quickstart.u.showCustomer(infoObj) //binding this will reload this 'page' and show the appropriate content.
 						}).appendTo($('#loginSuccessContainer'));					
 					}
 //should only get here if the page does not require authentication or the user is logged in.
 				else	{
 					$('#newsletterArticle').hide(); //hide the default.
-					var $article = $('#'+infoObj.show+'Article')
+					var $article = $('#'+infoObj.show+'Article',$customer)
 					$article.show(); //only show content if page doesn't require authentication.
 
 //already rendered the page and it's visible. do nothing. Orders is always re-rendered cuz the data may change.
@@ -2478,34 +2541,28 @@ elasticsearch.size = 50;
 					else	{
 					
 						switch(infoObj.show)	{
+							case 'help':
+								myApp.ext.quickstart.a.showBuyerCMUI();
+								break;
+						
 							case 'newsletter':
 								$article.showLoading({'message':'Fetching newsletter list'});
-								app.calls.appNewsletterList.init({callback : function(rd){
-									$article.hideLoading();
-									if(app.model.responseHasErrors(rd)){
-										$article.anymessage({'message':rd});
-										}
-									else	{
-										$article.anycontent({'datapointer':rd.datapointer});
-										app.u.handleAppEvents($article);
-										$(":checkbox",$article).each(function(){$(this).closest('label').anycb()});
-										}									
-									}},'mutable'); app.model.dispatchThis();
+								_app.model.addDispatchToQ({"_cmd":"appNewsletterList","_tag" : {
+									"datapointer" : "appNewsletterList",
+									callback : 'tlc',
+									jqObj : $article
+									}},'mutable');
+								_app.model.dispatchThis('mutable');
 								break;
 							
 							case 'subscriberLists':
-								app.calls.buyerNewsletters.init({},'mutable');
-								app.calls.appNewsletterList.init({callback : function(rd){
-									$article.hideLoading();
-									if(app.model.responseHasErrors(rd)){
-										$article.anymessage({'message':rd});
-										}
-									else	{
-										$article.anycontent({'datapointer':rd.datapointer});
-										app.u.handleAppEvents($article);
-										$("label",$article).anycb();
-										}									
-									}},'mutable'); app.model.dispatchThis();
+								_app.model.addDispatchToQ({"_cmd":"buyerNewsletters","_tag":{"datapointer":"buyerNewsletters"}},"mutable");
+								_app.model.addDispatchToQ({"_cmd":"appNewsletterList","_tag" : {
+									"datapointer" : "appNewsletterList",
+									callback : 'tlc',
+									jqObj : $article
+									}},'mutable');
+								_app.model.dispatchThis('mutable');
 								break;	
 							case 'invoice':
 							
@@ -2513,46 +2570,51 @@ elasticsearch.size = 50;
 								var cartID = infoObj.uriParams.cartid;
 								if(cartID && orderID)	{
 									$article.showLoading({'message':'Retrieving order information'});
-									app.ext.store_crm.calls.buyerOrderGet.init({'orderid':orderID,'cartid':cartID},{'callback': function(rd){
-										$article.hideLoading();
-										if(app.model.responseHasErrors(rd)){
-											$article.anymessage({'message':rd});
-											}
-										else	{
-											$article.anycontent({'datapointer':rd.datapointer});
-											app.u.handleAppEvents($article);
-											}
-										}},'mutable');
-									app.model.dispatchThis('mutable');
+									_app.model.addDispatchToQ({"_cmd":"buyerOrderGet",'orderid':orderID,'cartid':cartID,"_tag":{
+										"datapointer":"buyerOrderGet|"+orderID,
+										"callback": "tlc",
+										"jqObj" : $article
+										}},"mutable");
+									_app.model.dispatchThis('mutable');
 									}
 								else	{
 									$article.anymessage({'message':'Both a cart id and an order id are required (for security reasons) and one is not available. Please try your link again or, if the error persists, contact us for additional help.'});
 									}
 								break;
 							case 'orders':
-							//{'parentID':'orderHistoryContainer','templateID':'orderLineItemTemplate','callback':'showOrderHistory','extension':'store_crm'}
-								app.calls.buyerPurchaseHistory.init({'callback':function(rd){
-									$("[data-app-role='orderList']",'#ordersArticle').empty().anycontent({'datapointer':rd.datapointer});
-									}},'mutable');
+							//always fetch a clean copy of the order history.
+								_app.model.addDispatchToQ({"_cmd":"buyerPurchaseHistory","_tag":{
+									"datapointer":"buyerPurchaseHistory",
+									"callback":"tlc",
+									"verb" : "translate",
+									"jqObj" : $("[data-app-role='orderList']",$article).empty()
+									}},"mutable");
 								break;
 							case 'lists':
-	
-								app.calls.buyerProductLists.init({'parentID':'listsContainer','callback':'showBuyerLists','extension':'myRIA'});
+								_app.model.addDispatchToQ({"_cmd":"buyerProductLists","_tag":{"datapointer":"buyerProductLists",'parentID':'listsContainer','callback':'showBuyerLists','extension':'quickstart'}},"mutable");
 								break;
 							case 'myaccount':
-	//							app.u.dump(" -> myaccount article loaded. now show addresses...");
-								app.ext.cco.calls.appCheckoutDestinations.init({},'mutable'); //needed for country list in address editor.
-								app.calls.buyerAddressList.init({'callback':'showAddresses','extension':'myRIA'},'mutable');
+	//							dump(" -> myaccount article loaded. now show addresses...");
+								_app.ext.cco.calls.appCheckoutDestinations.init({},'mutable'); //needed for country list in address editor.
+								_app.calls.buyerAddressList.init({'callback':'showAddresses','extension':'quickstart'},'mutable');
+								break;
+							
+							case 'logout':
+								dump(" --------> got to here");
+								$(document.body).removeClass('buyerLoggedIn');
+								$('.username').empty();
+								_app.u.logBuyerOut();
+								showContent('homepage',{});
 								break;
 							default:
-								app.u.dump("WARNING - unknown article/show ["+infoObj.show+" in showCustomer. ");
+								dump("WARNING - unknown article/show ["+infoObj.show+" in showCustomer. ");
 							}
-						app.model.dispatchThis();
+						_app.model.dispatchThis();
 						}
 					}
-				infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-				app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-				return r;
+				infoObj.state = 'complete'; //needed for handleTemplateEvents.
+				_app.renderFunctions.handleTemplateEvents($customer,infoObj);
+				return $customer;
 				},  //showCustomer
 				
 				
@@ -2575,19 +2637,17 @@ elasticsearch.size = 50;
 
 
 
-
-
 			showPaymentUpdateModal : function(orderid,cartid)	{
 				var $updateDialog = $("<div \/>",{'title':'Payment Update'}).appendTo('body');
 				$updateDialog.dialog({'modal':true,'width':500,'height':500});
 				
 				if(orderid && cartid)	{
 					$updateDialog.showLoading({'message':'One moment please. Acquiring payment methods.'});
-					app.ext.cco.calls.appPaymentMethods.init({'cartid':cartid,'orderid':orderid},{},'immutable');
-					app.model.dispatchThis('immutable');
+					_app.ext.cco.calls.appPaymentMethods.init({'cartid':cartid,'orderid':orderid},{},'immutable');
+					_app.model.dispatchThis('immutable');
 					}
 				else	{
-					$updateDialog.anymessage({'message':'In myRIA.u.showPaymentUpdateModal, either orderid ['+orderid+'] or cartid ['+cartid+'] is not set.','gMessage':true});
+					$updateDialog.anymessage({'message':'In quickstart.u.showPaymentUpdateModal, either orderid ['+orderid+'] or cartid ['+cartid+'] is not set.','gMessage':true});
 					}
 				},
 
@@ -2610,7 +2670,7 @@ elasticsearch.size = 50;
 					}
 				else	{
 					}
-//					app.u.dump(P);
+//					dump(P);
 				return P;
 			}, //parseAnchor
 			
@@ -2618,18 +2678,18 @@ elasticsearch.size = 50;
 //will add an onclick event of showContent().  uses the href value to set params.
 //href should be ="#customer?show=myaccount" or "#company?show=shipping" or #product?pid=PRODUCTID" or #category?navcat=.some.cat.id
 			bindNav : function(selector)	{
-//				app.u.dump("BEGIN bindNav ("+selector+")");
+//				dump("BEGIN bindNav ("+selector+")");
 				$(selector).each(function(){
 					var $this = $(this);
-//					app.u.dump($this.attr('href'));
-					var P = app.ext.myRIA.u.parseAnchor($this.attr('href'));
+//					dump($this.attr('href'));
+					var P = _app.ext.quickstart.u.parseAnchor($this.attr('href'));
 					if(P.pageType == 'category' && P.navcat && P.navcat != '.'){
 //for bindnavs, get info to have handy. add to passive Q and It'll get dispatched by a setInterval.
-app.ext.store_navcats.calls.appNavcatDetailMax.init(P.navcat,{},'passive');
+_app.calls.appNavcatDetail.init({'path':P.navcat,'detail':'max'},{},'passive');
 						}
 					$this.click(function(event){
 //						event.preventDefault(); //cancels any action on the href. keeps anchor from jumping.
-						return app.ext.myRIA.a.showContent('',P)
+						return _app.ext.quickstart.a.showContent('',P)
 						});
 					});
 				}, //bindNav
@@ -2640,10 +2700,10 @@ by closing modals only (instead of all dialogs), we can use dialogs to show info
 buyer to 'take with them' as they move between  pages.
 */
 			closeAllModals : function(){
-//				app.u.dump("BEGIN myRIA.u.closeAllModals");
+//				dump("BEGIN quickstart.u.closeAllModals");
 				$(".ui-dialog-content").each(function(){
 					var $dialog = $(this);
-///					app.u.dump(" -> $dialog.dialog('option','dialog'): "); app.u.dump($dialog.dialog('option','dialog'));
+///					dump(" -> $dialog.dialog('option','dialog'): "); dump($dialog.dialog('option','dialog'));
 					if($dialog.dialog( "option", "modal" ))	{
 						$dialog.dialog("close"); //close all modal windows.
 						}
@@ -2665,30 +2725,30 @@ buyer to 'take with them' as they move between  pages.
 //articles should exist inside their respective pageInfo templates (companyTemplate or customerTemplate)
 //NOTE - as of version 201225, the parameter no longer has to be a string (subject), but can be an object. This allows for uri params or any other data to get passed in.
 // * 201346 -> function now returns a boolean based on whether or not hte page is shown.
-			showArticle : function(infoObj)	{
+			showArticleIn : function($page,infoObj)	{
 				var r = true; //what is returned. set to false if the article is NOT shown.
-//				app.u.dump("BEGIN myRIA.u.showArticle"); app.u.dump(infoObj);
-				$('#mainContentArea .textContentArea').hide(); //hide all the articles by default and we'll show the one in focus later.
+//				dump("BEGIN quickstart.u.showArticle"); dump(infoObj);
+				$('.textContentArea',$page).hide(); //hide all the articles by default and we'll show the one in focus later.
 				
 				var subject;
 				if(typeof infoObj == 'object')	{
 					subject = infoObj.show
-					$('.sideline .navLink_'+subject).addClass('ui-state-highlight');
+					$('.sideline .navLink_'+subject,$page).addClass('ui-state-highlight');
 					}
 				else if(typeof infoObj == 'string')	{subject = infoObj}
 				else	{
-					app.u.dump("WARNING - unknown type for 'infoObj' ["+typeof infoObj+"] in showArticle")
+					dump("WARNING - unknown type for 'infoObj' ["+typeof infoObj+"] in showArticle")
 					}
 
 				if(subject)	{
-					var $article = $('#'+subject+'Article');
+					var $article = $('#'+subject+'Article',$page);
 					if($article.length)	{
 						if(!$article.hasClass('disabled'))	{
-							$('#'+subject+'Article').show(); //only show content if page doesn't require authentication.
+							$article.show(); //only show content if page doesn't require authentication.
 							switch(subject)	{
 								case 'faq':
-									app.ext.store_crm.calls.appFAQsAll.init({'parentID':'faqContent','callback':'showFAQTopics','extension':'store_crm','templateID':'faqTopicTemplate'});
-									app.model.dispatchThis();
+									_app.ext.store_crm.calls.appFAQsAll.init({'parentID':'faqContent','callback':'showFAQTopics','extension':'store_crm','templateID':'faqTopicTemplate'});
+									_app.model.dispatchThis();
 									break;
 								default:
 									//the default action is handled in the 'show()' above. it happens for all.
@@ -2698,7 +2758,7 @@ buyer to 'take with them' as they move between  pages.
 							r = false;
 							$('#globalMessaging').anymessage({
 								'gMessage' : true,
-								'message' : "In myRIA.u.showArticle, subject = "+subject+" no longer exists."
+								'message' : "In quickstart.u.showArticle, subject = "+subject+" no longer exists."
 								});
 							}
 						}
@@ -2706,14 +2766,14 @@ buyer to 'take with them' as they move between  pages.
 						r = false;
 						$('#globalMessaging').anymessage({
 							'gMessage' : true,
-							'message' : "In myRIA.u.showArticle, subject = "+subject+" but that article has no length on the DOM"
+							'message' : "In quickstart.u.showArticle, subject = "+subject+" but that article has no length on the DOM"
 							});
 						}
 					}
 				else	{
 					$('#globalMessaging').anymessage({
 						'gMessage' : true,
-						'message' : "In myRIA.u.showArticle, infoObj.show was not defined."
+						'message' : "In quickstart.u.showArticle, infoObj.show was not defined."
 						});
 					}
 				return r;
@@ -2722,13 +2782,13 @@ buyer to 'take with them' as they move between  pages.
 //will return a list of recent searches as a jq object ordered list.
 			getRecentSearchesOL : function()	{
 				var $o = $("<ol \/>"); //What's returned. ordered lists of searches w/ click events.
-				var L = app.ext.myRIA.vars.session.recentSearches.length;
+				var L = _app.ext.quickstart.vars.session.recentSearches.length;
 				var keywords,count;
 				for(var i = 0; i < L; i++)	{
-					keywords = app.ext.myRIA.vars.session.recentSearches[i];
-//					app.u.dump(" -> app.data['searchResult|"+keywords+"'] and typeof = "+typeof app.data['searchResult|'+keywords]);
-					count = $.isEmptyObject(app.data['appPublicSearch|'+keywords]) ? '' : app.data['appPublicSearch|'+keywords]['_count']
-					if(app.u.isSet(count))	{
+					keywords = _app.ext.quickstart.vars.session.recentSearches[i];
+//					dump(" -> _app.data['searchResult|"+keywords+"'] and typeof = "+typeof _app.data['searchResult|'+keywords]);
+					count = $.isEmptyObject(_app.data['appPublicSearch|'+keywords]) ? '' : _app.data['appPublicSearch|'+keywords]['_count']
+					if(_app.u.isSet(count))	{
 						count = " ("+count+")";
 						}
 					$("<li \/>").on('click',function(){
@@ -2742,11 +2802,11 @@ buyer to 'take with them' as they move between  pages.
 
 			showPageInDialog : function(infoObj)	{
 				if(infoObj.templateID && infoObj.navcat)	{
-					infoObj.dialogID = infoObj.templateID+'_'+app.u.makeSafeHTMLId(infoObj.navcat)+"_dialog";
+					infoObj.dialogID = infoObj.templateID+'_'+_app.u.makeSafeHTMLId(infoObj.navcat)+"_dialog";
 //dialog can be set to true and will use default settings or it can be set to an object of supported dialog parameters.
 					infoObj.dialog = $.isEmptyObject(infoObj.dialog) ? {modal: true,width:'86%',height:$(window).height() - 100} : infoObj.dialog; 
 					infoObj.dialog.autoOpen = false; //always set to false, then opened below. fixes some issues with re-opening the same id in a modal.
-					var $parent = $(app.u.jqSelector('#',infoObj.dialogID));
+					var $parent = $(_app.u.jqSelector('#',infoObj.dialogID));
 					
 //parent may not exist. empty if it does, otherwise create it.
 					if($parent.length)	{$parent.empty()}
@@ -2758,7 +2818,7 @@ buyer to 'take with them' as they move between  pages.
 					$parent.dialog('open');
 					}
 				else	{
-					app.u.dump("WARNING! either templateID ["+infoObj.templateID+"] or navcat ["+infoObj.navcat+"] not passed into showPageInDialog");
+					dump("WARNING! either templateID ["+infoObj.templateID+"] or navcat ["+infoObj.navcat+"] not passed into showPageInDialog");
 					}
 				return infoObj;
 				},
@@ -2766,17 +2826,16 @@ buyer to 'take with them' as they move between  pages.
 //best practice would be to NOT call this function directly. call showContent.
 
 			showPage : function(infoObj)	{
-				//app.u.dump("BEGIN myRIA.u.showPage("+infoObj.navcat+")");
-				var r = null; //what is returned. will be set to parent id, if all required data is present.
+//				dump("BEGIN quickstart.u.showPage("+infoObj.navcat+")");
+
 				var catSafeID = infoObj.navcat;
 				if(!catSafeID)	{
-					app.u.throwGMessage("no navcat passed into myRIA.showPage");
+					$("#globalMessaging").anymessage({"message":"In quickstart.u.showPage, no navcat was passed in infoObj.","gMessage":true});
 					}
 				else	{
 					if(infoObj.templateID){
 						//templateID 'forced'. use it.
 						}
-						
 					else if(catSafeID == zGlobals.appSettings.rootcat || infoObj.pageType == 'homepage')	{
 						infoObj.templateID = 'homepageTemplate'
 						}
@@ -2786,37 +2845,39 @@ buyer to 'take with them' as they move between  pages.
 					else	{
 						infoObj.templateID = 'categoryTemplate'
 						}
-					infoObj.state = 'onInits';
-					var parentID = infoObj.parentID || infoObj.templateID+'_'+app.u.makeSafeHTMLId(catSafeID);
+					infoObj.state = 'init';
+					var parentID = infoObj.parentID || infoObj.templateID+'_'+_app.u.makeSafeHTMLId(catSafeID);
+					var $parent = $(_app.u.jqSelector('#',parentID));
+					
+					dump(" -> $parent.length: "+$parent.length);
+					
 					infoObj.parentID = parentID;
-					app.ext.myRIA.u.handleTemplateFunctions(infoObj);
-
-//only have to create the template instance once. showContent takes care of making it visible again. but the oncompletes are handled in the callback, so they get executed here.
-					if($('#'+parentID).length > 0){
+					_app.renderFunctions.handleTemplateEvents($parent,infoObj);
+//only have to create the template instance once. showContent takes care of making it visible again. but the onComplete are handled in the callback, so they get executed here.
+					if($parent.length > 0){
 //set datapointer OR it won't be present on an oncomplete for a page already rendered.
 						infoObj.datapointer = infoObj.datapointer || "appNavcatDetail|"+catSafeID; 
-//						app.u.dump(" -> "+parentID+" already exists. Use it");
-						infoObj.state = 'onCompletes'; //needed for handleTemplateFunctions.
-						app.ext.myRIA.u.handleTemplateFunctions(infoObj);
+//						dump(" -> "+parentID+" already exists. Use it");
+						infoObj.state = 'complete'; //needed for handleTemplateEvents.
+						_app.renderFunctions.handleTemplateEvents($parent,infoObj);
 						}
 					else	{
-						var $content = app.renderFunctions.createTemplateInstance(infoObj.templateID,{"id":parentID,"catsafeid":catSafeID});
+//						var $content = _app.renderFunctions.createTemplateInstance(infoObj.templateID,{"id":parentID,"catsafeid":catSafeID});
+						$parent = $("<div>",{id:parentID,"data-catsafeid":catSafeID}).tlc({templateid:infoObj.templateID,'verb':'template'});
 //if dialog is set, we've entered this function through showPageInDialog.
 //content gets added immediately to the dialog.
 //otherwise, content is added to mainContentArea and hidden so that it can be displayed with a transition.
-						if(infoObj.dialogID)	{$('#'+infoObj.dialogID).append($content)}
+						if(infoObj.dialogID)	{$('#'+infoObj.dialogID).append($parent)}
 						else	{
-							$content.addClass('displayNone'); //hidden by default for page transitions.
-							$('#mainContentArea').append($content);
+							$parent.addClass('displayNone'); //hidden by default for page transitions.
+							$('#mainContentArea').append($parent);
 							}
-						$.extend(infoObj,{'callback':'fetchPageContent','extension':'myRIA','parentID':parentID});
-						app.ext.store_navcats.calls.appNavcatDetailMax.init(catSafeID,infoObj);
-						app.model.dispatchThis();
+						$.extend(infoObj,{'callback':'fetchPageContent','extension':'quickstart','jqObj':$parent});
+						_app.calls.appNavcatDetail.init({'path':catSafeID,'detail':'max'},infoObj);
+						_app.model.dispatchThis();
 						}
-
-
 					}
-				return parentID;
+				return $parent;
 				}, //showPage
 
 
@@ -2824,169 +2885,93 @@ buyer to 'take with them' as they move between  pages.
 //required params include templateid and either: tagObj.navcat or tagObj.pid  navcat can = . for homepage.
 //load in a template and the necessary queries will be built.
 //currently, only works on product, category and home page templates.
+//by the time we get to this point, the core dataset (appNavcatDetail or appProductGet) is already in memory.
 			buildQueriesFromTemplate : function(tagObj)	{
-//app.u.dump("BEGIN myRIA.u.buildQueriesFromTemplate");
-//app.u.dump(tagObj);
+//dump("BEGIN quickstart.u.buildQueriesFromTemplate");
+//dump(tagObj);
 
 var numRequests = 0; //will be incremented for # of requests needed. if zero, execute showPageContent directly instead of as part of ping. returned.
-var catSafeID = tagObj.navcat;
 
-var myAttributes = new Array(); // used to hold all the 'page' attributes that will be needed. passed into appPageGet request.
-var elementID; //used as a shortcut for the tag ID, which is requied on a search element. recycled var.
-
-$.extend(tagObj, {"callback":"showPageContent","searchArray":[],"extension":"myRIA","lists":[]});
+$.extend(tagObj, {"callback":"showPageContent","extension":"quickstart","lists":[]});
 /*
 var tagObj = P;  //used for ping and in handleCallback if ping is skipped.
 tagObj.callback = 'showPageContent';
 tagObj.searchArray = new Array(); //an array of search datapointers. added to _tag so they can be translated in showPageContent
-tagObj.extension = 'myRIA'
+tagObj.extension = 'quickstart'
 tagObj.lists = new Array(); // all the list id's needed.
 */
-app.model.fetchData('appPageGet|'+catSafeID); //move data from local storage to memory, if present.
 
-//goes through template.  Put together a list of all the data needed. Add appropriate calls to Q.
-app.templates[tagObj.templateID].find('[data-bind]').each(function()	{
+//compiles a list of all the bind commands scalar pointers. (ex:  %page.description,@products) NOT the values themselves.
+//used to determine what data needs to be fetched.
+var bindArr = new tlc().getBinds(tagObj.templateID);
 
-	var $focusTag = $(this);
+if(tagObj.pid)	{
+	if($.inArray('%ATTRIBS.zoovy:grp_children',bindArr) >= 0 && _app.u.thisNestedExists("data.appProductGet|"+tagObj.pid+".%attribs",_app) && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_type'] == 'CHILD' && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent'])	{
+		numRequests += _app.calls.appProductGet.init({'pid':_app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'mutable');
+		}
+	}
+else if(tagObj.navcat)	{
+	_app.model.fetchData('appPageGet|'+tagObj.navcat); //move data from local storage to memory, if present.
+	//pageAttributes is an array of all the %page. scalars refenced in the template. They're fetched in a special manner.
+	//pageObj is a pointer to the category page object in memory, if set. used to see if data is already available.
+	var pageAttributes = new Array(), pageObj = (_app.u.thisNestedExists("data.appPageGet|"+tagObj.navcat+".%page",_app)) ? _app.data['appPageGet|'+tagObj.navcat]['%page'] : {}; 
 	
-//proceed if data-bind has a value (not empty).
-	if(app.u.isSet($focusTag.attr('data-bind'))){
-		
-		var bindData = app.renderFunctions.parseDataBind($focusTag.attr('data-bind')) ;
-//		app.u.dump(bindData);
-		var namespace = app.u.isSet(bindData['var']) ? bindData['var'].split('(')[0] : "";
-		var attribute = app.renderFunctions.parseDataVar(bindData['var']);
-		var tmpAttr; //recycled. used when a portion of the attribute is stipped (page.) and multiple references to trimmed var are needed.
-//these get used in prodlist and subcat elements (anywhere loadstemplate is used)
-		bindData.templateID = bindData.loadsTemplate;
-		bindData.parentID = $focusTag.attr('id');
-
-//		app.u.dump(" -> namespace: "+namespace);
-//		app.u.dump(" -> attribute: "+attribute);
-		
-		if(bindData.useParentData)	{}
+	for(var i = 0, L = bindArr.length; i < L; i += 1)	{
+		if(bindArr[i].indexOf('%page') == 0 && (!pageObj[bindArr[i]] || !pageObj[bindArr[i]] === null))	{ //a null value would mean the data was requested already but isn't set.
+			pageAttributes.push(bindArr[i].substring(6)); //api is sent an array w/out %page. (ex: %page.description is set as description)
+			}
+		else if(bindArr[i].charAt(0) == '$' && bindArr[i].indexOf('.@products') >= 0)	{
+			var listName = bindArr[i].split('.')[0];
+			numRequests += _app.calls.appNavcatDetail.init({'path':listName,'detail':'fast'});
+			tagObj.lists.push(listName); //attribute formatted as $listname.@products
+			}
+		else if(bindArr[i] == '@subcategoryDetail')	{
+//SANITY -> can't use thisNestedExists here because appNavcatDetail|. for homepage will return false.
+			if(_app.data['appNavcatDetail|'+tagObj.navcat]['@subcategoryDetail'] && !$.isEmptyObject(_app.data['appNavcatDetail|'+tagObj.navcat]['@subcategoryDetail']))	{
+				numRequests += _app.ext.store_navcats.u.getChildDataOf(tagObj.navcat,{},'max');
+				}
+			}
+		else	{}
+/*
+### TODO -> these should probably be moved to the renderFormat since w/out a namespace, we won't know for sure what we're dealing w/
 		else if(namespace == 'elastic-native')	{
-//			app.u.dump(" -> Elastic-native namespace");
+//			dump(" -> Elastic-native namespace");
 			elementID = $focusTag.attr('id');
 			if(elementID)	{
-				numRequests += app.ext.store_search.calls.appPublicProductSearch.init(jQuery.parseJSON(attribute),{'datapointer':'appPublicSearch|'+elementID,'templateID':bindData.loadsTemplate});
+				numRequests += _app.ext.store_search.calls.appPublicProductSearch.init(jQuery.parseJSON(attribute),{'datapointer':'appPublicSearch|'+elementID,'templateID':bindData.loadsTemplate});
 				tagObj.searchArray.push('appPublicSearch|'+elementID); //keep a list of all the searches that are being done. used in callback.
 				}
 			}
-//session is a globally recognized namespace. It's content usually doesn't require a request. the data is in memory (myRIA.vars.session)
-		else if(namespace == 'session')	{
-
-			}
-
-//handle all the queries that are specific to a product.
-//by now the product info, including variations, inventory and review 'should' already be in memory (showProd has been executed)
-// the callback, showPageContent, does not run transmogrify over the product data. the lists are handled through buildProdlist, so if any new attributes
-// are supported that may require a request for additional data, something will need to be added to showPageContent to handle the display.
-// don't re-render entire layout. Inefficient AND will break some extensions, such as powerreviews.
-		else if(tagObj.pid)	{
-//on a child page, need to go get the 'siblings' (on a small, go get med, large, etc)
-//don't just look at children, ALWAYS look at ['zoovy:grp_type'] to verify it's set as a CHILD (or PARENT in some cases)
-			if(namespace == 'product' && attribute == 'zoovy:grp_children' && typeof app.data['appProductGet|'+tagObj.pid] === 'object' && app.data['appProductGet|'+tagObj.pid]['%attribs'] && app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_type'] == 'CHILD' && app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent'])	{
-				app.u.dump(" -> Fetch parent product record.");
-				numRequests += app.calls.appProductGet.init({'pid':app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'mutable');
-				}
-			else if(bindData.format == 'productList')	{
-//a product list takes care of getting all it's own data.
-//get the data for all the items in this attibutes list. no callback is executed because no parentID is set in params.
-//					numRequests += app.ext.store_prodlist.u.getProductDataForList({'csv':app.ext.store_prodlist.u.cleanUpProductList(app.data['appProductGet|'+tagObj.pid]['%attribs'][attribute])});
-				}
-				
-			else if(namespace == 'reviews')	{
-				//reviews is a recognized namespace, but data is already retrieved.
-				}				
-
-			else if(namespace == 'product')	{
-				//do nothing here, but make sure the 'else' for unrecognized namespace isn't reached.
-				}
-			else	{
-				app.u.throwMessage("Uh oh! unrecognized namespace ["+namespace+"] used on attribute "+attribute+" for pid "+tagObj.pid);
-				app.u.dump("ERROR! unrecognized namespace ["+namespace+"] used on attribute "+attribute+" for pid "+tagObj.pid);
-				}
-			}// /tagObj.pid
 
 
-// this is a navcat in focus
-		else	{
-			if(namespace == 'category' &&  attribute.substring(0,5) === '%page')	{
-				tmpAttr = attribute.substring(6);
-				
-//if some attributes for this page have already been fetched, check to see if the attribute in focus in here or not set.
-// ** 201318 -> the changes below are to make the appGet more efficient (eliminates duplicate %page attribute requests)
-//				if(myAttributes.indexOf(tmpAttr) >= 0)	{} //attribute is already in the list of attributes to be fetched.
-// ** 201332 -> IE8 doesn't support indexOf on an array.
-//				if($.inArray(tmpAttr,myAttributes))	{} //attribute is already in the list of attributes to be fetched.
-// ** 201332 -> The return value of inArray is the same as indexOf, so it should be >= 0 as well
-				if($.inArray(tmpAttr,myAttributes) >= 0)	{} //attribute is already in the list of attributes to be fetched.
-				else if(app.data['appPageGet|'+catSafeID] && app.data['appPageGet|'+catSafeID]['%page'])	{
-					if(app.data['appPageGet|'+catSafeID]['%page'][tmpAttr])	{} //already have value
-					else if(app.data['appPageGet|'+catSafeID]['%page'][tmpAttr] === null){} //value has been requested but is not set.
-					else	{
-						myAttributes.push(tmpAttr);  //set value to the actual value
-						}
-					}
-//no attributes are present so go get them pls.
-				else	{
-					myAttributes.push(tmpAttr);  //set value to the actual value
-					}				
-				
-				}
 			else if(namespace == 'list' && attribute.charAt(0) == '$')	{
 				var listPath = attribute.split('.')[0]
-				tagObj.lists.push(listPath); //attribute formatted as $listname.@products
-//** 201318 -> numRequests could have been getting set to zero, causing no dispatch to go
-				numRequests += app.ext.store_navcats.calls.appNavcatDetail.init(listPath);
+				
+				numRequests += _app.ext.calls.appNavcatDetail.init({'path':listPath,'detail':'fast'});
 				}
-			else if(namespace == 'list')	{
-				// no src is set.
-				app.u.throwGMessage("In myRIA.u.buildQueriesByTemplate, namespace set to list but invalid SRC ["+attribute+"] is specified... so we don't know where to get the data.");
-				app.u.dump(bindData);
-				}
-			else if(namespace == 'category' && attribute == '@subcategoryDetail' )	{
-//				app.u.dump(" -> category(@subcategoryDetail) found");
-//check for the presence of subcats. if none are present, do nothing.
-//if detail isn't set on the subcat, fetching subcats isn't necessary anyway.
-				if(bindData.detail && typeof app.data['appNavcatDetail|'+catSafeID]['@subcategoryDetail'] == 'object' && !$.isEmptyObject(app.data['appNavcatDetail|'+catSafeID]['@subcategoryDetail']))	{
-					numRequests += app.ext.store_navcats.u.getChildDataOf(catSafeID,{},'appNavcatDetailMax');
-					}
-				}
+
 			else if(namespace == 'category' && bindData.format == 'breadcrumb')	{
-				numRequests += app.ext.store_navcats.u.addQueries4BreadcrumbToQ(catSafeID)
+				numRequests += _app.ext.store_navcats.u.addQueries4BreadcrumbToQ(catSafeID).length;
 				}
-			else if(namespace == 'category' && bindData.format == 'productList' )	{
-				//product lists take care of themselves. do nothing.
-				}
-			else if(namespace == 'category')	{
-				// do nothing. this would be hit for something like category(pretty), which is perfectly valid but needs no additional data.
-				}
-			else	{
-					app.u.throwMessage("Uh oh! unrecognized namespace ["+bindData['var']+"] used for pagetype "+tagObj.pageType+" for navcat "+tagObj.navcat);
-					app.u.dump("Uh oh! unrecognized namespace ["+bindData['var']+"] used for pagetype "+tagObj.pageType+" for navcat "+tagObj.navcat);
-				}
+*/
+		}
+	if(pageAttributes.length)	{
+		numRequests += _app.ext.store_navcats.calls.appPageGet.init({'PATH':tagObj.navcat,'@get':pageAttributes});
+		}
 
-			}
-		} //ends isset(databind).
-	}); //ends each
+	if(numRequests > 0)	{
+		delete tagObj.datapointer; //delete datapointer or ping will save over it.
+		_app.calls.ping.init(tagObj);
+		}
+	else	{
+		_app.ext.quickstart.callbacks.showPageContent.onSuccess(tagObj);
+		}		
+
+	return numRequests;
+
+	}
 
 
-			//app.u.dump(" -> numRequests b4 appPageGet: "+numRequests);
-				if(myAttributes.length > 0)	{
-					numRequests += app.ext.store_navcats.calls.appPageGet.init({'PATH':catSafeID,'@get':myAttributes});
-					}
-//				app.u.dump(" -> numRequests AFTER appPageGet: "+numRequests);
-//queries are all compiled. if a dispatch is actually needed, add a 'ping' to execute callback, otherwise, just execute the callback now.
-				if(numRequests > 0)	{
-					app.calls.ping.init(tagObj);
-					}
-				else	{
-					app.ext.myRIA.callbacks.showPageContent.onSuccess(tagObj);
-					}		
-
-				return numRequests;
 				}, //buildQueriesFromTemplate
 
 
@@ -2995,7 +2980,7 @@ app.templates[tagObj.templateID].find('[data-bind]').each(function()	{
 
 
 			showOrderDetails : function($orderParent)	{
-//				app.u.dump("BEGIN myRIA.u.showOrderDetails");
+//				dump("BEGIN quickstart.u.showOrderDetails");
 				
 				var $orderHeader = $("[data-app-role='orderHeader']",$orderParent).first(),
 				$orderContents = $("[data-app-role='orderContents']",$orderParent).first(),
@@ -3006,18 +2991,14 @@ app.templates[tagObj.templateID].find('[data-bind]').each(function()	{
 
 					$orderContents.show().addClass('ui-corner-bottom ui-accordion-content-active'); //object that will contain order detail contents.
 					$orderContents.showLoading();
-					
-					app.calls.buyerOrderGet.init({'orderid':orderID},{'callback':function(rd){
-						$orderContents.hideLoading();
-						if(app.model.responseHasErrors(rd)){
-							$orderContents.anymessage({'message':rd});
-							}
-						else	{
-							$orderContents.anycontent({'templateID':'invoiceTemplate','datapointer':rd.datapointer});
-							app.u.handleAppEvents($orderContents);
-							}
-						}})
-					app.model.dispatchThis();
+
+					_app.model.addDispatchToQ({"_cmd":"buyerOrderGet",'orderid':orderID,"_tag":{
+						"datapointer":"buyerOrderGet|"+orderID,
+						'templateid':'invoiceTemplate',
+						"callback": "tlc",
+						"jqObj" : $orderContents
+						}},"mutable");
+					_app.model.dispatchThis('mutable');
 	
 					$orderContents.siblings().addClass('ui-state-active').removeClass('ui-corner-bottom').find('.ui-icon-triangle-1-e').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
 
@@ -3039,229 +3020,68 @@ else	{
 
 				}, //showOrderDetails
 	
-			removeByValue : function(arr, val) {
-				for(var i=0; i<arr.length; i++) {
-					if(arr[i] == val) {
-						arr.splice(i, 1);
-						break;
-						}
-					}
-				}, //removeByValue
-
-
-			
-//executed in checkout when 'next/submit' button is pushed for 'existing account' after adding an email/password. (preflight panel)
-//handles inline validation
-			loginFrmSubmit : function(email,password)	{
-				var errors = '';
-				var $errorDiv = $("#loginMessaging").empty(); //make sure error screen is empty. do not hide or callback errors won't show up.
-
-				if(app.u.isValidEmail(email) == false){
-					errors += "Please provide a valid email address<br \/>";
-					}
-				if(!password)	{
-					errors += "Please provide your password<br \/>";
-					}
-					
-				if(errors == ''){
-					app.calls.appBuyerLogin.init({"login":email,"password":password},{'callback':'authenticateBuyer','extension':'myRIA'});
-					app.calls.refreshCart.init({},'immutable'); //cart needs to be updated as part of authentication process.
-//					app.calls.buyerProductLists.init('forgetme',{'callback':'handleForgetmeList','extension':'store_prodlist'},'immutable');
-					
-					app.model.dispatchThis('immutable');
-					}
-				else {
-					$errorDiv.anymessage({'message':errors});
-					}
-				}, //loginFrmSubmit
-			
-
-//obj currently supports one param w/ two values:  action: modal|message
-//used for adding a single item to the cart, such as from a prodlist w/ an add to cart but no quantity inputs for bulk adding.
-			addItemToCart : function($form,obj)	{
-				app.u.dump("BEGIN myRIA.u.addItemToCart");
-				obj = obj || {'action':'modal'}
-				if($form && $form.length)	{
-					var cartObj = app.ext.store_product.u.buildCartItemAppendObj($form);
-					if(cartObj)	{
-						app.calls.cartItemAppend.init(cartObj,{},'immutable');
-						app.model.destroy('cartDetail');
-						app.calls.cartDetail.init({'callback':function(rd){
-							if(obj.action === "modal"){
-								showContent('cart',obj);
-								}
-							}},'immutable');
-						app.model.dispatchThis('immutable');
-						}
-					else	{} //do nothing, the validation handles displaying the errors.
-					}
-				else	{
-					app.u.throwGMessage("WARNING! add to cart $form has no length. can not add to cart.");
-					}
-				}, //handleAddToCart
-
-
 
 				
-//app.ext.myRIA.u.handleMinicartUpdate();			
+//_app.ext.quickstart.u.handleMinicartUpdate();			
 			handleMinicartUpdate : function(tagObj)	{
-//				app.u.dump("BEGIN myRIA.u.handleMinicartUPdate"); app.u.dump(tagObj);
+//				dump("BEGIN quickstart.u.handleMinicartUPdate"); dump(tagObj);
 				var r = false; //what's returned. t for cart updated, f for no update.
 				var $appView = $('#appView');
 				var itemCount = 0;
 				var subtotal = 0;
 				var total = 0;
-				if(app.data[tagObj.datapointer] && app.data[tagObj.datapointer].sum)	{
+				if(_app.data[tagObj.datapointer] && _app.data[tagObj.datapointer].sum)	{
 					r = true;
-					var itemCount = app.u.isSet(app.data[tagObj.datapointer].sum.items_count) || 0;
-					var subtotal = app.data[tagObj.datapointer].sum.items_total;
-					var total = app.data[tagObj.datapointer].sum.order_total;
+					var itemCount = _app.u.isSet(_app.data[tagObj.datapointer].sum.items_count) || 0;
+					var subtotal = _app.data[tagObj.datapointer].sum.items_total;
+					var total = _app.data[tagObj.datapointer].sum.order_total;
 					}
 				else	{
 					//cart not in memory yet. use defaults.
 					}
 
 				$('.cartItemCount',$appView).text(itemCount);
-				$('.cartSubtotal',$appView).text(app.u.formatMoney(subtotal,'$',2,false));
-				$('.cartTotal',$appView).text(app.u.formatMoney(total,'$',2,false));
+				$('.cartSubtotal',$appView).text(_app.u.formatMoney(subtotal,'$',2,false));
+				$('.cartTotal',$appView).text(_app.u.formatMoney(total,'$',2,false));
 
 				//no error for cart data not being present. It's a passive function.
 				return r;
 				},
 
-//This will create the arrays for each of the templates that support template functions (onCompletes, onInits and onDeparts).
-// 
-			createTemplateFunctions : function()	{
-
-				app.ext.myRIA.template = {};
-				var pageTemplates = new Array('categoryTemplate', 'categoryTemplateFilteredSearch','productTemplate','companyTemplate','customerTemplate','homepageTemplate','searchTemplate','cartTemplate','checkoutTemplate','pageNotFoundTemplate');
-				var L = pageTemplates.length;
-				for(var i = 0; i < L; i += 1)	{
-					app.ext.myRIA.template[pageTemplates[i]] = {"onCompletes":[],"onInits":[],"onDeparts":[]};
-//these will change the cursor to 'wait' and back to normal as each template loads/finishes loading.
-					app.ext.myRIA.template[pageTemplates[i]].onInits.push(function(){app.ext.myRIA.u.changeCursor('wait')});
-					app.ext.myRIA.template[pageTemplates[i]].onCompletes.push(function(P){
-//						app.u.dump("turn of cursor: "+P.templateID);
-						app.ext.myRIA.u.changeCursor('auto')
-						});
-					}
-
-				},
-			
-//infoObj.state = onCompletes or onInits. later, more states may be supported.
-			handleTemplateFunctions : function(infoObj)	{
-//				app.u.dump("BEGIN myRIA.u.handleTemplateFunctions");
-//				app.u.dump(infoObj);
-//in some cases, such as showContent/oninits, we may not 'know' what template is being loaded when this code is executed. try to guess.
-				if(!infoObj.templateID)	{
-					var couldBeType = this.whatAmIFor(infoObj);
-//					app.u.dump(" -> no templateID specified. Try to guess...");
-//					app.u.dump(" -> couldBeType: "+couldBeType);
-					if(typeof app.templates[couldBeType+"Template"] == 'object')	{
-//						app.u.dump(" -> Guessed template: "+couldBeType+"Template (which does exist)");
-						infoObj.templateID = couldBeType+"Template"
-						infoObj.guessedTemplateID = true;
-						}
-					}
-				
-				var r = -1; //what is returned. -1 means not everything was passed in. Otherwise, it'll return the # of functions executed.
-				// template[infoObj.templateID][infoObj.state] == 'object' -> this will tell us whether the state passed in is a valid state (more or less)
-				if(infoObj.templateID && infoObj.state && typeof app.ext.myRIA.template[infoObj.templateID] == 'object' && typeof app.ext.myRIA.template[infoObj.templateID][infoObj.state] == 'object')	{
-//					app.u.dump(" -> templateID and State are present and state is an object.");
-					r = 0;
-					var FA = app.ext.myRIA.template[infoObj.templateID][infoObj.state]  //FA is Functions Array.
-					if(FA.length > 0)	{
-						r = true;
-						for(var i = 0; i < FA.length; i += 1)	{
-							FA[i](infoObj);
-							r += 1;
-							}
-						}
-					else	{
-						//no action specified for this template/state
-						}
-					}
-				else	{
-					app.u.dump("WARNING! Something was not passed into handleTemplateFunctions");
-					app.u.dump(" -> template ID: "+infoObj.templateID);
-					app.u.dump(" -> state: "+infoObj.state);
-//					app.u.dump(" -> typeof app.ext.myRIA.template[infoObj.templateID]:"+ typeof app.ext.myRIA.template[infoObj.templateID]);
-//					app.u.dump(infoObj);
-					}
-//				app.u.dump("END myRIA.u.handleTemplateFunctions");
-				return r;
-				}, //handleTemplateFunctions 
-
-//htmlObj is 'this' if you add this directly to a form input.
-//this function is used in bindAppViewForms
-			handleFormField : function(htmlObj)	{
-//				app.u.dump("BEGIN myRIA.u.handleFormField.");
-				if (htmlObj.defaultValue == htmlObj.value)
-					htmlObj.value = "";
-				else if(htmlObj.value == '')
-					htmlObj.value = htmlObj.defaultValue;
-				}, //handleFormField
-
-//for now,classes are hard coded. later, we could support an object here that allows for id's and/or classes to be set
-//the selector parameter is optional. allows for the function to be run over  a specific section of html. on init, it's run over #appView
-			bindAppViewForms : function(selector)	{
-//				app.u.dump("BEGIN myRIA.u.bindAppViewForms");
-				selector = selector ? selector+' ' : ''; //default to blank, not undef, to avoid 'undefined' being part of jquery selectors below
-//				app.u.dump(" -> selector: '"+selector+"'");
-//				app.u.dump(" -> $(selector+' .handleDefault').length: "+$(selector+' .handleDefault').length);
-
-//for any form input in appView where there is default text that should be removed onFocus and re-inserted onBlur (if no text added), assign a class of .handleDefault
-				$(selector+'.handleDefault').bind('focus blur',function(event){app.ext.myRIA.u.handleFormField(this)});
 		
-//				app.u.dump(" -> $(selector+' .productSearchForm').length: "+$(selector+' .productSearchForm').length);
 
-				$(selector+'.productSearchForm').submit(function(event){
-					event.preventDefault(); //stops form from actually submitting.
-					var infoObj = {}
-					infoObj.pageType = 'search';
-					infoObj.KEYWORDS = $(this).find('.productSearchKeyword').val();
-					showContent('search',infoObj);
-					return false;
-					});
 
-				$(selector+ '.newsletterSubscriptionForm').submit(function(event){
-					event.preventDefault(); //stops form from actually submitting.
-					app.ext.store_crm.u.handleSubscribe(this.id);
-					return false;
-					});
-
-				}, //bindAppViewForms
 			
 			getDataFromInfoObj : function(infoObj){
 				//initialized to an empty object, so that we don't return a null pointer
 				var data = {};
 				
 				if(infoObj.datapointer){
-					data = app.data[infoObj.datapointer];
+					data = _app.data[infoObj.datapointer];
 					}
 				else {
 					switch(infoObj.pageType){
 						case "product" :
-							data = app.data['appProductGet|'+infoObj.pid];
+							data = _app.data['appProductGet|'+infoObj.pid];
 							break;
 						case "homepage" :
 							//both homepage and category share the same infoObj.navcat syntax, so we can cascade
 						case "category" :
-							data = app.data['appNavcatDetail|'+infoObj.navcat];
+							data = _app.data['appNavcatDetail|'+infoObj.navcat];
 							break;
 						case "customer" :
-							data = app.data.appBuyerLogin;
+							data = _app.data.appBuyerLogin;
 							break;
 						case "company" :
 							//Return an empty object
 							break;
 						case "search" :
-							data = app.data["appPublicSearch|"+JSON.stringify(infoObj.elasticsearch)];
+							data = _app.data["appPublicSearch|"+JSON.stringify(infoObj.elasticsearch)];
 							break;
 						case "cart" :
 							//Both cart and checkout can return the cart, so we can cascade
 						case "checkout" :
-							data = app.data.cartDetail;
+							data = _app.data.cartDetail;
 							break;
 						default :
 							//Return an empty object
@@ -3276,73 +3096,296 @@ else	{
 ////////////////////////////////////   app Events [e]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		e : {
+//add this as a data-app-submit to the login form.
+			accountLoginSubmit : function($ele,p)	{
+				p.preventDefault();
+				if(_app.u.validateForm($ele))	{
+					var sfo = $ele.serializeJSON();
+					_app.ext.cco.calls.cartSet.init({"bill/email":sfo.login,"_cartid":_app.model.fetchCartID()}) //whether the login succeeds or not, set bill/email in the cart.
+					sfo._cmd = "appBuyerLogin";
+					sfo._tag = {"datapointer":"appBuyerLogin",'callback':'authenticateBuyer','extension':'quickstart'}
+					_app.model.addDispatchToQ(sfo,"immutable");
+					_app.calls.refreshCart.init({},'immutable'); //cart needs to be updated as part of authentication process.
+					_app.model.dispatchThis('immutable');
+					}
+				else	{} //validateForm will handle the error display.
+				},
 
-			execOrder2Cart : function($btn)	{
-				$btn.button({icons: {primary: "ui-icon-cart"},text: false});
-				$btn.off('click.execOrder2Cart').on('click.execOrder2Cart',function(event){
-					event.preventDefault();
-					var orderID = $btn.closest("[data-orderid]").data('orderid');
-					if(orderID)	{
-						app.calls.buyerPurchaseHistoryDetail.init(orderID,{'callback':function(rd){
-							if(app.model.responseHasErrors(rd)){
-								$('#globalMessaging').anymessage({'message':rd});
-								}
-							else	{
-								var orderList = app.data[rd.datapointer]['@ITEMS'],
-								L = orderList.length;
-								for(var i = 0; i < L; i += 1)	{
-									var obj = {'sku':orderList[i].product,'qty':orderList[i].qty}
-									if(!$.isEmptyObject(orderList[i]['%options']))	{
-										var variations = orderList[i]['%options'];
-										obj['%variations'] = {};
-										for(var index in variations)	{
-											obj['%variations'][variations[index].id] = variations[index].v
-											}
-										}
-									app.calls.cartItemAppend.init(obj,{},'immutable');
-									app.model.destroy('cartDetail');
-									app.calls.cartDetail.init({'callback':function(rd){
-										showContent('cart');
-										}},'immutable');
-									app.model.dispatchThis('immutable');
-									}
-								}
-							}},'immutable');
-						app.model.dispatchThis('immutable');
+			accountPasswordRecoverSubmit : function($ele,p)	{
+				p.preventDefault();
+				if(_app.u.validateForm($ele))	{
+					$ele.showLoading({'message':'Sending request for password recovery.'});
+					_app.model.addDispatchToQ({
+						"_cmd":"appBuyerPasswordRecover",
+						"method":"email",
+						"login":$("[name='login']",$ele).val(),
+						"_tag":{
+							"datapointer":"appBuyerPasswordRecover",
+							'callback':'showMessaging',
+							'message':'Thank you, will receive an email shortly',
+							'jqObj':$ele
+							}
+						},"immutable");
+					_app.model.dispatchThis('immutable');
+					}
+				else	{} //validateForm will handle the error display.
+				},
+	
+			cartShipMethodSelect : function($ele,P)	{
+				var $cart = $ele.closest("[data-template-role='cart']");
+				_app.ext.cco.calls.cartSet.init({'_cartid':$cart.data('cartid'),'want/shipping_id':$ele.val()},{},'immutable');
+				$cart.trigger('fetch',{'Q':'immutable'});
+				_app.model.dispatchThis('immutable');
+				},
+			
+			cartMessagePageSend : function($ele,p)	{
+				p.preventDefault();
+				var vars = _app.u.getWhitelistedObject(_app.ext.quickstart.vars.sotw,['pageType','pid','show','navcat','keywords','templateID','uriParams']); //don't need everything in sotw.
+				var cartid = $ele.closest("[data-app-role='cartMessenger']").data('cartid');
+				vars.domain = (document.location.protocol == 'file:') ? _app.vars.testURL : document.domain;
+				_app.model.addDispatchToQ({'_cmd':'cartMessagePush','what':'view.'+vars.pageType,'vars':vars,'_cartid':cartid,'_tag':{
+					'callback' : function(rd)	{
+						if(_app.model.responseHasErrors(rd)){
+							$('#cartMessenger').anymessage({'message':rd});
+							}
+						else	{
+							//sample action. success would go here.
+							$("[data-app-role='messageHistory']",'#cartMessenger').append(vars.pageType+" page sent to admin.");
+							}
 						}
-					else	{
-						$('#globalMessaging').anymessage({'message':"In myRIA.e.execOrder2Cart, unable to determine orderID",'gMessage':true});
-						}
-					});
+					}},'passive');
+				_app.model.dispatchThis('passive');
+				},
+			
+			dialogCloseExec : function($ele,p)	{
+				$ele.closest('.ui-dialog-content').dialog('close');
+				},
+			
+			faqDetailShow : function($ele,p)	{
+				_app.ext.quickstart.a.showFAQbyTopic($ele.closest('[data-topicid]').data('topicid'));
+				},
+			
+			execOrder2Cart : function($ele,p)	{
+				var orderID = $ele.closest("[data-orderid]").data('orderid');
+				if(orderID)	{
+					_app.ext.cco.u.appendOrderItems2Cart({orderid:orderID,cartid:_app.model.fetchCartID()},function(rd){
+						if(_app.model.responseHasErrors(rd)){
+							$('#globalMessaging').anymessage({'message':rd});
+							}
+						else	{
+							showContent('cart');
+							}
+						});
+					}
+				else	{
+					$('#globalMessaging').anymessage({'message':"In quickstart.e.execOrder2Cart, unable to determine orderID",'gMessage':true});
+					}
 				}, //execOrder2Cart
 
-			showBuyerAddressUpdate : function($btn)	{
-				$btn.button();
-				$btn.off('click.showBuyerAddressUpdate').on('click.showBuyerAddressUpdate',function(){
-					app.ext.store_crm.u.showAddressEditModal({
-						'addressID' : $btn.closest("address").data('_id'),
-						'addressType' : $btn.closest("[data-app-addresstype]").data('app-addresstype')
-						},function(){
-						$('#mainContentArea_customer').empty().remove(); //kill so it gets regenerated. this a good idea?
-						showContent('customer',{'show':'myaccount'});
-						})
+			orderDetailShow : function($ele,p)	{
+				_app.ext.quickstart.u.showOrderDetails($ele.closest("[data-app-role='orderLineitemContainer']"));
+				},
+
+			inlineProductPreviewShow : function($ele,p)	{
+				_app.ext.quickstart.a.handleProdPreview($ele.closest("[data-pid]").data('pid'));
+				},
+
+			passwordChangeSubmit : function($ele,p)	{
+				p.preventDefault();
+				if(_app.u.validateForm($ele))	{
+					_app.ext.store_crm.u.handleChangePassword($ele,{'callback':'showMessaging','message':'Thank you, your password has been changed','jqObj':$ele});
+					}
+				else	{}
+				},
+
+			productAdd2Cart : function($ele,p)	{
+				p.preventDefault();
+				//the buildCartItemAppendObj needs a _cartid param in the form.
+				if($("input[name='_cartid']",$ele).length)	{}
+				else	{
+					$ele.append("<input type='hidden' name='_cartid' value='"+_app.model.fetchCartID()+"' \/>");
+					}
+
+				var cartObj = _app.ext.store_product.u.buildCartItemAppendObj($ele);
+				if(cartObj)	{
+					_app.ext.cco.calls.cartItemAppend.init(cartObj,{},'immutable');
+					_app.model.destroy('cartDetail|'+cartObj._cartid);
+					_app.calls.cartDetail.init(cartObj._cartid,{'callback':function(rd){
+						if(_app.model.responseHasErrors(rd)){
+							$('#globalMessaging').anymessage({'message':rd});
+							}
+						else	{
+							showContent('cart',{'show':$ele.data('show')});
+							}
+						}},'immutable');
+					_app.model.dispatchThis('immutable');
+					}
+				else	{} //do nothing, the validation handles displaying the errors.
+				},
+			productAdd2List : function($ele,p)	{
+				var pid = $ele.closest("[data-pid]").data('pid');
+				if($ele.data('listid') && pid)	{
+					_app.ext.quickstart.a.add2BuyerList({sku:pid,'listid':$ele.data('listid')});
+					}
+				else	{
+					$('#globalMessaging').anymessage({"message":"In admin_crm.e.productAdd2List, unable to ascertain pid ["+pid+"] or data-listid was not set on trigger element.","gMessage":true});
+					}
+				},
+				
+			productPicsInModalShow : function($ele,p){
+				_app.ext.store_product.u.showPicsInModal({"pid":$ele.closest("[data-pid]").data('pid')});
+				},
+
+			subscribeSubmit : function($ele,p)	{
+				p.preventDefault();
+				_app.ext.store_crm.u.handleSubscribe($ele.attr('id'));
+				},
+
+//add to form element. input name='KEYWORDS' is required for this simple search.
+			searchFormSubmit : function($ele,p)	{
+				p.preventDefault();
+				showContent('search',$ele.serializeJSON($ele));
+				},
+
+			showBuyerAddressUpdate : function($ele,p)	{
+				_app.ext.store_crm.u.showAddressEditModal({
+					'addressID' : $ele.closest("address").data('_id'),
+					'addressType' : $ele.closest("[data-app-addresstype]").data('app-addresstype')
+					},function(){
+					$('#mainContentArea_customer').empty().remove(); //kill so it gets regenerated. this a good idea?
+					showContent('customer',{'show':'myaccount'});
 					});
 				}, //showBuyerAddressUpdate
 
-			showBuyerAddressAdd : function($btn)	{
-				$btn.button({icons: {primary: "ui-icon-circle-plus"},text: false});
-				$btn.off('click.showBuyerAddressAdd').on('click.showBuyerAddressAdd',function(){
-					app.ext.store_crm.u.showAddressAddModal({
-						'addressType' : $btn.closest("[data-app-addresstype]").data('app-addresstype')
-						},function(rd){
-						$('#mainContentArea_customer').empty().remove(); //kill so it gets regenerated. this a good idea?
-						showContent('customer',{'show':'myaccount'});
-						})
-					});
-				} //showBuyerAddressAdd
+			showBuyerAddressAdd : function($ele,p)	{
+				_app.ext.store_crm.u.showAddressAddModal({
+					'addressType' : $ele.closest("[data-app-addresstype]").data('app-addresstype')
+					},function(rd){
+					$('#mainContentArea_customer').empty().remove(); //kill so it gets regenerated. this a good idea?
+					showContent('customer',{'show':'myaccount'});
+					})
+				}, //showBuyerAddressAdd
 
-			} // e/events
+			quickviewShow : function($ele,p)	{
+				var PID = $ele.data('pid') || $ele.closest('[data-pid]').attr('data-pid');
+				var templateID = $ele.data('loadstemplate');
+				if(PID && templateID)	{
+					quickView('product',{'templateID':templateID,'pid':PID});
+					}
+				else	{
+					$('#globalMessaging').anymessage({"message":"In quickstart.e.quickviewShow, unable to ascertain PID ["+PID+"] or no data-templateID set on trigger element.","gMessage":true});
+					}
+				}
+
+			}, // e/events
+
+
+////////////////////////////////////   			thirdPartyFunctions		    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+
+
+	thirdParty : {
+
+/*
+executed during control init. 
+for now, all it does is save the facebook user data as needed, if the user is authenticated.
+later, it will handle other third party plugins as well.
+*/
+		init : function()	{
+			dump("BEGIN quickstart.handleThirdParty.Init");
+
+			var uriParams = _app.u.kvp2Array(location.hash.substring(1));
+			//landing on the admin app, having been redirected after logging in to google.
+			if(uriParams.trigger == 'googleAuth')	{
+				_app.calls.authAdminLogin.init({
+					'authtype' : 'google:id_token',
+					'id_token' : uriParams.id_token
+					},{'datapointer' : 'authAdminLogin','callback':'showHeader','extension':'admin'},'immutable');
+				_app.model.dispatchThis('immutable');
+				}
+			//just returned from google
+			else if(uriParams.id_token && uriParams.state)	{
+
+				if(uriParams.state)	{
+					
+					dump(" -> state was defined as a uri param");
+					var state = jQuery.parseJSON(atob(uriParams.state));
+					dump(" -> post decode/parse state:");	dump(state);
+//to keep the DOM as clean as possible, only declare this function if it's needed.					
+					if(state.onReturn == 'return2Domain')	{
+						window.return2Domain = function(s,uP){
+							document.location = s.domain+"#trigger=googleAuth&access_token="+uP.access_token+"&id_token="+uP.id_token
+							}
+						}
+					
+					if(state.onReturn && typeof window[state.onReturn] == 'function')	{
+						window[state.onReturn](state,uriParams);
+						}
+					else	{
+						dump(" -> state was defined but either onReturn ["+state.onReturn+"] was not set or not a function [typeof: "+typeof window[state.onReturn]+"].");
+						}
+					}
+
+				}
+
+//initial init of fb _app.
+			if(typeof zGlobals !== 'undefined' && zGlobals.thirdParty.facebook.appId && typeof FB !== 'undefined')	{
+//				dump(" -> facebook appid set. load user data.");
+				FB.init({appId:zGlobals.thirdParty.facebook.appId, cookie:true, status:true, xfbml:true});
+				_app.ext.quickstart.thirdParty.fb.saveUserDataToSession();
+				}
+			else	{
+//				dump(" -> did not init FB app because either appid isn't set or FB is undefined ("+typeof FB+").");
+				}
+//			dump("END _app.u.handleThirdPartyInits");
+			}, //init
+
+//executed inside handleTHirdPartyInits as well as after a facebook login.
+
+// ### TODO -> move out of here and either into a FB extension or quickstart.		
+		fb : {
+			
+			postToWall : function(msg)	{
+				dump('BEGIN thirdpartyfunctions.facebook.posttowall. msg = '+msg);
+				FB.ui({ method : "feed", message : msg}); // name: 'Facebook Dialogs', 
+				},
+			
+			share : function(a)	{
+				a.method = 'send';
+				FB.ui(a);
+				},
+				
 		
+			saveUserDataToSession : function()	{
+//				dump("BEGIN _app.ext.quickstart.thirdParty.fb.saveUserDataToSession");
+				
+				FB.Event.subscribe('auth.statusChange', function(response) {
+//					dump(" -> FB response changed. status = "+response.status);
+					if(response.status == 'connected')	{
+	//save the fb user data elsewhere for easy access.
+						FB.api('/me',function(user) {
+							if(user != null) {
+//								dump(" -> FB.user is defined.");
+								_app.vars.fbUser = user;
+								_app.ext.cco.calls.cartSet.init({"bill/email":user.email,"_cartid":_app.model.fetchCartID()});
+
+//								dump(" -> user.gender = "+user.gender);
+
+if(_gaq.push(['_setCustomVar',1,'gender',user.gender,1]))
+	dump(" -> fired a custom GA var for gender.");
+else
+	dump(" -> ARGH! GA custom var NOT fired. WHY!!!");
+
+
+								}
+							});
+						}
+					});
+//				dump("END _app.ext.quickstart.thirdParty.fb.saveUserDataToSession");
+				}
+			}
+		}
+
 		} //r object.
 	return r;
 	}
