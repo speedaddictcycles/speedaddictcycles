@@ -65,13 +65,13 @@
 #header #headerBanners #minicart {width: 126px; height: 100%;}
 
 .dropdownContent {
-	width: 768px;
+	width: 700px;
 }
 .dropdownContent.showDropDown.helmets {height: 570px;}
 .dropdownContent.showDropDown.parts {height: 570px;}
 .dropdownContent.showDropDown.apparel {height: 490px;}
 
-.dropdownContent .featBrands a {line-height: 70px; height: 70px; padding-top: 10px; width: 300px;}
+.dropdownContent .featBrands a {line-height: 70px; height: 70px; padding-top: 10px; width: 200px;}
 .dropdownContent .featBrands img { border: 3px solid #36393e; margin-right: 10px; }
 
 .dropdownContent .dropdownList a {line-height: 70px; height: 70px; padding-top: 10px; margin-left: 10px;}
