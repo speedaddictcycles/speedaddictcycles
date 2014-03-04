@@ -291,7 +291,7 @@ document.write = function(v){
 
 		showProd : 	{
 			onSuccess : function(tagObj)	{
-				dump("BEGIN quickstart.callbacks.showProd");
+//				dump("BEGIN quickstart.callbacks.showProd");
 //				dump(tagObj);
 				var tmp = _app.data[tagObj.datapointer];
 				var pid = _app.data[tagObj.datapointer].pid;
@@ -304,7 +304,6 @@ document.write = function(v){
 				tagObj.jqObj.tlc({'verb':'translate','dataset':tmp});
 				tagObj.pid = pid;
 				//build queries will validate the namespaces used AND also fetch the parent product if this item is a child.
-				dump(tagObj);
 				_app.ext.quickstart.u.buildQueriesFromTemplate(tagObj);
 				_app.model.dispatchThis();
 				
@@ -367,7 +366,6 @@ document.write = function(v){
 		showPageContent : {
 			onSuccess : function(tagObj)	{
 				dump(" BEGIN quickstart.callbacks.onSuccess.showPageContent");
-				dump(tagObj);
 //when translating a template, only 1 dataset can be passed in, so detail and page are merged and passed in together.
 
 //cat page handling.
@@ -421,7 +419,6 @@ document.write = function(v){
 				tagObj.state = 'complete'; //needed for handleTemplateEvents.
 
 				_app.renderFunctions.handleTemplateEvents((tagObj.jqObj || $(_app.u.jqSelector('#',tagObj.parentID))),tagObj);
-				dump("finish showPageContent");
 				},
 			onError : function(responseData,uuid)	{
 				$('#mainContentArea').removeClass('loadingBG')
@@ -943,7 +940,7 @@ fallback is to just output the value.
 // -> unshift is used in the case of 'recent' so that the 0 spot always holds the most recent and also so the length can be maintained (kept to a reasonable #).
 // infoObj.back can be set to 0 to skip a URI update (will skip both hash state and popstate.) 
 			showContent : function(pageType,infoObj)	{
-				dump("BEGIN showContent ["+pageType+"]."); dump(infoObj);
+//				dump("BEGIN showContent ["+pageType+"]."); dump(infoObj);
 				infoObj = infoObj || {}; //could be empty for a cart or checkout
 /*
 what is returned. is set to true if pop/pushState NOT supported. 
@@ -1018,8 +1015,7 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 	
 					case 'search':
 	//					dump(" -> Got to search case.");	
-						_app.ext.quickstart.u.showSearch(infoObj);
-						$new = 'mainContentArea_search';
+						$new = _app.ext.quickstart.u.showSearch(infoObj);
 						break;
 	
 					case 'customer':
@@ -1387,23 +1383,23 @@ the ui also helps the buyer show the merchant what they're looking at and, optio
 								$detail.anymessage({'message':rd});
 								}
 							else	{
-								$detail.tlc({'templateID':'productTemplateQuickView','dataset' : _app.data[rd.datapointer]})
+								$detail.tlc({'templateid':'productTemplateQuickView','dataset' : _app.data[rd.datapointer]})
 								}
 
 //in a timeout to prevent a doubleclick on the buttons. if data in memory, doubleclick will load two templates.
-dump(" -> liIndex: "+liIndex)
+//dump(" -> liIndex: "+liIndex);
 setTimeout(function(){
 	if(liIndex === 0)	{
-		$('.prevButton',$parent).button("option", "disabled", true);
-		$('.nextButton',$parent).button("option", "disabled", false);
+		$('.prevButton',$parent).button('disable');
+		$('.nextButton',$parent).button('enable');
 		}
 	else if(liIndex == ($("ul",$liContainer).children().length))	{
-		$('.prevButton',$parent).button("option", "disabled", false);
-		$('.nextButton',$parent).button("option", "disabled", true);
+		$('.prevButton',$parent).button('enable');
+		$('.nextButton',$parent).button('disable');
 		}
 	else	{
-		$('.prevButton',$parent).button("option", "disabled", false);
-		$('.nextButton',$parent).button("option", "disabled", false);
+		$('.prevButton',$parent).button('enable');
+		$('.nextButton',$parent).button('enable');
 		}
 },300);
 							}
@@ -1733,6 +1729,7 @@ $target.tlc({
 //used in results page if the preview mode feature is enabled.
 			revertPageFromPreviewMode : function($parent)	{
 				if(typeof $parent == 'object')	{
+					var 
 					$liContainer = $('.previewListContainer',$parent), //div around UL with search results.
 					$detail = $('.previewProductDetail',$parent); //target for content.
 
@@ -2236,7 +2233,6 @@ effects the display of the nav buttons only. should be run just after the handle
 
 //rather than having all the params in the dom, just call this function. makes updating easier too.
 			showProd : function(infoObj)	{
-				dump(infoObj);
 				var pid = infoObj.pid
 				var parentID = null; //what is returned. will be set to parent id if a pid is defined.
 //				dump("BEGIN quickstart.u.showProd ["+pid+"]");
@@ -2356,11 +2352,10 @@ effects the display of the nav buttons only. should be run just after the handle
 
 //only create instance once.
 				if($page.length)	{
-					_app.ext.quickstart.u.revertPageFromPreviewMode($('#mainContentArea_search'));
+					_app.ext.quickstart.u.revertPageFromPreviewMode($page);
 					}
 				else	{
-					$('#mainContentArea').tlc({'templateID':infoObj.templateID,'showLoading':false,'dataAttribs':{'id':'mainContentArea_search'}});
-					$page = $('#mainContentArea_search');
+					$page = new tlc().runTLC({'templateid':infoObj.templateID,'verb':'template'}).attr('id','mainContentArea_search').appendTo('#mainContentArea');
 					}
 
 //add item to recently viewed list IF it is not already in the list.
@@ -2923,11 +2918,9 @@ tagObj.lists = new Array(); // all the list id's needed.
 var bindArr = new tlc().getBinds(tagObj.templateID);
 
 if(tagObj.pid)	{
-	dump('product in buildQueriesFromTemplate');
 	if($.inArray('%ATTRIBS.zoovy:grp_children',bindArr) >= 0 && _app.u.thisNestedExists("data.appProductGet|"+tagObj.pid+".%attribs",_app) && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_type'] == 'CHILD' && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent'])	{
-		numRequests += _app.calls.appProductGet.init({'pid':_app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'immutable');
+		numRequests += _app.calls.appProductGet.init({'pid':_app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'mutable');
 		}
-	dump(numRequests);
 	}
 else if(tagObj.navcat)	{
 	_app.model.fetchData('appPageGet|'+tagObj.navcat); //move data from local storage to memory, if present.
@@ -2978,8 +2971,6 @@ else if(tagObj.navcat)	{
 		numRequests += _app.ext.store_navcats.calls.appPageGet.init({'PATH':tagObj.navcat,'@get':pageAttributes});
 		}
 
-	}
-
 	if(numRequests > 0)	{
 		delete tagObj.datapointer; //delete datapointer or ping will save over it.
 		_app.calls.ping.init(tagObj);
@@ -2989,6 +2980,9 @@ else if(tagObj.navcat)	{
 		}		
 
 	return numRequests;
+
+	}
+
 
 				}, //buildQueriesFromTemplate
 

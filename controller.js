@@ -893,7 +893,7 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 				uriParams : _app.router.getURIParams(),
 				hashParams : (location.hash.indexOf('?') >= 0 ? _app.u.kvp2Array(decodeURIComponent(location.hash.split("?")[1])) : {})
 				});
-			var routeObj = _app.router._getRouteObj(document.location.hash.substr(2),'init'); //strips out the #! and trailing slash, if present.
+			var routeObj = _app.router._getRouteObj(document.location.href,'init'); //strips out the #! and trailing slash, if present.
 			if(routeObj)	{
 				_app.router._executeCallback(routeObj);
 				}
@@ -3049,7 +3049,7 @@ $tmp.empty().remove();
 			}, //truncText
 
 //used in a cart or invoice spec to display which options were selected for a stid.
-		selectedOptionsDisplay : function($tag,data)	{
+		selectedoptionsdisplay : function($tag,data)	{
 			var o = '';
 			for(var key in data.value) {
 //				_app.u.dump("in for loop. key = "+key);
