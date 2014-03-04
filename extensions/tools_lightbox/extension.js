@@ -45,7 +45,7 @@ var tools_lightbox = function(_app) {
 		a : {
 
 			}, //a [actions]
-
+		
 		renderFormats : {
 			
 /****************************************
@@ -53,7 +53,7 @@ A renderformat for creating a lightbox link completely agnostic of data-object t
 
 This renderformat is intended to be on a link tag around a typical img tag bound by imageURL.
 ex: 
-<a data-bind="useParentData:true; format:lightboxLink; extension:tools_lightbox; hrefAttr:%attribs.zoovy:prod_image1;">
+<a data-bind="useParentData:true; format:lightboxLink; extension:tools_lightbox; hrefattr:%attribs.zoovy:prod_image1;">
 	<img src='blank.gif' class='prodBigImage' data-bind='var: product(zoovy:prod_image1); format:imageURL;' width='296' height='296' />
 </a>
 
@@ -61,7 +61,7 @@ Do not specify a var, ALWAYS set useParentData to true.
 
 bindData params:
 required:
-	hrefAttr - a dot-notation path for de-referencing the image path from the parent data- ex: "%attribs.zoovy:prod_image1"
+	hrefattr - a dot-notation path for de-referencing the image path from the parent data- ex: "%attribs.zoovy:prod_image1"
 optional:
 	w - A width to be passed to the _app.u.makeImage call
 	h - A height to be passed to the _app.u.makeImage call
@@ -73,32 +73,33 @@ optional:
 	
 	titleAttr - a dot-notation path for de-referencing an attribute for title- ex: "%attribs.zoovy:prod_name"
 ****************************************/
-			lightboxLink: function($tag,data){
-				if(!data.bindData.hrefAttr){
+			lightboxlink: function($tag,data){
+				dump(data);
+				if(!data.bindData.hrefattr){
 					_app.u.dump("-> tools_lightbox.renderFormats.lightboxLink NO HREFATTR SPECIFIED");
 					return false;
 					}
 				else {
-					var hrefAttr = data.value;
-					var hrefParams = data.bindData.hrefAttr.split('.');
+					var hrefattr = data.value;
+					var hrefParams = data.bindData.hrefattr.split('.');
 					
 					for(var index in hrefParams){
-						if(hrefAttr[hrefParams[index]]){
-							hrefAttr = hrefAttr[hrefParams[index]];
+						if(hrefattr[hrefParams[index]]){
+							hrefattr = hrefattr[hrefParams[index]];
 							}
 						else {
-							hrefAttr = false;
+							hrefattr = false;
 							break;
 							}
 						}
 					
-					if(!hrefAttr){
-						_app.u.dump("-> tools_lightbox.renderFormats.lightboxLink HREFATTR["+data.bindData.hrefAttr+"] COULD NOT BE INTERPOLATED FROM DATA OBJECT");
+					if(!hrefattr){
+						_app.u.dump("-> tools_lightbox.renderFormats.lightboxLink HREFATTR["+data.bindData.hrefattr+"] COULD NOT BE INTERPOLATED FROM DATA OBJECT");
 						return false;
 						}
 					else {
 						var imgObj = {
-							name : hrefAttr
+							name : hrefattr
 							};
 						if(data.bindData.w){ imgObj.w = data.bindData.w; }
 						if(data.bindData.h){ imgObj.h = data.bindData.h; }
@@ -107,25 +108,25 @@ optional:
 						var href = _app.u.makeImage(imgObj);
 						
 						var group= '';
-						if(data.bindData.groupingAttr){
-							var groupingAttr = data.value;
-							var groupingParams = data.bindData.groupingAttr.split('.');
+						if(data.bindData.groupingattr){
+							var groupingattr = data.value;
+							var groupingParams = data.bindData.groupingattr.split('.');
 							
 							for(var index in groupingParams){
-								if(groupingAttr[groupingParams[index]]){
-									groupingAttr = groupingAttr[groupingParams[index]];
+								if(groupingattr[groupingParams[index]]){
+									groupingattr = groupingattr[groupingParams[index]];
 									}
 								else {
-									groupingAttr = false;
+									groupingattr = false;
 									break;
 									}
 								}
-							if(groupingAttr){
+							if(groupingattr){
 								
-								if(data.bindData.groupingPrefix){
-									group += data.bindData.groupingPrefix;
+								if(data.bindData.groupingprefix){
+									group += data.bindData.groupingprefix;
 									}
-								group += groupingAttr;
+								group += groupingattr;
 															
 								}
 						
@@ -135,21 +136,21 @@ optional:
 						if(group === ''){ group = href; }
 						
 						var title = false;
-						if(data.bindData.titleAttr){
-							var titleAttr = data.value;
-							var titleParams = data.bindData.titleAttr.split('.');
+						if(data.bindData.titleattr){
+							var titleattr = data.value;
+							var titleParams = data.bindData.titleattr.split('.');
 							
 							for(var index in titleParams){
-								if(titleAttr[titleParams[index]]){
-									titleAttr = titleAttr[titleParams[index]];
+								if(titleattr[titleParams[index]]){
+									titleattr = titleattr[titleParams[index]];
 									}
 								else {
-									titleAttr = false;
+									titleattr = false;
 									break;
 									}
 								}
-							if(titleAttr){
-								title = titleAttr;							
+							if(titleattr){
+								title = titleattr;							
 								}
 						
 						

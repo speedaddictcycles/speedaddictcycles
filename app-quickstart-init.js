@@ -12,7 +12,7 @@ myApp.rq.push(['script',0,(document.location.protocol == 'file:') ? myApp.vars.t
 myApp.rq.push(['extension',0,'order_create','extensions/checkout/extension.js']);
 myApp.rq.push(['extension',0,'cco','extensions/cart_checkout_order.js']);
 
-myApp.rq.push(['extension',0,'store_routing','extensions/store_routing.js']);
+myApp.rq.push(['extension',0,'store_routing','extensions/store_routing.js', 'attachEventHandlers']);
 myApp.rq.push(['extension',0,'store_seo','extensions/store_seo.js']);
 
 myApp.rq.push(['extension',0,'store_prodlist','extensions/store_prodlist.js']);
@@ -34,7 +34,7 @@ myApp.rq.push(['extension',0,'quickstart','app-quickstart.js','startMyProgram'])
 //myApp.rq.push(['extension',1,'powerReviews_reviews','extensions/partner_powerreviews_reviews.js','startExtension']);
 //myApp.rq.push(['extension',0,'magicToolBox_mzp','extensions/partner_magictoolbox_mzp.js','startExtension']); // (not working yet - ticket in to MTB)
 
-myApp.rq.push(['extension',0,'store_sac','extensions/_store_sac.js']);
+myApp.rq.push(['extension',0,'store_sac','extensions/_store_sac.js', 'attachEventHandlers']);
 myApp.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.min.js']); 
 myApp.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
 myApp.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);

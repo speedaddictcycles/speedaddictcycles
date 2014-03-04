@@ -304,6 +304,7 @@ This one block should get called for both img and imageurl but obviously, imageu
 				}
 			else	{
 				mediaParams = {'width':argObj.width,'height':argObj.height,'data-bgcolor':argObj.bgcolor,'data-minimal':(argObj.minimal ? argObj.minimal : 0),'data-filename':argObj.media};
+				dump(argObj);
 				filePath = this.makeImageURL(mediaParams);
 				}
 			}

@@ -100,7 +100,8 @@ var store_seo = function(_app) {
 					baseTitle = _app.ext.store_seo.vars.defaultTitle;
 					}
 				
-				document.title = _app.ext.store_seo.vars.titlePrefix + title + _app.ext.store_seo.vars.titlePostfix;
+				document.title = _app.ext.store_seo.vars.titlePrefix + baseTitle + _app.ext.store_seo.vars.titlePostfix;
+				dump('title written');
 				$('meta[name=description]').attr('content', desc);
 				}
 			}, //u [utilities]

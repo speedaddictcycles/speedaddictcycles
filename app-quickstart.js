@@ -291,7 +291,7 @@ document.write = function(v){
 
 		showProd : 	{
 			onSuccess : function(tagObj)	{
-//				dump("BEGIN quickstart.callbacks.showProd");
+				dump("BEGIN quickstart.callbacks.showProd");
 //				dump(tagObj);
 				var tmp = _app.data[tagObj.datapointer];
 				var pid = _app.data[tagObj.datapointer].pid;
@@ -304,6 +304,7 @@ document.write = function(v){
 				tagObj.jqObj.tlc({'verb':'translate','dataset':tmp});
 				tagObj.pid = pid;
 				//build queries will validate the namespaces used AND also fetch the parent product if this item is a child.
+				dump(tagObj);
 				_app.ext.quickstart.u.buildQueriesFromTemplate(tagObj);
 				_app.model.dispatchThis();
 				
@@ -366,6 +367,7 @@ document.write = function(v){
 		showPageContent : {
 			onSuccess : function(tagObj)	{
 				dump(" BEGIN quickstart.callbacks.onSuccess.showPageContent");
+				dump(tagObj);
 //when translating a template, only 1 dataset can be passed in, so detail and page are merged and passed in together.
 
 //cat page handling.
@@ -419,6 +421,7 @@ document.write = function(v){
 				tagObj.state = 'complete'; //needed for handleTemplateEvents.
 
 				_app.renderFunctions.handleTemplateEvents((tagObj.jqObj || $(_app.u.jqSelector('#',tagObj.parentID))),tagObj);
+				dump("finish showPageContent");
 				},
 			onError : function(responseData,uuid)	{
 				$('#mainContentArea').removeClass('loadingBG')
@@ -940,7 +943,7 @@ fallback is to just output the value.
 // -> unshift is used in the case of 'recent' so that the 0 spot always holds the most recent and also so the length can be maintained (kept to a reasonable #).
 // infoObj.back can be set to 0 to skip a URI update (will skip both hash state and popstate.) 
 			showContent : function(pageType,infoObj)	{
-//				dump("BEGIN showContent ["+pageType+"]."); dump(infoObj);
+				dump("BEGIN showContent ["+pageType+"]."); dump(infoObj);
 				infoObj = infoObj || {}; //could be empty for a cart or checkout
 /*
 what is returned. is set to true if pop/pushState NOT supported. 
@@ -1541,7 +1544,7 @@ $target.tlc({
 					}
 				
 				if(typeof infoObj != 'object')	{infoObj = {}}
-				infoObj = this.detectRelevantInfoToPage(window.location.href); 
+				//infoObj = this.detectRelevantInfoToPage(window.location.href); 
 				infoObj.back = 0; //skip adding a pushState on initial page load.
 //getParams wants string to start w/ ? but doesn't need/want all the domain url crap.
 				infoObj.uriParams = {};
@@ -1573,8 +1576,17 @@ $target.tlc({
 
 //				dump(" -> infoObj follows:");
 //				dump(infoObj);
-				_app.ext.quickstart.a.showContent('',infoObj);
-				return infoObj //returning this saves some additional looking up in the appInit
+				//_app.ext.quickstart.a.showContent('',infoObj);
+				dump("handleAppInit Routing");
+				var routeObj = _app.router._getRouteObj(window.location.hash.substr(2),'hash');
+				if(routeObj){
+					routeObj.params = $.extend({}, infoObj, routeObj.params);
+					_app.router._executeCallback(routeObj);
+					return routeObj.params //returning this saves some additional looking up in the appInit
+				} else {
+					return infoObj;
+				}
+				
 				},
 
 
@@ -2224,6 +2236,7 @@ effects the display of the nav buttons only. should be run just after the handle
 
 //rather than having all the params in the dom, just call this function. makes updating easier too.
 			showProd : function(infoObj)	{
+				dump(infoObj);
 				var pid = infoObj.pid
 				var parentID = null; //what is returned. will be set to parent id if a pid is defined.
 //				dump("BEGIN quickstart.u.showProd ["+pid+"]");
@@ -2848,13 +2861,14 @@ buyer to 'take with them' as they move between  pages.
 					infoObj.state = 'init';
 					var parentID = infoObj.parentID || infoObj.templateID+'_'+_app.u.makeSafeHTMLId(catSafeID);
 					var $parent = $(_app.u.jqSelector('#',parentID));
-					
-					dump(" -> $parent.length: "+$parent.length);
-					
 					infoObj.parentID = parentID;
-					_app.renderFunctions.handleTemplateEvents($parent,infoObj);
+					
+					
+					
+					
 //only have to create the template instance once. showContent takes care of making it visible again. but the onComplete are handled in the callback, so they get executed here.
 					if($parent.length > 0){
+						_app.renderFunctions.handleTemplateEvents($parent,infoObj);
 //set datapointer OR it won't be present on an oncomplete for a page already rendered.
 						infoObj.datapointer = infoObj.datapointer || "appNavcatDetail|"+catSafeID; 
 //						dump(" -> "+parentID+" already exists. Use it");
@@ -2862,8 +2876,11 @@ buyer to 'take with them' as they move between  pages.
 						_app.renderFunctions.handleTemplateEvents($parent,infoObj);
 						}
 					else	{
+						$parent = _app.templates[infoObj.templateID].clone(true);
+						$parent.attr('id', parentID);
+						$parent.attr('data-catsafeid', catSafeID);
+						_app.renderFunctions.handleTemplateEvents($parent,infoObj);
 //						var $content = _app.renderFunctions.createTemplateInstance(infoObj.templateID,{"id":parentID,"catsafeid":catSafeID});
-						$parent = $("<div>",{id:parentID,"data-catsafeid":catSafeID}).tlc({templateid:infoObj.templateID,'verb':'template'});
 //if dialog is set, we've entered this function through showPageInDialog.
 //content gets added immediately to the dialog.
 //otherwise, content is added to mainContentArea and hidden so that it can be displayed with a transition.
@@ -2906,9 +2923,11 @@ tagObj.lists = new Array(); // all the list id's needed.
 var bindArr = new tlc().getBinds(tagObj.templateID);
 
 if(tagObj.pid)	{
+	dump('product in buildQueriesFromTemplate');
 	if($.inArray('%ATTRIBS.zoovy:grp_children',bindArr) >= 0 && _app.u.thisNestedExists("data.appProductGet|"+tagObj.pid+".%attribs",_app) && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_type'] == 'CHILD' && _app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent'])	{
-		numRequests += _app.calls.appProductGet.init({'pid':_app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'mutable');
+		numRequests += _app.calls.appProductGet.init({'pid':_app.data['appProductGet|'+tagObj.pid]['%attribs']['zoovy:grp_parent']},{},'immutable');
 		}
+	dump(numRequests);
 	}
 else if(tagObj.navcat)	{
 	_app.model.fetchData('appPageGet|'+tagObj.navcat); //move data from local storage to memory, if present.
@@ -2959,6 +2978,8 @@ else if(tagObj.navcat)	{
 		numRequests += _app.ext.store_navcats.calls.appPageGet.init({'PATH':tagObj.navcat,'@get':pageAttributes});
 		}
 
+	}
+
 	if(numRequests > 0)	{
 		delete tagObj.datapointer; //delete datapointer or ping will save over it.
 		_app.calls.ping.init(tagObj);
@@ -2968,9 +2989,6 @@ else if(tagObj.navcat)	{
 		}		
 
 	return numRequests;
-
-	}
-
 
 				}, //buildQueriesFromTemplate
 

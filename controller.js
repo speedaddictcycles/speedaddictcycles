@@ -2853,6 +2853,8 @@ return $r;
 
 //infoObj.state = onCompletes or onInits. later, more states may be supported.
 			handleTemplateEvents : function($ele,infoObj)	{
+				dump('handling template events');
+				dump(infoObj.pageType+"."+infoObj.state);
 				infoObj = infoObj || {};
 				if($ele instanceof jQuery && infoObj.state)	{
 					if($.inArray(infoObj.state,['init','complete','depart']) >= 0)	{

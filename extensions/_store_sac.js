@@ -50,7 +50,9 @@ var store_sac = function(_app) {
 			
 		attachEventHandlers : {
 			onSuccess : function(){
+				dump('attaching custom handlers');
 				_app.templates.homepageTemplate.on('complete.sac',function(event, $context, infoObj){
+					dump('homepageComplete');
 					_app.ext.store_sac.u.startHomepageSlideshow();
 					
 					var $carousel = $('[data-sac=carousel]',$context);
@@ -92,26 +94,28 @@ var store_sac = function(_app) {
 
 		a : {
 			showYoutubeVideo : function(videoid, title){
-				var $modal = $('<div id="ytModal"><div class="overlay"></div></div>');
-				var $ytContainer = $('<div class="ytContainer"></div>');
-				var $btn = $('<button></button>');
-				$btn.button({
-					icons : {"primary" : "ui-icon-closethick"},
-					text : false
-					});
-				$btn.on('click', function(){$modal.empty().remove();})
-				$ytContainer.append($btn);
-				$ytContainer.append("<iframe style='z-index:1;' src='https://www.youtube.com/embed/"+videoid+"?autoplay=1&wmode=transparent' frameborder='0' allowfullscreen></iframe>");
-				$modal.append($ytContainer);
-				
-				$('body').append($modal);
+				if(videoid){
+					var $modal = $('<div id="ytModal"><div class="overlay"></div></div>');
+					var $ytContainer = $('<div class="ytContainer"></div>');
+					var $btn = $('<button></button>');
+					$btn.button({
+						icons : {"primary" : "ui-icon-closethick"},
+						text : false
+						});
+					$btn.on('click', function(){$modal.empty().remove();})
+					$ytContainer.append($btn);
+					$ytContainer.append("<iframe style='z-index:1;' src='https://www.youtube.com/embed/"+videoid+"?autoplay=1&wmode=transparent' frameborder='0' allowfullscreen></iframe>");
+					$modal.append($ytContainer);
+					
+					$('body').append($modal);
+					}
 				}
 			}, //Actions
 
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		renderFormats : {
-			filterCheckboxList : function($tag,data){
+			filtercheckboxlist : function($tag,data){
 				var options = false;
 				if(data.bindData.index){
 					options = data.value[data.bindData.index];
@@ -132,27 +136,18 @@ var store_sac = function(_app) {
 					$tag.remove();
 					}
 				},
-			assignData : function($tag, data){
+			assigndata : function($tag, data){
 				$tag.data(data.bindData.attribute, data.value);
 				//_app.u.dump($tag.data(data.bindData.attribute));
 				},
-			showIfShipFree : function($tag, data){
+			showifshipfree : function($tag, data){
 				if($.inArray("IS_SHIPFREE", data.value) >= 0){
 					$tag.show();
 					}
 				},
-			youtubeModalLink : function($tag, data){
-				_app.u.dump(data.value);
-				if(data.value['%attribs']['youtube:videoid']){
-					$tag.show();
-					$tag.on('click',function(){
-						_app.ext.store_sac.a.showYoutubeVideo(data.value['%attribs']['youtube:videoid'], data.value['%attribs']['zoovy:prod_name']);
-						return false;
-						});
-					}
-				},
 			prodchildoption: function($tag, data){
 				$tag.val(data.value.pid);
+				dump(data.value);
 				if(data.value['%attribs']['amz:grp_varvalue']){
 					$tag.text(data.value['%attribs']['amz:grp_varvalue']);
 					}
@@ -160,13 +155,12 @@ var store_sac = function(_app) {
 					$tag.text(data.value['%attribs']['zoovy:prod_name']);
 					}
 				},
-			imajize360 : function($tag, data){
+			imajize : function($tag, data){
 				var src = "http://embed.imajize.com/"+data.value;
 				$tag.attr('src',src);
 				},
-			imageSrcset : function($tag, data){
-				//_app.u.dump(data.bindData.dims);
-				//_app.u.dump(data.bindData.dims.split(" "));
+			imagesrcset : function($tag, data){
+				//dump(data);
 				var dims = data.bindData.dims.split(" ");
 				var srcset = "";
 				for(var i = 0; i < dims.length; i++){
@@ -182,6 +176,7 @@ var store_sac = function(_app) {
 						"h" : h,
 						"b" : data.bindData.bgColor || "ffffff"
 						}));
+					//dump(src);
 					if(i==0){
 						$tag.attr('src',src);
 						}
@@ -190,6 +185,7 @@ var store_sac = function(_app) {
 						srcset += " "+param+",";
 						}
 					}
+				dump(srcset);
 				$tag.attr('srcset', srcset);
 				}
 			}, //renderFormats
@@ -353,17 +349,19 @@ var store_sac = function(_app) {
 				}, 750);
 				
 				$fc.data('filter-list-clear-timer', timer);
-				},
-			addItemToCart : function($form,obj){
+				}
+			}, //u [utilities]
+
+		e : {
+			productAdd2Cart : function($form, p){
+				p.preventDefault();
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
 					if($childSelect.val()){
-						_app.calls.cartItemAppend.init({"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()},{},'immutable');
+						_app.ext.cco.calls.cartItemAppend.init({"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()},{},'immutable');
 						_app.model.destroy('cartDetail');
 						_app.calls.cartDetail.init({'callback':function(rd){
-							if(obj.action === "modal"){
-								showContent('cart',obj);
-								}
+							showContent('cart',{'show':$form.data('show')});
 							}},'immutable');
 						_app.model.dispatchThis('immutable');
 						}
@@ -372,12 +370,9 @@ var store_sac = function(_app) {
 						}
 					}
 				else {
-					_app.ext.myRIA.u.addItemToCart($form, obj);
+					_app.ext.quickstart.e.productAdd2Cart($form, p);
 					}
 				}
-			}, //u [utilities]
-
-		e : {
 			}, //e [app Events]
 			
 		// A map of navcats to objects containing their base filters and available filters for filtered search.  

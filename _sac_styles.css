@@ -58,7 +58,7 @@ body {
 	background: white;
 }
 
-#header {position:relative; z-index:1000;}
+#header {position:relative; z-index:100;}
 #header .tread {
 	position: absolute;
 	z-index: 1;

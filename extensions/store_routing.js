@@ -46,32 +46,21 @@ var store_routing = function(_app) {
 				_app.router.addAlias('homepage', 	function(routeObj){showContent('homepage',	routeObj.params);});
 				_app.router.addAlias('category', 	function(routeObj){showContent('category',	routeObj.params);});
 				_app.router.addAlias('product', 	function(routeObj){showContent('product',	routeObj.params);});
-				_app.router.addAlias('company', 	function(routeObj){showContent('company',	routeObj.params);});
+				_app.router.addAlias('company', 	function(routeObj){dump('company'); showContent('company',	routeObj.params);});
 				_app.router.addAlias('customer', 	function(routeObj){showContent('customer',	routeObj.params);});
 				_app.router.addAlias('checkout', 	function(routeObj){showContent('checkout',	routeObj.params);});
 				_app.router.addAlias('cart', 		function(routeObj){showContent('cart',		routeObj.params);});
 				_app.router.addAlias('search', 		function(routeObj){showContent('search',	routeObj.params);});
 				
 				_app.router.appendHash({'type':'exact','route':'/','callback':'homepage'});
-				_app.router.appendInit({'type':'exact','route':'/','callback':'homepage'});
 				_app.router.appendHash({'type':'exact','route':'','callback':'homepage'});
-				_app.router.appendInit({'type':'exact','route':'','callback':'homepage'});
 				_app.router.appendHash({'type':'match','route':'/category/{{navcat}}/*','callback':'category'});
-				_app.router.appendInit({'type':'match','route':'/category/{{navcat}}/*','callback':'category'});
 				_app.router.appendHash({'type':'match','route':'/product/{{pid}}/*','callback':'product'});
-				_app.router.appendInit({'type':'match','route':'/product/{{pid}}/*','callback':'product'});
 				_app.router.appendHash({'type':'match','route':'/company/{{show}}/','callback':'company'});
-				_app.router.appendInit({'type':'match','route':'/company/{{show}}/','callback':'company'});
 				_app.router.appendHash({'type':'match','route':'/customer/{{show}}/','callback':'customer'});
-				_app.router.appendInit({'type':'match','route':'/customer/{{show}}/','callback':'customer'});
 				_app.router.appendHash({'type':'exact','route':'/checkout/','callback':'checkout'});
-				_app.router.appendInit({'type':'exact','route':'/checkout/','callback':'checkout'});
 				_app.router.appendHash({'type':'exact','route':'/cart/','callback':'cart'});
-				_app.router.appendInit({'type':'exact','route':'/cart/','callback':'cart'});
 				_app.router.appendHash({'type':'match','route':'/search/{{KEYWORDS}}/','callback':'search'});
-				_app.router.appendInit({'type':'match','route':'/search/{{KEYWORDS}}/','callback':'search'});
-				
-				//_app.router.init();
 				
 				r = true;
 
@@ -80,6 +69,55 @@ var store_routing = function(_app) {
 			onError : function()	{
 				_app.u.dump('BEGIN store_routing.callbacks.init.onError');
 				}
+			},
+		attachEventHandlers : {
+			onSuccess : function(){
+				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/");});
+				
+				_app.templates.categoryTemplate.on('complete.routing', function(event, $context, infoObj){
+					var hash = "";
+					var $routeEle = $('[data-routing-hash]',$context)
+					if($routeEle.length){
+						hash = $routeEle.attr('data-routing-hash');
+						}
+					else {
+						hash = "#!/category/"+infoObj.navcat+"/";
+					}
+					_app.ext.store_routing.u.setHash(hash);
+					});
+					
+				_app.templates.categoryTemplateFilteredSearch.on('complete.routing', function(event, $context, infoObj){
+					var hash = "";
+					var $routeEle = $('[data-routing-hash]',$context)
+					if($routeEle.length){
+						hash = $routeEle.attr('data-routing-hash');
+						}
+					else {
+						hash = "#!/category/"+infoObj.navcat+"/";
+					}
+					_app.ext.store_routing.u.setHash(hash);
+					});
+					
+				_app.templates.productTemplate.on('complete.routing', function(event, $context, infoObj){
+					var hash = "";
+					var $routeEle = $('[data-routing-hash]',$context)
+					if($routeEle.length){
+						hash = $routeEle.attr('data-routing-hash');
+						}
+					else {
+						hash = "#!/product/"+infoObj.pid+"/";
+					}
+					dump(hash);
+					_app.ext.store_routing.u.setHash(hash);
+					});
+				
+				_app.templates.companyTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/company/"+infoObj.show+"/");});
+				_app.templates.customerTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/customer/"+infoObj.show+"/");});
+				_app.templates.searchTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/search/"+encodeURI(infoObj.KEYWORDS)+"/");});
+				_app.templates.cartTemplate.on('complete.routing', function(event, $context, infoObj){if(infoObj.show == "inline"){_app.ext.store_routing.u.setHash("#!/cart/");}});
+				//_app.templates.checkoutTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/checkout/");});
+				},
+			onError : function(){}
 			}
 		}, //callbacks
 
@@ -98,10 +136,23 @@ var store_routing = function(_app) {
 				var args = thisTLC.args2obj(data.command.args, data.globals);
 				if(args.pid && args.seo){
 					data.globals.binds[data.globals.focusBind] =  _app.ext.store_routing.u.productLink(args.pid, args.seo);
+					dump(data.globals.binds[data.globals.focusBind]);
 					return true;
 					} 
 				else {
 					dump('-> store_routing productlink tlcformat: The PID or SEO content was not provided in the tlc.');
+					//stop execution of the commands.  throw a tantrum.
+					return false;
+					}
+				},
+			categorylink : function(data,thisTLC){
+				var args = thisTLC.args2obj(data.command.args, data.globals);
+				if(args.navcat && args.seo){
+					data.globals.binds[data.globals.focusBind] =  _app.ext.store_routing.u.categoryLink(args.navcat, args.seo);
+					return true;
+					} 
+				else {
+					dump('-> store_routing categorylink tlcformat: The navcat or SEO content was not provided in the tlc.');
 					//stop execution of the commands.  throw a tantrum.
 					return false;
 					}
@@ -111,12 +162,17 @@ var store_routing = function(_app) {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
+			setHash : function(hash){
+				window.location.href = window.location.href.split("#")[0]+hash;
+				},
 			productLink : function(pid, seo){
-				var href="#!/product/"+pid+"/"+(seo ? encodeURI(seo) :"");
+				seo = seo || "";
+				var href="#!/product/"+pid+"/"+encodeURI(seo);
 				return href;
 				},
 			categoryLink : function(navcat, seo){
-				var href="#!/category/"+navcat+"/"+(seo ? encodeURI(seo) : "");
+				seo = seo || "";
+				var href="#!/category/"+navcat+"/"+encodeURI(seo);
 				return href;
 				}
 			}, //u [utilities]
