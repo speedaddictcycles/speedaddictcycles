@@ -131,35 +131,35 @@ $(document).ready(function(){
 <div id='appView' class='displayNone'>
 	
 	<div id="freeship" class="alignCenter">
-		<a href="#!/company?show=shipping" data-onClick="appLink" class="freeBanner"></a>
+		<a href="#!/company/shipping/" class="freeBanner"></a>
 	</div>
 	
 	<div id="header">
 		<div class="tread"></div>
 		
 		<div class="logoContainer headerGradientBG alignCenter headerMarginRight floatLeft">
-			<a href="#!/homepage" data-onClick="appLink" class="logoLink"></a>
+			<a href="#!/" class="logoLink"></a>
 		</div>
 		
 			<div id="headerBanners" class="floatLeft displayNone_320">
 				<div id="questions" class="headerGradientBG headerMarginRight floatLeft displayNone_480">
-					<a data-onClick="appLink" href="#!/company?show=contact">
+					<a href="#!/company/contact/">
 						<img src="images/questions.png" />
 					</a>
 				</div>
 				<div id="return90days" class="headerGradientBG headerMarginRight floatLeft displayNone_640 displayNone_480">
-					<a data-onClick="appLink" href="#!/company?show=return">
+					<a href="#!/company/return/">
 						<img src="images/90days_120x41.png" />
 					</a>
 				</div>
 				<div id="freeExchange" class="headerGradientBG headerMarginRight floatLeft displayNone_640 displayNone_480">
-					<a data-onClick="appLink" href="#!/company?show=return">
+					<a href="#!/company/return/">
 						<img src="images/freeExchange_73x38.png" />
 					</a>
 				</div>
 				<div id="returnExchangeCombo" class="headerMarginRight floatLeft displayNone_960 displayNone_768 ">
 					<div id="returnInCombo" class="highlightBG">
-						<a data-onClick="appLink" href="#!/company?show=return">
+						<a href="#!/company/return/">
 							<img src="images/90days_133x22.png"/>
 						</a>
 					</div>
@@ -187,13 +187,13 @@ $(document).ready(function(){
 					</a>
 				</div>
 				<div id="minicartSmall" class="headerGradientBG floatLeft">
-					<a data-onClick="appLink" href="#!/cart">
+					<a href="#!/cart/">
 						<img src="images/cart_96x38.png" />
 					</a>
 				</div>
 			</div>
 			<div id="questionsBar" class="alignCenter displayNone_960 displayNone_768 displayNone_640 displayNone_320">
-				<a data-onClick="appLink" href="#!/company?show=contact">
+				<a href="#!/company/contact/">
 					<img src="images/questions_bar_434x13.png" />
 				</a>
 			</div>
@@ -204,7 +204,7 @@ $(document).ready(function(){
 			</div>
 		<div id="nav" class="clear sourceSans">
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderRight_320 navOptionBorderBottom_320">
-				<a class="navLink" href="#!/category?navcat=.motorcycle-helmets" data-onClick="appLink" >HELMETS</a>
+				<a class="navLink" href="#!/category/.motorcycle-helmets/" data-onClick="appLink" >HELMETS</a>
 				<div data-sac="dropdownContent" class="dropdownContent helmets">
 					<div class="dropdownList floatLeft">
 						<a href="#!/category?navcat=.motorcycle-helmets.full-face" data-onClick="appLink" class="block clear">
@@ -690,7 +690,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 
 </div>
 
-<div id="categoryTemplateFilteredSearch" class="loadingBG categoryTemplateFilteredSearch">
+<div id="categoryTemplateFilteredSearch" class="categoryTemplateFilteredSearch">
 	<span class="displayNone" data-tlc="bind $navcat '.navcat'; bind $seo '.pretty'; bind $hash ''; store_routing#categorylink --navcat=$navcat --seo=$seo; apply --attrib='data-routing-hash';"></span>
 	
 	<ul data-tlc="bind $var '.path'; store_navcats#breadcrumb  --templateid='breadcrumbTemplate'  --legacy;" class="breadcrumb clearfix noPadOrMargin fluidList"></ul>
@@ -698,128 +698,128 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<ul data-sac="output" class='listStyleNone fluidList noPadOrMargin productList'></ul>
 </div>
 
-<form id="filterListTemplate">
-	<input type="hidden" data-sac="filterBase" data-bind="var:filter(base); format:assignData; extension:store_sac; attribute:filter-base;"></input>
+<form id="filterListTemplate" onSubmit="return false;">
+	<input data-tlc="bind $var '.base'; store_sac#assigndata  --attribute='filter-base' --legacy;" data-sac="filterBase" type="hidden">
 	
 	<!-- Has Video and Has 360 filters are shown on all filter lists- no need for data-binds -->
 	<div class="marginBottom">
 		<h5 class="highlightText">
-			<input type="checkbox" name="videoid" data-filter-index="videoid" data-filter-type="hasAttribute"/> Has Video
+			<input name="videoid" data-filter-index="videoid" data-filter-type="hasAttribute" type="checkbox"> Has Video
 		</h5>
 	</div>
 	<div class="marginBottom">
 		<h5 class="highlightText">
-			<input type="checkbox" name="prod_360_viewer_id" data-filter-index="prod_360_viewer_id" data-filter-type="hasAttribute"/> Has 360 View
+			<input name="prod_360_viewer_id" data-filter-index="prod_360_viewer_id" data-filter-type="hasAttribute" type="checkbox"> Has 360 View
 		</h5>
 	</div>
 	
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.app_brand); format:showIfSet;">Brand:</h5>
-		<div data-bind="var:filter(options); index:app_brand; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.app_brand'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Brand:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='app_brand' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.helmet_type); format:showIfSet;">Helmet Type:</h5>
-		<div data-bind="var:filter(options); index:helmet_type; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.helmet_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Helmet Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='helmet_type' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.part_type); format:showIfSet;">Part Type:</h5>
-		<div data-bind="var:filter(options); index:part_type; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.part_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_type' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.part_helper); format:showIfSet;">Part Type:</h5>
-		<div data-bind="var:filter(options); index:part_helper; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.part_helper'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_helper' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.part_sub_type); format:showIfSet;">Part Type:</h5>
-		<div data-bind="var:filter(options); index:part_sub_type; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.part_sub_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_sub_type' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.progressive_model); format:showIfSet;">Progressive Model:</h5>
-		<div data-bind="var:filter(options); index:progressive_model; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.progressive_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Progressive Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='progressive_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.make_key); format:showIfSet;">Fits:</h5>
-		<div data-bind="var:filter(options); index:make_key; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.make_key'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Fits:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='make_key' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.apparel_accessories); format:showIfSet;">Apparel or Accessory Type:</h5>
-		<div data-bind="var:filter(options); index:apparel_accessories;	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.apparel_accessories'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Apparel or Accessory Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='apparel_accessories' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.suomy_model); format:showIfSet;">Suomy Model:</h5>
-		<div data-bind="var:filter(options); index:suomy_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.suomy_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Suomy Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='suomy_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.sas_model); format:showIfSet;">SS Model:</h5>
-		<div data-bind="var:filter(options); index:sas_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.sas_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">SS Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='sas_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.arai_model); format:showIfSet;">Arai Model:</h5>
-		<div data-bind="var:filter(options); index:arai_model; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.arai_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Arai Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='arai_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.shoei_model); format:showIfSet;">Shoei Model:</h5>
-		<div data-bind="var:filter(options); index:shoei_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.shoei_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Shoei Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='shoei_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.hjc_model); format:showIfSet;">HJC Model:</h5>
-		<div data-bind="var:filter(options); index:hjc_model; 			format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.hjc_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">HJC Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='hjc_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_kit_gearing); format:showIfSet;">Chain Kit Gearing:</h5>
-		<div data-bind="var:filter(options); index:chain_kit_gearing; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.chain_kit_gearing'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Kit Gearing:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_kit_gearing' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_pitch); format:showIfSet;">Chain Pitch:</h5>
-		<div data-bind="var:filter(options); index:chain_pitch; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.chain_pitch'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Pitch:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_pitch' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_type); format:showIfSet;">Chain Type:</h5>
-		<div data-bind="var:filter(options); index:chain_type; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.chain_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_type' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_links); format:showIfSet;">Chain Links:</h5>
-		<div data-bind="var:filter(options); index:chain_links; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.chain_links'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Links:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_links' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.chain_color); format:showIfSet;">Chain Color:</h5>
-		<div data-bind="var:filter(options); index:chain_color; 	format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.chain_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Color:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_color' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.burly_model); format:showIfSet;">Burly Model:</h5>
-		<div data-bind="var:filter(options); index:burly_model; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.burly_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Burly Model:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='burly_model' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.glove_style); format:showIfSet;">Glove Style:</h5>
-		<div data-bind="var:filter(options); index:glove_style; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.glove_style'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Glove Style:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='glove_style' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.riding_style); format:showIfSet;">Riding Style:</h5>
-		<div data-bind="var:filter(options); index:riding_style; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.riding_style'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Riding Style:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='riding_style' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.primary_color); format:showIfSet;">Color:</h5>
-		<div data-bind="var:filter(options); index:primary_color; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.primary_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Color:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='primary_color' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.accent_color); format:showIfSet;">Accent Color:</h5>
-		<div data-bind="var:filter(options); index:accent_color; 		format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.accent_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Accent Color:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='accent_color' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.finish); format:showIfSet;">Finish:</h5>
-		<div data-bind="var:filter(options); index:finish; 				format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.finish'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Finish:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='finish' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.measures); format:showIfSet;">Shock Length:</h5>
-		<div data-bind="var:filter(options); index:measures; 				format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.measures'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Shock Length:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='measures' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.luggage_type); format:showIfSet;">Luggage Type:</h5>
-		<div data-bind="var:filter(options); index:luggage_type; 				format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.luggage_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Luggage Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='luggage_type' --legacy;"></div>
 	</div>
 	<div class="marginBottom">
-		<h5 class="displayNone highlightText" data-bind="var:filter(options.lock_type); format:showIfSet;">Luggage Type:</h5>
-		<div data-bind="var:filter(options); index:lock_type; 				format:filterCheckboxList; extension:store_sac;"></div>
+		<h5 data-tlc="bind $var '.options.lock_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Luggage Type:</h5>
+		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='lock_type' --legacy;"></div>
 	</div>
 	
 	
@@ -828,7 +828,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<select data-bind="var:filter(options); index:primary_color; format:filterSelect; extension:store_sac;"></select>
 	<select data-bind="var:filter(options); index:accent_color; format:filterSelect; extension:store_sac;"></select>
 	-->
-	<button onClick="app.ext.store_sac.u.sendFilteredSearch(); return false;">Go!</button>
+	<button onclick="myApp.ext.store_sac.u.sendFilteredSearch(); return false;">Go!</button>
 </form>
 
 <select>
@@ -997,7 +997,7 @@ the loadingBG class is removed (must be that classname) when the template is tra
 remember to NOT put the button inside the 'onclick' container or two events will occur onclick.
 
 SANITY -> if you change the height and width of this image, change the .minimalMode .searchResultsProduct in qs_styles.css to match
--->
+
 <li id='productListTemplateResults' class='loadingBG searchResultsProduct ' >
 	
 	<div data-bind="var:product(pid); format:assignAttribute; attribute:data-pid;">
@@ -1017,6 +1017,31 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 	<img class="tag freeshipTag displayNone"  src="images/shipfree.jpg"data-bind="var:product(tags); format:showIfShipFree; extension:store_sac;"/>
 	<img class="tag imajizeTag displayNone" src="images/360tag.png" data-bind="var:product(prod_360_viewer_id); format:showIfSet;"/>
 	<img class="tag videoTag displayNone" src="images/videotag.png"  data-bind="var:product(videoid); format:showIfSet;"/>
+</li>
+
+-->
+<li id="productListTemplateResults" class="loadingBG searchResultsProduct ">
+	
+	<div data-tlc="bind $var '.pid'; apply --attrib='data-pid'; ">
+		<div data-tlc="bind $var '.prod_name'; apply --attrib='data-pid'; " onclick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" class="pointer">
+			<div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --hide; }}; if (is $var --notblank;) {{apply --append;}};" class="prodThumbContainer">
+				<!--
+				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ apply --img --media=$var --width=232 --height=232 --bgcolor='#ffffff';}};" src="blank.gif" class="prodThumb">
+				-->
+				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ store_sac#imageurl --name=$var --w=232 --h=232 --b='ffffff'; apply --attrib='src';}};" src="blank.gif" class="prodThumb">
+			</div>
+			<div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
+				<iframe data-tlc="bind $var '.prod_360_viewer_id'; store_sac#imajize  --legacy;" class="prodThumb"></iframe>
+			</div>
+			<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{format --truncate='54'; apply --append;}};" class="name"></h5>
+
+			<h4 data-tlc="bind $var '.base_price'; if (is $var --notblank;) {{math --div='100'; format --currency='USD'; apply --append;}};" class="price"></h4>
+			
+		</div>
+	</div>
+	<img data-tlc="bind $var '.tags'; store_sac#showifshipfree  --legacy;" class="tag freeshipTag displayNone" src="images/shipfree.jpg">
+	<img data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="tag imajizeTag displayNone" src="images/360tag.png">
+	<img data-tlc="bind $var '.videoid'; if(is $var --notblank;) {{ apply --show; }}; " class="tag videoTag displayNone" src="images/videotag.png">
 </li>
 
 <li id="productListTemplateResultsNoPreview" class="loadingBG searchResultsProduct ">

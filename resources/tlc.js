@@ -257,8 +257,9 @@ var tlc = function()	{
 	//In an admin session, the config.js isn't loaded. The secure domain is set as a global var when a domain is selected or can be retrieved from adminDomainList
 	//In an admin session, the config.js isn't loaded. The secure domain is set as a global var when a domain is selected or can be retrieved from adminDomainList
 			if($._app.u.thisIsAnAdminSession())	{
-				if(location.protocol === 'file:')	{
-					url = 'http:\/\/'+(_app.vars.domain);
+				//this is for quickstart local testing.
+				if(location.protocol === 'file:' && $._app.vars.domain)	{
+					url = 'http:\/\/'+($._app.vars.domain);
 					}
 				else	{
 					url = 'https:\/\/'+($._app.vars['media-host'] || $._app.data['adminDomainList']['media-host']);
@@ -380,7 +381,7 @@ This one block should get called for both img and imageurl but obviously, imageu
 
 	this.handle_apply_verb = function(verb,$tag,argObj,globals){
 		switch(verb)	{
-//new Array('empty','hide','show','add','remove','prepend','append','replace','input-value','select','state','attrib'),
+//new Array('empty','hide','show','add','remove','prepend','append','replace','inputvalue','select','state','attrib'),
 			case 'empty': $tag.empty(); break;
 			case 'hide': $tag.hide(); break;
 			case 'show': $tag.show(); break;
@@ -405,7 +406,7 @@ This one block should get called for both img and imageurl but obviously, imageu
 			case 'prepend': $tag.prepend(globals.binds[globals.focusBind]); break;
 			case 'append': $tag.append(globals.binds[globals.focusBind]); break;
 			case 'replace': $tag.replaceWith(globals.binds[globals.focusBind]); break;
-			case 'input-value':
+			case 'inputvalue':
 				$tag.val(globals.binds[globals.focusBind]);
 				break;
 			case 'select' :
@@ -466,6 +467,7 @@ This one block should get called for both img and imageurl but obviously, imageu
 			case "notblank":
 				if(p1 == false || p1 == 'undefined' || p1 == null){r = false;}
 				else	{r = true;}
+//				dump(" -> p1: "+p1+' and r: '+r);
 				break;
 			case "null":
 				if(p1 == null){r = true;}; break;
@@ -547,7 +549,11 @@ This one block should get called for both img and imageurl but obviously, imageu
 		var r = true; //what is returned. if false is returned, the rest of the statement is NOT executed.
 // ### FUTURE -> once renderFormats are no longer supported, won't need argObj or the 'if' for legacy (tho it could be left to throw a warning)
 		if(argObj.legacy)	{
-			if($._app.ext[cmd.module] && $._app.ext[cmd.module].renderFormats && typeof $._app.ext[cmd.module].renderFormats[cmd.name] == 'function')	{
+			if(cmd.module == 'controller' && typeof $._app.renderFormats[cmd.name] == 'function')	{
+				$._app.renderFormats[cmd.name](globals.tags[globals.focusTag],{'value': (globals.focusBind ? globals.binds[globals.focusBind] : dataset),'bindData':argObj});
+				r = false; //when a renderFormat is executed, the rest of the statement is not run. renderFormats aren't designed to work with this and their predicability is unknown. so is their life expectancy.
+				}
+			else if($._app.ext[cmd.module] && $._app.ext[cmd.module].renderFormats && typeof $._app.ext[cmd.module].renderFormats[cmd.name] == 'function')	{
 				$._app.ext[cmd.module].renderFormats[cmd.name](globals.tags[globals.focusTag],{'value': (globals.focusBind ? globals.binds[globals.focusBind] : dataset),'bindData':argObj})
 				r = false; //when a renderFormat is executed, the rest of the statement is not run. renderFormats aren't designed to work with this and their predicability is unknown. so is their life expectancy.
 				}
@@ -710,7 +716,7 @@ returning a 'false' here will exit the statement loop.
 		var r = true;
 		if(cmd.module == 'core')	{
 			var
-				verbs = new Array('empty','hide','show','add','remove','prepend','append','replace','input-value','select','state','attrib'),
+				verbs = new Array('empty','hide','show','add','remove','prepend','append','replace','inputvalue','select','state','attrib'),
 				formatters = new Array('img','imageurl','text','html'),
 				argObj = this.args2obj(cmd.args,globals), //an object is used to easily check if specific apply commands are present
 				$tag = globals.tags[(argObj.tag || globals.focusTag)],
@@ -894,7 +900,9 @@ returning a 'false' here will exit the statement loop.
 			if(commands[i].type == 'command')	{
 				if(this.handleType_command(commands[i],theseGlobals,dataset))	{} //continue
 				else	{
-					dump(" -> early exit of statement loop caused on cmd: "+commands[i].name+" (normal if this was legacy/renderFormat)");
+					if($._app.vars.debug == 'tlc')	{
+						dump(" -> early exit of statement loop caused on cmd: "+commands[i].name+" (normal if this was legacy/renderFormat)");
+						}
 					//handleCommand returned a false. That means either an error occured OR this executed a renderFormat. stop processing.
 					break;
 					}

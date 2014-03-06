@@ -72,7 +72,7 @@ var store_routing = function(_app) {
 			},
 		attachEventHandlers : {
 			onSuccess : function(){
-				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/");});
+				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){location.replace("#!/");});
 				
 				_app.templates.categoryTemplate.on('complete.routing', function(event, $context, infoObj){
 					var hash = "";

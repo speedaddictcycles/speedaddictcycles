@@ -76,7 +76,7 @@ var store_sac = function(_app) {
 					});
 				
 				_app.templates.categoryTemplateFilteredSearch.on('complete',function(event, $context, infoObj){
-					_app.ext.store_sac.u.initFilteredSearch(infoObj);
+					_app.ext.store_sac.u.initFilteredSearch($context, infoObj);
 					});
 				_app.templates.categoryTemplateFilteredSearch.on('depart',function(event, $context, infoObj){
 					_app.ext.store_sac.u.destroyFilteredSearch(infoObj);
@@ -113,7 +113,15 @@ var store_sac = function(_app) {
 			}, //Actions
 
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
+		
+		tlcFormats : {
+			imageurl : function(data,thisTLC){
+				var args = thisTLC.args2obj(data.command.args, data.globals);
+				data.globals.binds[data.globals.focusBind] = _app.u.makeImage(args);
+				return true;
+				}
+			},
+		
 		renderFormats : {
 			filtercheckboxlist : function($tag,data){
 				var options = false;
@@ -271,7 +279,7 @@ var store_sac = function(_app) {
 					}
 				return $banner;
 				},
-			initFilteredSearch : function(infoObj){
+			initFilteredSearch : function($context, infoObj){
 				var $fc = $('#filterContainer');
 				var $fl = $('#filterList', $fc);
 				var timer = $fc.data('filter-list-clear-timer');
@@ -281,11 +289,11 @@ var store_sac = function(_app) {
 					$fc.removeData('filter-list-clear-timer');
 				}
 				
-				$fl.data('jqContext',$(_app.u.jqSelector('#',infoObj.parentID)));
+				$fl.data('jqContext',$context);
 				$fl.data('navcat',infoObj.navcat);
 				$fl.data('filters',_app.ext.store_sac.filters[infoObj.navcat]);
 				
-				$fl.anycontent({'data':_app.ext.store_sac.filters[infoObj.navcat], 'templateID':'filterListTemplate'});
+				$fl.tlc({'dataset':_app.ext.store_sac.filters[infoObj.navcat], 'templateid':'filterListTemplate'});
 				$('button', $fl).button();
 				$fc.addClass('active');
 				_app.ext.store_sac.u.sendFilteredSearch();
