@@ -446,7 +446,7 @@ the object created here is passed as 'data' into the mulitpage template. that's 
 					}
 //				_app.u.dump(" -> typeof csv: "+typeof csv);
 				csv = $.grep(csv,function(n){return(n);}); //remove blanks. commonly occurs in product attributes cuz of extra comma
-				csv = $.map(csv, function(n){return(n.trim());});
+				csv = $.map(csv,function(n){return(n.trim());}); //remove blanks. commonly occurs in product attributes cuz of extra comma
 				return csv;
 				},
 
@@ -653,8 +653,9 @@ $pageTag is the jquery object of whatever was clicked. the data to be used is st
 					}
 				else	{
 //					$output = _app.renderFunctions.transmogrify({'id':'mpControl_'+plObj.parentID+'_'+location,'targetList':plObj.parentID},'mpControlSpec',plObj);
+					$output = $("<div \/>");
 					$output.tlc({
-						'templateid' : mpControlSpec,
+						'templateid' : 'mpControlSpec',
 						'dataset' : plObj,
 						'dataAttribs' : {'id':'mpControl_'+plObj.parentID+'_'+location}
 						})

@@ -45,7 +45,9 @@ var tools_lightbox = function(_app) {
 		a : {
 
 			}, //a [actions]
-		
+		tlcFormats : {
+			
+		},
 		renderFormats : {
 			
 /****************************************

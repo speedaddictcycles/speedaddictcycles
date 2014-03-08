@@ -45,7 +45,6 @@ myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/tlc.js']); //in zero pas
 myApp.rq.push(['css',1,myApp.vars.baseURL+'resources/anyplugins.css']);
 
 myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/jsonpath.0.8.0.js']); //used pretty early in process..
-myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/peg-0.8.0.js']); //in zero pass in case product page is first page.
 
 //once peg is loaded, need to retrieve the grammar file. Order is important there. This will validate the file too.
 myApp.u.loadScript(myApp.vars.baseURL+'resources/peg-0.8.0.js',function(){
@@ -55,6 +54,7 @@ myApp.u.loadScript(myApp.vars.baseURL+'resources/peg-0.8.0.js',function(){
 //Cart Messaging Responses.
 
 myApp.cmr.push(['chat.join',function(message){
+//	dump(" -> message: "); dump(message);
 	var $ui = myApp.ext.quickstart.a.showBuyerCMUI();
 	$("[data-app-role='messageInput']",$ui).show();
 	$("[data-app-role='messageHistory']",$ui).append("<p class='chat_join'>"+message.FROM+" has joined the chat.<\/p>");
@@ -109,7 +109,7 @@ myApp.u.showProgress = function(progress)	{
 
 //Any code that needs to be executed after the app init has occured can go here.
 //will pass in the page info object. (pageType, templateID, pid/navcat/show and more)
-myApp.u.appInitComplete = function(P)	{
+myApp.u.appInitComplete = function()	{
 	myApp.u.dump("Executing myAppIsLoaded code...");
 	
 	myApp.ext.order_create.checkoutCompletes.push(function(vars,$checkout){
@@ -129,3 +129,38 @@ myApp.u.appInitComplete = function(P)	{
 		else	{$('.ocmFacebookComment').hide()}
 		});
 	}
+
+
+
+
+
+//this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
+//it'll also handle the old 'meta' uri params.
+myApp.router.appendInit({
+	'type':'function',
+	'route': function(v){
+		return {'init':true} //returning anything but false triggers a match.
+		},
+	'callback':function(f,g){
+		g = g || {};
+		dump('here');
+		dump(document.location.hash);
+		if(document.location.hash)	{	
+			myApp.u.dump('triggering handleHash');
+			myApp.router.handleHashChange();
+			}
+		else	{
+			showContent('homepage');
+			}
+		if(g.uriParams && g.uriParams.meta)	{
+			myApp.ext.cco.calls.cartSet.init({'want/refer':infoObj.uriParams.meta,'cartID':_app.model.fetchCartID()},{},'passive');
+			}
+		if(g.uriParams && g.uriParams.meta_src)	{
+			myApp.ext.cco.calls.cartSet.init({'want/refer_src':infoObj.uriParams.meta_src,'cartID':_app.model.fetchCartID()},{},'passive');
+			}
+		}
+	});
+
+
+
+

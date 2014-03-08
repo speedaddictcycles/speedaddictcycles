@@ -854,7 +854,7 @@ ACHIEVEMENTS
 	<legend>General Properties</legend>
 	<label>
 		<span>Domain/Profile:</span>
-		<select name="profile" required='required' data-bind="var: rss(@DOMAINS); format:optionsFromList; text:DOMAINNAME; value:DOMAINNAME;" />
+		<select name="profile" required='required' data-bind="var: rss(@DOMAINS); format:optionsfromlist; text:DOMAINNAME; value:DOMAINNAME;" />
 			<option></option>
 		</select>
 	</label>
@@ -879,7 +879,7 @@ ACHIEVEMENTS
 	
 	<label>
 		<span>Feed Link</span>
-			<input type="text" name="LINK" value="" data-bind="var: rss(LINK); format: popVal;" readonly="readonly" />
+			<input type="text" name="LINK" value="" data-bind="var: rss(LINK); format: popVal;" readonly />
 			<span class="toolTip" title="The URL to your store, or for this promotion.">?</span>
 	</label>
 	<label>
@@ -907,7 +907,7 @@ ACHIEVEMENTS
 
 	<label>
 		<span>Source List:</span>
-		<select name="list" required='required' data-bind="var: rss(@paths); format:optionsFromList;">
+		<select name="list" required='required' data-bind="var: rss(@paths); format:optionsfromlist;">
 			<option></option>
 		</select>
 		<span class="toolTip" title="The list from which this RSS feed is built (where the product come from).">?</span>
@@ -920,7 +920,7 @@ ACHIEVEMENTS
 	
 	<label>
 		<span>Pricing Schedule:</span>
-		<select name='schedule' data-bind="var: rss(@SCHEDULES);format:optionsFromList; text:SID; value:SID;">
+		<select name='schedule' data-bind="var: rss(@SCHEDULES);format:optionsfromlist; text:SID; value:SID;">
 			<option>none</option>
 		</select>
 	</label>
@@ -1104,3 +1104,33 @@ data-contentloaded is used to determine if dynamic content has already been load
 <label id='pickerLaunchProfileRowTemplate'>
 	<input type='checkbox' name='' data-bind="var:list(PROFILE); format:assignAttribute; attribute:name; valuePretext:PROFILE+;" /><span data-bind="var: list(PROFILE); format:text;"></span>
 </label>
+
+
+
+
+
+
+
+
+<div id='tlctest'>
+<h1>Some TLC for testing. execute this with #!/ext/admin/tlcTest</h1>
+<h2>Data src is adminDomainList. pretty much can guarantee it's in memory.</h2>
+<br><br>
+<h3 data-tlc="bind $var '.media-host'; apply --append;">media host: </h3>
+<table>
+<tbody data-tlc="bind $items '.@DOMAINS'; foreach $item in $items {{transmogrify --templateid='tlclisttest' --dataset=$item; apply --append;}};"></tbody>
+</table>
+</div>
+
+<table>
+	<tr id='tlclisttest'>
+		<td>
+		<img data-tlc="bind $var '.LOGO'; if(is $var --notblank;){{apply --img --bob='was here' --media=$var --width=25 --height=25 --bgcolor='#ffffff' --replace;}};" src="blank.gif" class="prodThumb" alt="">
+		</td>
+		<td>
+		<img data-tlc="bind $var '.LOGO'; if(is $var --notblank;){{apply --img --bob='was here' --media=$var --imgdefault --replace;}};" width='50' height='50' data-bgcolor='#fffff' src="blank.gif" class="prodThumb" alt="">
+		</td>
+		<td data-tlc="bind $var '.DOMAINNAME'; apply --append;"></td>
+		<td data-tlc="bind $var '.LOGO'; if(is $var --notblank;){{apply --imageurl --media=$var --width=25 --height=25 --bgcolor='#ffffff' --append;}};"></td>
+	</tr>
+</table>

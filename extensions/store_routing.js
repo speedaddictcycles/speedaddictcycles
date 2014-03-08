@@ -33,35 +33,49 @@ var store_routing = function(_app) {
 			onSuccess : function()	{
 				var r = false; 
 				
-				dump('here');
-				_app.vars._ignoreHashChange = true;
-				$('body').on('click.hashchange', 'a[href^="#!"]', function(e){
-					dump($(this).attr('href'));
-					var routeObj = _app.router._getRouteObj($(this).attr('href').substr(2),'hash');
-					if(routeObj){
-						_app.router._executeCallback(routeObj);
+				if(_app.u.getParameterByName('seoRequest')){
+					_app.vars.showContentHashChange = true;
+					_app.vars.ignoreHashChange = true;
 					}
-				});
+				
 				
 				_app.router.addAlias('homepage', 	function(routeObj){showContent('homepage',	routeObj.params);});
 				_app.router.addAlias('category', 	function(routeObj){showContent('category',	routeObj.params);});
 				_app.router.addAlias('product', 	function(routeObj){showContent('product',	routeObj.params);});
-				_app.router.addAlias('company', 	function(routeObj){dump('company'); showContent('company',	routeObj.params);});
+				_app.router.addAlias('company', 	function(routeObj){showContent('company',	routeObj.params);});
 				_app.router.addAlias('customer', 	function(routeObj){showContent('customer',	routeObj.params);});
 				_app.router.addAlias('checkout', 	function(routeObj){showContent('checkout',	routeObj.params);});
-				_app.router.addAlias('cart', 		function(routeObj){showContent('cart',		routeObj.params);});
+
 				_app.router.addAlias('search', 		function(routeObj){showContent('search',	routeObj.params);});
-				
-				_app.router.appendHash({'type':'exact','route':'/','callback':'homepage'});
+
+
+				_app.router.appendHash({'type':'exact','route':'/cart','callback':function(routeObj){showContent('cart',routeObj.params);}});
+				_app.router.appendHash({'type':'exact','route':'/home','callback':'homepage'});
 				_app.router.appendHash({'type':'exact','route':'','callback':'homepage'});
-				_app.router.appendHash({'type':'match','route':'/category/{{navcat}}/*','callback':'category'});
-				_app.router.appendHash({'type':'match','route':'/product/{{pid}}/*','callback':'product'});
-				_app.router.appendHash({'type':'match','route':'/company/{{show}}/','callback':'company'});
-				_app.router.appendHash({'type':'match','route':'/customer/{{show}}/','callback':'customer'});
-				_app.router.appendHash({'type':'exact','route':'/checkout/','callback':'checkout'});
-				_app.router.appendHash({'type':'exact','route':'/cart/','callback':'cart'});
-				_app.router.appendHash({'type':'match','route':'/search/{{KEYWORDS}}/','callback':'search'});
-				
+				_app.router.appendHash({'type':'exact','route':'/','callback':'homepage'});
+				_app.router.appendHash({'type':'match','route':'/category/{{navcat}}*','callback':'category'});
+				_app.router.appendHash({'type':'match','route':'/product/{{pid}}/{{name}}*','callback':'product'});
+				_app.router.appendHash({'type':'match','route':'/product/{{pid}}*','callback':'product'});
+				_app.router.appendHash({'type':'match','route':'/company/{{show}}*','callback':'company'});
+				_app.router.appendHash({'type':'exact','route':'/company','callback':'company'});
+				_app.router.appendHash({'type':'match','route':'/customer/{{show}}*','callback':'customer'});
+				_app.router.appendHash({'type':'exact','route':'/customer','callback':'company'});
+				_app.router.appendHash({'type':'match','route':'/checkout*','callback':'checkout'});
+				_app.router.appendHash({'type':'match','route':'/search/tag/{{tag}}*','callback':'search'});
+				_app.router.appendHash({'type':'match','route':'/search/{{KEYWORDS}}*','callback':'search'});
+
+
+/*
+some other things we could do
+_app.router.appendHash({'type':'match','route':'quickview/product/{{pid}}*','callback':function(routeObj){
+	quickview('product',routeObj.params);
+	}});
+
+or a more generic one, like so:
+_app.router.appendHash({'type':'match','route':'modal/product/{{pid}}*','callback':function(routeObj){
+	quickview('product',routeObj.params);
+	}});
+*/
 				r = true;
 
 				return r;
@@ -72,7 +86,7 @@ var store_routing = function(_app) {
 			},
 		attachEventHandlers : {
 			onSuccess : function(){
-				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){location.replace("#!/");});
+				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/");});
 				
 				_app.templates.categoryTemplate.on('complete.routing', function(event, $context, infoObj){
 					var hash = "";
@@ -99,6 +113,9 @@ var store_routing = function(_app) {
 					});
 					
 				_app.templates.productTemplate.on('complete.routing', function(event, $context, infoObj){
+					dump('here');
+					dump('here');
+					dump('here');
 					var hash = "";
 					var $routeEle = $('[data-routing-hash]',$context)
 					if($routeEle.length){
@@ -135,8 +152,7 @@ var store_routing = function(_app) {
 			productlink : function(data, thisTLC){
 				var args = thisTLC.args2obj(data.command.args, data.globals);
 				if(args.pid && args.seo){
-					data.globals.binds[data.globals.focusBind] =  _app.ext.store_routing.u.productLink(args.pid, args.seo);
-					dump(data.globals.binds[data.globals.focusBind]);
+					data.globals.binds[data.globals.focusBind] =  _app.ext.store_routing.u.productAnchor(args.pid, args.seo);
 					return true;
 					} 
 				else {
@@ -145,39 +161,114 @@ var store_routing = function(_app) {
 					return false;
 					}
 				},
-			categorylink : function(data,thisTLC){
-				var args = thisTLC.args2obj(data.command.args, data.globals);
-				if(args.navcat && args.seo){
-					data.globals.binds[data.globals.focusBind] =  _app.ext.store_routing.u.categoryLink(args.navcat, args.seo);
-					return true;
-					} 
-				else {
-					dump('-> store_routing categorylink tlcformat: The navcat or SEO content was not provided in the tlc.');
-					//stop execution of the commands.  throw a tantrum.
-					return false;
+
+/*
+optional params:
+	type -> acceptable values are product, category, dwiw or blank (blank = dwiw). set implicitly for best results.
+		 -> if blank/dwiw, type is guessed.
+	seo -> supported for both category and product, will append /product pretty name or /category pretty name (uri encoded) to the end of the href.
+*/
+			seoanchor : function(data, thisTLC){
+				var args = thisTLC.args2obj(data.command.args, data.globals), r;
+				if(!args.type || args.type == 'dwiw')	{
+					if(data.value.pid)	{args.type = 'product'}
+					else if(data.value.path)	{args.type = 'category'}
+					else	{}
 					}
-				}
-		},
+
+				switch(args.type) {
+					case 'product':
+						r = true;
+						var seoname = '';
+						if(args.seo)	{
+							seoname = data.value['zoovy:prod_seo_title'] || data.value['zoovy:prod_name'];
+							}
+						data.globals.binds[data.globals.focusBind] = _app.ext.store_routing.u.productAnchor(data.value.pid, seoname);
+						break;
+					
+					case 'category':
+						r = true;
+						data.globals.binds[data.globals.focusBind] = _app.ext.store_routing.u.categoryAnchor(data.value.path, (args.seo ? data.value.pretty : ''));
+						break;
+					
+					default:
+						dump("in tlcFormat.seolink, the type specified ["+args.type+"] is not recognized.");
+						r = false; //unrecognized 'type'
+					}
+				return r;
+				} //seolink
+
+			},
 		
+		renderFormats : {
+			productLink : function($tag, data){
+				var href="#!product/";
+				if(data.bindData.useParentData){
+					href += data.value.pid+"/";
+					if(data.bindData.seoattr){
+						href += data.value["%attribs"][data.bindData.seoattr];
+						}
+					}
+				else {
+					href += data.value+"/";
+					}
+				$tag.attr('href',href);
+				}
+			}, //renderFormats
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
 			setHash : function(hash){
-				window.location.href = window.location.href.split("#")[0]+hash;
+				if(_app.vars.showContentHashChange){
+					dump('forcing a hash change');
+					window.location.href = window.location.href.split("#")[0]+hash;
+					}
 				},
-			productLink : function(pid, seo){
-				seo = seo || "";
-				var href="#!/product/"+pid+"/"+encodeURI(seo);
-				return href;
+			productAnchor : function(pid, seo){
+				return "#!product/"+pid+"/"+(seo ? encodeURI(seo) : '');
 				},
-			categoryLink : function(navcat, seo){
-				seo = seo || "";
-				var href="#!/category/"+navcat+"/"+encodeURI(seo);
-				return href;
+			categoryAnchor : function(path,seo)	{
+				return "#!category/"+path+((seo) ? "/"+encodeURI(seo) : '');
+				},
+			searchAnchor : function(type,value)	{
+				var r;
+				if(type == 'tag')	{
+					r = '#!search/tag/'+value;
+					}
+				else if(type == 'keywords')	{
+					r = '#!search/keywords/'+value;
+					}
+// ### FUTURE -> support ability to search for a match on a specific attribute.
+//				else if(type == 'attrib')	{
+//					r = '#!search/attrib/' ... some key value pair.
+//					}
+				else	{
+					//unrecognized type
+					}
+				return "#!category/"+path+((seo) ? "/"+encodeURI(seo) : '');
 				}
 			}, //u [utilities]
 
 		e : {
+/*			
+			navigateTo : function($ele,P)	{
+				if($ele.data('type'))	{
+					switch($ele.data('type'))	{
+						case 'product':
+							document.location.hash = _app.ext.store_routing.u.productAnchor($ele.data('pid'));
+							break;
+						case 'category':
+							document.location.hash = _app.ext.store_routing.u.categoryAnchor($ele.data('path'));
+							break;
+						default:
+							$("#globalMessaging").anymessage({"message":"In store_router.e.navigateTo, invalid data.type ["+$ele.data('type')+"] on trigger element.","gMessage":true});
+						}
+					}
+				else	{
+					
+					}
+				}
+*/
 			} //e [app Events]
 		} //r object.
 	return r;

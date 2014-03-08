@@ -215,7 +215,12 @@ this is what would traditionally be called an 'invoice' page, but certainly not 
 				
 //show post-checkout invoice and success messaging.
 				$checkout.empty();
-				$checkout.anycontent({'templateID':'chkoutCompletedTemplate',data: checkoutData}); //show invoice
+				$checkout.tlc({'templateid':'chkoutCompletedTemplate',dataset: checkoutData}); //show invoice
+
+//This will add a cart message. handy if the buyer and merchant are dialoging.
+				if(cartMessagePush in window)	{
+					cartMessagePush(oldCartID,'cart.orderCreate',{'vars':{'orderid':orderID}});
+					}
 
 //time for some cleanup. Nuke the old cart from memory and local storage, then obtain a new cart id, if necessary (admin doesn't auto-create a new one).
 
@@ -1038,7 +1043,8 @@ note - the order object is available at _app.data['order|'+P.orderID]
 //							_app.u.dump(" -> cartDetail callback for startCheckout reached.");
 							if(_app.data[rd.datapointer]['@ITEMS'].length || _app.u.thisIsAnAdminSession())	{
 								_app.u.dump(" -> cart has items or this is an admin session. cartID: "+cartID);
-								var $checkoutContents = _app.renderFunctions.transmogrify({},'checkoutTemplate',_app.ext.order_create.u.extendedDataForCheckout(cartID));
+//								var $checkoutContents = _app.renderFunctions.transmogrify({},'checkoutTemplate',_app.ext.order_create.u.extendedDataForCheckout(cartID));
+								var $checkoutContents = new tlc().runTLC({'templateid':'checkoutTemplate','dataset':_app.ext.order_create.u.extendedDataForCheckout(cartID)})
 								
 								$checkoutContents.data('cartid',cartID);
 
@@ -1180,9 +1186,9 @@ _app.u.handleButtons($chkContainer); //will handle buttons outside any of the fi
 				if(orderID)	{
 					var $orderContent = $("[data-app-role='orderContents']:first",$ele.closest("[data-app-role='orderContainer']")).show();
 					_app.ext.admin.calls.adminOrderDetail.init(orderID,{
-						'callback' : 'anycontent',
+						'callback' : 'tlc',
 						'jqObj' : $orderContent,
-						'translateOnly' : true
+						'verb' : 'translate'
 						},'mutable');
 					_app.model.dispatchThis('mutable');
 					}
@@ -1463,7 +1469,7 @@ _app.u.handleButtons($chkContainer); //will handle buttons outside any of the fi
 					_app.model.destroy('cartDetail|'+$checkout.data('cartid'));
 
 					_app.ext.cco.calls.cartSet.init({"bill/email":$email.val(),"_cartid":$checkout.data('cartid')}) //whether the login succeeds or not, set bill/email in the cart.
-					_app.model.addDispatchToQ({"_cmd":"appBuyerLogin","login":$email.val(),"password":$password.val(),"_tag":{"datapointer":"appBuyerLogin","callback":function(rd){
+					_app.model.addDispatchToQ({"_cmd":"appBuyerLogin","login":$email.val(),"password":$password.val(),'method':'unsecure',"_tag":{"datapointer":"appBuyerLogin","callback":function(rd){
 						$('body').hideLoading();
 						if(_app.model.responseHasErrors(rd)){$fieldset.anymessage({'message':rd})}
 						else	{
@@ -1489,7 +1495,7 @@ _app.u.handleButtons($chkContainer); //will handle buttons outside any of the fi
 							_app.model.dispatchThis('immutable');
 							$fieldset.anymessage({'message':'Thank you, you are now logged in.','_msg_0_type':'success'});
 							}						
-						}}},"mutable");
+						}}},"immutable");
 					_app.calls.cartDetail.init($checkout.data('cartid'),{},'immutable'); //update cart so that if successful, the refresh on preflight panel has updated info.
 					_app.model.dispatchThis('immutable');
 					}
@@ -1629,6 +1635,18 @@ _app.u.handleButtons($chkContainer); //will handle buttons outside any of the fi
 				_app.ext.order_create.u.handleCommonPanels($form);
 				_app.model.dispatchThis('immutable');
 				}, //execCouponAdd
+//executed on a giftcard when it is in the list of payment methods.
+			addGiftcardPaymethodAsPayment : function($ele,p)	{
+				if($ele.attr('data-giftcard-id'))	{
+					$ele.button('disable');
+					var $checkout = $ele.closest("[data-app-role='checkout']");
+					_app.ext.cco.calls.cartGiftcardAdd.init($ele.attr('data-giftcard-id'),$checkout.data('cartid'),{'callback':'updateAllPanels','extension':'order_create','jqObj':$checkout},'immutable');
+					_app.model.dispatchThis('immutable');
+					}
+				else	{
+					$("#globalMessaging").anymessage({"message":"In order_create.e.addGiftcardPaymethodAsPayment, data-giftcard-id is not set on trigger element.","gMessage":true});
+					}
+				},
 
 			execGiftcardAdd : function($ele,p)	{
 				var $fieldset = $ele.closest('fieldset'),
@@ -1854,7 +1872,7 @@ _app.u.handleButtons($chkContainer); //will handle buttons outside any of the fi
 							}
 						}, //perform things like locking form fields, hiding/showing the panel based on some setting. never pass in the setting, have it read from the form or cart.
 					ao.translate = function(formObj, $fieldset)	{
-						$fieldset.anycontent({'data' : _app.ext.order_create.u.extendedDataForCheckout(cartID)});
+						$fieldset.tlc({'verb' : 'translate','dataset' : _app.ext.order_create.u.extendedDataForCheckout(cartID)});
 						} //populates the template.
 					
 					for(var i = 0; i < L; i += 1)	{
@@ -2065,8 +2083,23 @@ _app.model.dispatchThis('passive');
 						}
 					else if(L > 0)	{
 						for(var i = 0; i < L; i += 1)	{
-	//onClick event is added through an app-event. allows for app-specific events.
-							$r.append("<div class='headerPadding' data-app-role='paymentMethodContainer'><label><input type='radio' name='want/payby' value='"+pMethods[i].id+"' />"+pMethods[i].pretty+"<\/label></div>");
+							var $div = $("<div class='headerPadding' data-app-role='paymentMethodContainer'>");
+							var $label = $("<label \/>");
+							if(pMethods[i].id.indexOf("GIFTCARD") === 0)	{
+								//onClick event is added through an app-event. allows for app-specific events.
+								$("<button \/>")
+									.text('add')
+									.attr({'title':'Apply this giftcard towards this purchase','data-giftcard-id':pMethods[i].id.split(':')[1]})
+									.button({icons: {primary: "ui-icon-cart"},text: true})
+									.addClass('isGiftcard')
+									.appendTo($label);
+								}
+							else	{
+								//onClick event is added through an app-event. allows for app-specific events.
+								$label.append("<input type='radio' name='want/payby' value='"+pMethods[i].id+"' />");
+								}
+							$label.append(pMethods[i].pretty).appendTo($div);
+							$div.appendTo($r);
 							}
 						}
 					else	{
@@ -2095,7 +2128,7 @@ _app.model.dispatchThis('passive');
 
 		renderFormats : {
 //pass the cart(cart/cartid); in for the databind var. Multiple pieces of data are required for this render format (want/shipping_id and @SHIPMETHODS).
-			shipMethodsAsRadioButtons : function($tag,data)	{
+			shipmethodsasradiobuttons : function($tag,data)	{
 				var o = '',sMethods,L;
 				sMethods = data.value['@SHIPMETHODS'];
 				if(sMethods && sMethods.length)	{
@@ -2112,9 +2145,9 @@ _app.model.dispatchThis('passive');
 				if(data.value.want && data.value.want.shipping_id)	{
 					$("input[value='"+data.value.want.shipping_id+"']",$tag).prop('checked','checked').closest('li').addClass('selected ui-state-active');
 					}
-				}, //shipMethodsAsRadioButtons
+				}, //shipmethodsasradiobuttons
 
-			payMethodsAsRadioButtons : function($tag,data)	{
+			paymethodsasradiobuttons : function($tag,data)	{
 //				_app.u.dump('BEGIN _app.ext.order_create.renderFormats.payOptionsAsRadioButtons');
 //				_app.u.dump(data);
 				var o = '', cartData,pMethods;
@@ -2122,15 +2155,16 @@ _app.model.dispatchThis('passive');
 					cartData = _app.data['cartDetail|'+data.value];
 					pMethods = _app.data['appPaymentMethods|'+data.value]['@methods'];
 					o = _app.ext.order_create.u.buildPaymentOptionsAsRadios(pMethods,cartData.want.payby);
+					$("button[data-giftcard-id]",o).attr('data-app-click','order_create|addGiftcardPaymethodAsPayment');
 					$(":radio",o).each(function(){
 						$(this).attr('data-app-change','order_create|shipOrPayMethodSelectExec');
 						});
 					}
 				else	{
-					o = $("<div \/>").anymessage({'persistent':true,'message':'In order_create.renderFormats.payMethodsAsRadioButtons, cartDetail|'+data.value+' ['+( typeof _app.data['cartDetail|'+data.value] )+'] and/or appPaymentMethods|'+data.value+' ['+( typeof _app.data['appPaymentMethods|'+data.value] )+'] not found in memory. Both are required.','gMessage':true});
+					o = $("<div \/>").anymessage({'persistent':true,'message':'In order_create.renderFormats.paymethodsasradiobuttons, cartDetail|'+data.value+' ['+( typeof _app.data['cartDetail|'+data.value] )+'] and/or appPaymentMethods|'+data.value+' ['+( typeof _app.data['appPaymentMethods|'+data.value] )+'] not found in memory. Both are required.','gMessage':true});
 					}
 				$tag.html(o);
-				} //payMethodsAsRadioButtons
+				} //paymethodsasradiobuttons
 			
 
 			

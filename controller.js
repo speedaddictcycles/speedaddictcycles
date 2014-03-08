@@ -790,13 +790,22 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 				return r;
 				},
 			'match' : function(routeObj,hash){
-				var pattern = routeObj.route.replace(/{{(.*?)}}/g,'([^\\/]+)');
-				if(routeObj.route.charAt(routeObj.route.length - 1) == '*' )	{pattern += "(/\?.*)?";} //allows for wildcards to be set. so admin/ext/a?some=params can be declared w/ admin/{{ext}}/{{a}}*
-				var r = false, regex = new RegExp(pattern), isMatch = regex.exec(hash);
-	//regex.exec[0] will be the match value. so comparing that to the hash will ensure no substring matches get thru.
-	//substring matches can be accomplished w/ a regex in the route.
-				if(isMatch && isMatch[0] == hash)	{
-					r = {'match' : isMatch, 'params' : _app.router._buildMatchParams(routeObj.route,hash,isMatch.splice(1))}; //isMatch is spliced because the first val is the 'match value'.
+				var r;
+				if(routeObj.route == '')	{r = false; dump("routeobj.route was blank"); dump(routeObj);} //can't 'match' against blank.
+				else if(routeObj.route)	{
+					var pattern = routeObj.route.replace(/{{(.*?)}}/g,'([^\\/]+)');
+					if(routeObj.route.charAt(routeObj.route.length - 1) == '*' )	{pattern += "(/\?.*)?";} //allows for wildcards to be set. so admin/ext/a?some=params can be declared w/ admin/{{ext}}/{{a}}*
+					var r = false, regex = new RegExp(pattern), isMatch = regex.exec(hash);
+		//regex.exec[0] will be the match value. so comparing that to the hash will ensure no substring matches get thru.
+		//substring matches can be accomplished w/ a regex in the route.
+					if(isMatch && isMatch[0] == hash)	{
+						r = {'match' : isMatch, 'params' : _app.router._buildMatchParams(routeObj.route,hash,isMatch.splice(1))}; //isMatch is spliced because the first val is the 'match value'.
+						}
+					}
+				else	{
+					//unknown error.
+					dump("in matchFunctions.match, an unknown error occured based on the value of routeObj.route: "+routeObj.route); dump(routeObj);
+					r = false
 					}
 				return r;
 				},
@@ -817,6 +826,7 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 		_doesThisRouteMatchHash : function(routeObj,hash)	{
 			var r = null;
 			routeObj = routeObj || {};
+			//don't test for .route here because it could be blank, and that's valid.
 			if(routeObj.type && typeof _app.router.matchFunctions[routeObj.type] == 'function')	{
 				r = _app.router.matchFunctions[routeObj.type](routeObj,hash);
 				if(r)	{
@@ -824,7 +834,7 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 					}
 				}
 			else	{
-				_app.u.dump("for route "+routeObj.route+", routeObj.type is not set ["+routeObj.type+"] OR typeof is not a function ["+(typeof _app.router.matchFunctions[routeObj.type])+"].","warn");
+				_app.u.dump("for route ["+routeObj.route+"], routeObj.type is not set ["+routeObj.type+"] OR typeof is not a function ["+(typeof _app.router.matchFunctions[routeObj.type])+"].","warn");
 				_app.u.dump(routeObj);
 				}
 			return r;
@@ -849,7 +859,7 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 			if(routeObj.callback)	{
 				if(typeof routeObj.callback === 'string')	{
 					if(_app.router.aliases[routeObj.callback])	{
-						_app.router.aliases[routeObj.callback](routeObj);
+						_app.router.aliases[routeObj.callback](routeObj,_app.router.initObj);
 						}
 					else	{
 						//no matching handler found.
@@ -857,7 +867,7 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 						}
 					}
 				else if(typeof routeObj.callback == 'function')	{
-					routeObj.callback(routeObj);
+					routeObj.callback(routeObj,_app.router.initObj);
 					}
 				else	{
 					_app.u.dump("In _execute handler, invalid type for routeObj.callback. typeof: "+(typeof routeObj.callback),"error");
@@ -875,11 +885,9 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 				if(ps.indexOf('#') == 0){} //'could' happen if uri is ...admin.html?#doSomething. no params, so do nothing.
 				else	{
 					if(ps.indexOf('#') >= 1)	{ps = ps.split('#')[0]} //uri params should be before the #
-			//	app.u.dump(ps);
 					uriParams = {}
 					uriParams = _app.u.kvp2Array(ps);
 					}
-			//	app.u.dump(uriParams);
 				}
 			return uriParams;
 			},
@@ -888,7 +896,6 @@ ex: whoAmI call executed during app init. Don't want "we have no idea who you ar
 
 			//initObj is a blank object by default, but may be updated outside this process. so instead of setting it to an object, it's extended to merge the two.
 			$.extend(_app.router.initObj,{
-				location : document.location,
 				hash : location.hash,
 				uriParams : _app.router.getURIParams(),
 				hashParams : (location.hash.indexOf('?') >= 0 ? _app.u.kvp2Array(decodeURIComponent(location.hash.split("?")[1])) : {})
@@ -2068,10 +2075,15 @@ VALIDATION
 //used frequently to throw errors or debugging info at the console.
 //called within the throwError function too
 		dump : function(msg,type)	{
-			type = type || 'log'; //supported types are 'warn' and 'error'
+			// * 201402 -> the default type for an object was changed to debug to take less room in the console. dir is still available if passed as type.
+			if(!type)	{type = (typeof msg == 'object') ? 'debug' : 'log';} //supported types are 'warn' and 'error'
 //if the console isn't open, an error occurs, so check to make sure it's defined. If not, do nothing.
 			if(typeof console != 'undefined')	{
-				if(typeof console.dir == 'function' && typeof msg == 'object')	{
+// ** 201402 -> moved the type check to the top so that it gets priority (otherwise setting debug on an object is overridden by dir)
+				if(type && typeof console[type] === 'function')	{
+					console[type](msg);
+					}
+				else if(typeof console.dir == 'function' && typeof msg == 'object')	{
 				//IE8 doesn't support console.dir.
 					console.dir(msg);
 					}
@@ -2081,9 +2093,6 @@ VALIDATION
 					}
 				else if(type == 'greet')	{
 					console.log("%c\n\n"+msg+"\n\n",'color: purple; font-weight: bold;')
-					}
-				else if(typeof console[type] === 'function')	{
-					console[type](msg);
 					}
 				else	{} //hhhhmm... unsupported type.
 					
@@ -2853,7 +2862,6 @@ return $r;
 
 //infoObj.state = onCompletes or onInits. later, more states may be supported.
 			handleTemplateEvents : function($ele,infoObj)	{
-				dump('handling template events');
 				dump(infoObj.pageType+"."+infoObj.state);
 				infoObj = infoObj || {};
 				if($ele instanceof jQuery && infoObj.state)	{
@@ -2996,26 +3004,19 @@ do's should modify $tag or apply the value.
 				}
 			},
 
-//EX:  data-bind='var: (@LIST);format:optionsFromList; text:pretty; value:safeid;'
-		optionsFromList : function($tag,data)	{
+//EX:  data-bind='var: (@LIST);format:optionsfromlist; text:pretty; value:safeid;'
+		optionsfromlist : function($tag,data)	{
 			for(var index in data.value)	{
 				$("<option \/>").val((data.bindData.value) ? data.value[index][data.bindData.value] : data.value[index]).text((data.bindData.text) ? data.value[index][data.bindData.text] : data.value[index]).appendTo($tag);
 				}
 			},
 
-//for embedding. There is an action for showing a youtube video in an iframe in quickstart.
-// hint: set the action as an onclick and set attribute youtube:video id on element and use jquery to pass it in. 
-//ex: data-bind='var:product(youtube:videoid);format:assignAttribute; attribute:data-videoid;' onClick="_app.ext.quickstart.a.showYoutubeInModal($(this).attr('data-videoid'));
-		youtubeVideo : function($tag,data){
+		youtubevideo : function($tag,data){
 			var width = data.bindData.width ? data.bindData.width : 560
 			var height = data.bindData.height ? data.bindData.height : 315
 			var r = "<iframe style='z-index:1;' width='"+width+"' height='"+height+"' src='"+(document.location.protocol === 'https:' ? 'https:' : 'http:')+"//www.youtube.com/embed/"+data.value+"' frameborder='0' allowfullscreen></iframe>";
 			$tag.append(r);
 			},
-
-
-
-		
 
 
 //if classname is set in the bindData, it'll be concatonated with the value so that specific classes can be defined.

@@ -169,9 +169,9 @@ calls should always return the number of dispatches needed. allows for cancellin
 
 		cartSet : {
 			init : function(obj,_tag,Q)	{
-				if(obj._cartid && _app.u.thisNestedExists('ext.cart_message.vars.carts.'+obj._cartid,_app))	{
-					_app.model.addDispatchToQ({'_cmd':'cartMessagePush','what':'cart.update','_cartid':obj._cartid},'immutable');
-					}
+//				if(obj._cartid && _app.u.thisNestedExists('ext.cart_message.vars.carts.'+obj._cartid,_app))	{
+//					_app.model.addDispatchToQ({'_cmd':'cartMessagePush','what':'cart.update','_cartid':obj._cartid},'immutable');
+//					}
 				obj["_cmd"] = "cartSet";
 				obj._tag = _tag || {};
 				_app.model.addDispatchToQ(obj,Q || 'immutable');
@@ -1141,7 +1141,7 @@ in a reorder, that data needs to be converted to the variations format required 
 
 		renderFormats : {
 // pass in parent data object (entire cart). need to get both the cart ID and the country that has already been selected.
-			countriesAsOptions : function($tag,data)	{
+			countriesasoptions : function($tag,data)	{
 				var r = '';
 				if(data.value.cart && data.value.cart.cartid){
 					var cartid = data.value.cart.cartid;
@@ -1154,10 +1154,10 @@ in a reorder, that data needs to be converted to the variations format required 
 						$tag.val(_app.u.thisNestedExists("data.cartDetail|"+cartid+"."+data.bindData.shiptype+".countrycode",_app) ? cartData[data.bindData.shiptype].countrycode : 'US');
 						}
 					else if(!data.bindData.shiptype)	{
-						$tag.parent().append($("<div \/>").anymessage({'persistent':true,'message':'In cco.renderFormats.countriesAsOptions, data-bind rules must have a shiptype set.','gMessage':true}));
+						$tag.parent().append($("<div \/>").anymessage({'persistent':true,'message':'In cco.renderFormats.countriesasoptions, data-bind rules must have a shiptype set.','gMessage':true}));
 						}
 					else	{
-						$tag.parent().append($("<div \/>").anymessage({'persistent':true,'message':'in cco.renderFormats.countriesAsOptions, _app.data[appCheckoutDestinations|'+cartid+'] or _app.data.cartDetail|'+cartid+' and both are required. is not available in memory.','gMessage':true}));
+						$tag.parent().append($("<div \/>").anymessage({'persistent':true,'message':'in cco.renderFormats.countriesasoptions, _app.data[appCheckoutDestinations|'+cartid+'] or _app.data.cartDetail|'+cartid+' and both are required. is not available in memory.','gMessage':true}));
 						}
 
 					}
@@ -1184,7 +1184,7 @@ in a reorder, that data needs to be converted to the variations format required 
 					}
 				},
 
-			paypalECButton : function($tag,data)	{
+			paypalecbutton : function($tag,data)	{
 	
 				if(zGlobals.checkoutSettings.paypalCheckoutApiUser)	{
 					var payObj = _app.ext.cco.u.which3PCAreAvailable();
@@ -1202,7 +1202,7 @@ in a reorder, that data needs to be converted to the variations format required 
 										document.location = _app.data[rd.datapointer].URL;
 										}
 									else	{
-										$('#globalMessaging').anymessage({"message":"In paypalECButton render format, dispatch to obtain paypal URL was successful, but no URL in the response.","gMessage":true});
+										$('#globalMessaging').anymessage({"message":"In paypalecbutton render format, dispatch to obtain paypal URL was successful, but no URL in the response.","gMessage":true});
 										}
 									}
 								}});
@@ -1217,9 +1217,9 @@ in a reorder, that data needs to be converted to the variations format required 
 				else	{
 					$tag.addClass('displayNone');
 					}
-				}, //paypalECButton
+				}, //paypalecbutton
 
-			googleCheckoutButton : function($tag,data)	{
+			googlecheckoutbutton : function($tag,data)	{
 	
 				if(zGlobals.checkoutSettings.googleCheckoutMerchantId && (window._gat && window._gat._getTracker))	{
 					var payObj = _app.ext.cco.u.which3PCAreAvailable(); //certain product can be flagged to disable googlecheckout as a payment option.
@@ -1241,7 +1241,7 @@ in a reorder, that data needs to be converted to the variations format required 
 					$tag.addClass('displayNone');
 					}
 		
-				}, //googleCheckoutButton
+				}, //googlecheckoutbutton
 	
 
 
@@ -1265,19 +1265,9 @@ in a reorder, that data needs to be converted to the variations format required 
 					o += _app.u.formatMoney(amount,data.bindData.currencySign,'',data.bindData.hideZero);
 					}
 				
-				$tag.text(o);  //update DOM.
+				$tag.text("Balance due: "+o);  //update DOM.
 //				_app.u.dump('END _app.renderFunctions.format.orderBalance()');
 				}, //orderBalance
-
-			secureLink : function($tag,data)	{
-//				_app.u.dump('BEGIN _app.ext.cco.renderFormats.secureLink');
-//				_app.u.dump(" -> data.windowName = '"+data.windowName+"'");
-//if data.windowName is set, the link will open a new tab/window. otherwise, it just changes the page/tab in focus.
-				if(_app.u.isSet(data.windowName))
-					$tag.click(function(){window.open(zGlobals.appSettings.https_app_url+$.trim(data.value)),data.windowName});
-				else
-					$tag.click(function(){window.location = zGlobals.appSettings.https_app_url+$.trim(data.value)});
-				}, //secureLink
 
 //displays the shipping method followed by the cost.
 //is used in cart summary total during checkout.
@@ -1303,16 +1293,16 @@ in a reorder, that data needs to be converted to the variations format required 
 					//shipMethods is empty. this may be perfectly normal (admin UI -> new order -> no product in cart yet. store -> no zip or state.)
 					}
 				$tag.html(o);
-				}, //shipInfoById
+				}, //shipinfobyid
 
-			walletName2Icon : function($tag,data)	{
+			walletnameintoicon : function($tag,data)	{
 				$tag.addClass('paycon_'+data.value.substring(0,4).toLowerCase());
 				},
-			paymentStatus : function($tag,data)        {
+			paymentstatus : function($tag,data)        {
 				if(Number(data.value[0]) === 0)        {$tag.append("Paid");}
 				else{$tag.append("Unpaid")}
 				},
-			marketPlaceOrderID : function($tag,data)        {
+			marketplaceorderid : function($tag,data)        {
 				var order = _app.data['adminOrderDetail|'+data.value];
 				var output = "";
 				if(order.flow.payment_method == 'AMAZON')        {output = order.mkt.amazon_orderid}
@@ -1377,6 +1367,20 @@ in a reorder, that data needs to be converted to the variations format required 
 					//cartItemUpdate will handle error display.
 					}
 				}, //cartItemUpdateExec
+			//will post the input to the cart, passively.
+			cartSetAttrib : function($ele,p)	{
+				var cartid = $ele.data('cartid') || $ele.closest("[data-cartid]").data('cartid');
+				if(cartid)	{
+					var cmdObj = {
+						_cartid : cartid
+						};
+					cmdObj[$ele.attr('name')] = $ele.val();
+					_app.ext.cco.calls.cartSet.init(cmdObj,{},'passive'); _app.model.dispatchThis('passive');
+					}
+				else	{
+					$("#globalMessaging").anymessage({"message":"In cco.e.cartSetAttib, unable to ascertain cart id. Be sure data-cartid is set on/above trigger element.","gMessage":true});
+					}
+				},
 
 			cartZipUpdateExec : function($ele,p)	{
 				_app.ext.cco.calls.cartSet.init({'ship/postal':$ele.val(), 'ship/region':'','_cartid': $ele.closest("[data-template-role='cart']").data('cartid')},{},'immutable');
