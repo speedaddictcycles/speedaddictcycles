@@ -145,7 +145,10 @@ myApp.router.appendInit({
 		g = g || {};
 		dump('here');
 		dump(document.location.hash);
-		if(document.location.hash)	{	
+		if(g.uriParams.seoRequest){
+			showContent(g.uriParams.pageType, g.uriParams);
+			}
+		else if(document.location.hash)	{	
 			myApp.u.dump('triggering handleHash');
 			myApp.router.handleHashChange();
 			}
