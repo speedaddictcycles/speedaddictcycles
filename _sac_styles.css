@@ -233,7 +233,7 @@ HOMEPAGE STYLES
 CATEGORY PAGE STYLES
 
 *********************************************************/
-.searchResultsProduct .name {color: #142069; height:32px;}
+.searchResultsProduct .name {color: #142069; height:56px;}
 .searchResultsProduct .price {color: #f75400;}
 
 .searchResultsProduct {position:relative;}
