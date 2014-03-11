@@ -2123,7 +2123,7 @@ effects the display of the nav buttons only. should be run just after the handle
 					var $nav = $('#companyNav ul:first',$mcac);
 //builds the nav menu.
 					$('.textContentArea',$mcac).not('.disabled').each(function(){
-						$nav.append("<li><a href='#!company/"+$(this).attr('id').replace('Article','')+"'>"+($('h1:first',$(this)).text())+"</a></li>");
+						$nav.append("<li><a href='#!/company/"+$(this).attr('id').replace('Article','')+"'>"+($('h1:first',$(this)).text())+"</a></li>");
 						});
 
 					$('#mainContentArea').append($mcac);

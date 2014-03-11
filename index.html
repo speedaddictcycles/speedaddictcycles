@@ -1395,12 +1395,13 @@ if you change these, you should move them above this comment so that when you (o
 
 
 <!-- loadingBG needed on this for app init (content may take a moment to load) -->
-<div id="companyTemplate" class="companyPage clearfix loadingBG fixedGradientBG">
+<div id="companyTemplate" class="companyPage clearfix fixedGradientBG">
 	<div class="showMenuBtn displayNone_960 displayNone_768 pointer" onclick="$('.companyPage .sideline').addClass('responsiveShow');"></div>
 	<div class="sideline">
 		<button onclick="$('.companyPage .sideline').removeClass('responsiveShow'); return false;" class="displayNone_960 displayNone_768 ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button>
 		<nav id="companyNav">
-			<ul class="listStyleNone noPadOrMargin" onclick="$('.companyPage .sideline').removeClass('responsiveShow'); return false;">
+			<ul class="listStyleNone noPadOrMargin" onclick="$(this).parent().parent().removeClass('responsiveShow');">
+				<!--
 				<li><a href="#!/company/about/">About Us</a></li>
 				<li><a href="#!/company/contact/">Contact Information</a></li>
 				<li><a href="#!/company/faq/">FAQ</a></li>
@@ -1408,6 +1409,7 @@ if you change these, you should move them above this comment so that when you (o
 				<li><a href="#!/company/privacy/">Privacy Statement</a></li>
 				<li><a href="#!/company/return/">Return Policy</a></li>
 				<li><a href="#!/company/shipping/">Shipping Information</a></li>
+				-->
 			</ul>
 		</nav>
 	</div>
