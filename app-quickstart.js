@@ -1011,7 +1011,7 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 // * changed from 'empty' to showLoading because empty could be a heavy operation if mainContentArea has a lot of content.
 							$('body').showLoading({'message':'Transferring to secure login'});							
 							var SSLlocation = _app.vars.secureURL+"?cartID="+_app.model.fetchCartID();
-							SSLlocation += "#customer?show="+infoObj.show
+							SSLlocation += "/customer/"+infoObj.show+"/";
 							_gaq.push(['_link', SSLlocation]); //for cross domain tracking.
 							document.location = SSLlocation; //redir to secure url.
 							}
@@ -1033,7 +1033,7 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 // * use showloading instead of .html (which could be heavy)
 //							$('#mainContentArea').addClass('loadingBG').html("<h1>Transferring you to a secure session for checkout.<\/h1><h2>Our app will reload shortly...<\/h2>");
 							$('body').showLoading({'message':'Transferring you to a secure session for checkout'});
-							var SSLlocation = zGlobals.appSettings.https_app_url+"?cartID="+_app.model.fetchCartID()+"&_session="+_app.vars._session+"#checkout?show=checkout";
+							var SSLlocation = zGlobals.appSettings.https_app_url+"?cartID="+_app.model.fetchCartID()+"&_session="+_app.vars._session+"#!/checkout/";
 							_gaq.push(['_link', SSLlocation]); //for cross domain tracking.
 							document.location = SSLlocation;
 							}
