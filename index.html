@@ -170,7 +170,7 @@ $(document).ready(function(){
 					</div>
 				</div>
 				<div id="minicart" class="headerGradientBG floatLeft">
-					<a href="#!/cart/">
+					<a href="#" onClick="myApp.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'}); return false;">
 						<img src="images/cart_81x60.png" />
 					</a>
 				</div>
@@ -187,7 +187,7 @@ $(document).ready(function(){
 					</a>
 				</div>
 				<div id="minicartSmall" class="headerGradientBG floatLeft">
-					<a href="#!/cart/">
+					<a href="#" onClick="myApp.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'}); return false;">
 						<img src="images/cart_96x38.png" />
 					</a>
 				</div>
@@ -448,7 +448,7 @@ $(document).ready(function(){
 				</a>
 			</div>
 			<div>
-				<a href="#!/cart/">
+				<a href="#" onClick="myApp.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'}); return false;">
 					&gt; Shopping Cart
 				</a>
 			</div>
@@ -1746,7 +1746,7 @@ This is the template used both within a dialog and inline, unless implicitly ove
 
 <div id="cartTemplate" class="clearfix"><!-- template role gets added by the myApp. don't add it yourself -->
 
-<form action="#" onsubmit="return false">
+<form action="#" onsubmit="return false;">
 
 <div class="cartStuffContainer">
 	<ul data-tlc="bind $var '.@ITEMS'; controller#loop --templateid='productListTemplateCart'; if (is $var --notblank;) {{apply --append;}};" class="listStyleNone fluidList clearfix noPadOrMargin productList lineItemProdlist"></ul>
@@ -1795,12 +1795,13 @@ This is the template used both within a dialog and inline, unless implicitly ove
 		</div>
 		<div class="ui-state-default cartButtons stdPadding clearfix">
 			<!-- spans are set around the buttons so each element has one consitent tag type around it -->
-			<span class="continueShoppingSpan thisButton"><button class="applyButton continueShoppingButton" data-app-click="myRIA|dialogClose">Continue Shopping</button></span>
+			<span class="continueShoppingSpan thisButton"><button class="applyButton continueShoppingButton" data-app-click="quickstart|dialogCloseExec">Continue Shopping</button></span>
 	
 			<span id="inStoreCheckoutButton thisButton" title="proceed to secure checkout"><button class="applyButton ui-state-highlight checkoutButton" onclick="showContent('checkout',{});">Store Checkout</button></span>
 	
-			<span data-tlc="bind $var '.cart/cartid'; cco#paypalecbutton  --legacy;" id="paypalECButton" class="thisButton"></span>
-	
+			<!--
+			<span data-tlc="cco#paypalecbutton  --legacy;" id="paypalECButton" class="thisButton"></span>
+			-->
 		</div>
 
 	</div>
@@ -2087,8 +2088,9 @@ The 'data-action' attribute is used to assign an onclick.
 	
 		<h3 data-tlc="bind $var '.order/flow/pool'; format --prepend='Order Status: '; if (is $var --notblank;) {{apply --append;}};"></h3>
 		<h5 data-tlc="bind $var '.order/sum/order_total'; format --prepend='Order Total: '; format --currency='USD'; if (is $var --notblank;) {{apply --append;}};" class="orderTotal"></h5>
+		<!--
 		<h5 data-tlc="bind $var '.order/sum/balance_due_total'; format --prepend='Balance Due: '; format --currency='USD'; if (is $var --notblank;) {{apply --append;}};" class="balanceDue"></h5>
-
+		-->
 	</div>
 
 	<section class="clearfix invoiceAddressContainer marginBottom">

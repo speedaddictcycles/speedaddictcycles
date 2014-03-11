@@ -1099,17 +1099,17 @@ in a reorder, that data needs to be converted to the variations format required 
 //will tell you which third party checkouts are available. does NOT look to see if merchant has them enabled,
 // just checks to see if the cart contents would even allow it.
 //currently, there is only a google field for disabling their checkout, but this is likely to change.
-			which3PCAreAvailable :	function(cartID){
-	//				_app.u.dump("BEGIN control.u.which3PCAreAvailable");
+			which3PCAreAvailable :	function(cart){
+					_app.u.dump("BEGIN control.u.which3PCAreAvailable");
 					var obj = {};
-					if(_app.data['cartDetail|'+cartID])	{
+					if(cart)	{
 		//by default, everything is available
 						obj = {
 							paypalec : true,
 							amazonpayment : true,
 							googlecheckout : true
 							}
-						var items = _app.data['cartDetail|'+cartID]['@ITEMS'], L = items.length;
+						var items = cart['@ITEMS'], L = items.length;
 						for(var i = 0; i < L; i += 1)	{
 							if(items[i]['%attribs'] && items[i]['%attribs']['gc:blocked'])	{obj.googlecheckout = false}
 							if(items[i]['%attribs'] && items[i]['%attribs']['paypalec:blocked'])	{obj.paypalec = false}
@@ -1185,12 +1185,12 @@ in a reorder, that data needs to be converted to the variations format required 
 				},
 
 			paypalecbutton : function($tag,data)	{
-	
 				if(zGlobals.checkoutSettings.paypalCheckoutApiUser)	{
-					var payObj = _app.ext.cco.u.which3PCAreAvailable();
+					var payObj = _app.ext.cco.u.which3PCAreAvailable(data.value);
 					if(payObj.paypalec)	{
 						$tag.empty().append("<img width='145' id='paypalECButton' height='42' border='0' src='"+(document.location.protocol === 'https:' ? 'https:' : 'http:')+"//www.paypal.com/en_US/i/btn/btn_xpressCheckoutsm.gif' alt='' />").addClass('pointer').off('click.paypal').on('click.paypal',function(){
 							_app.ext.cco.calls.cartPaypalSetExpressCheckout.init({'getBuyerAddress':1},{'callback':function(rd){
+								dump('paypal click');
 								$('body').showLoading({'message':'Obtaining secure PayPal URL for transfer...','indicatorID':'paypalShowLoading'});
 								if(_app.model.responseHasErrors(rd)){
 									$(this).removeClass('disabled').attr('disabled','').removeAttr('disabled');
