@@ -847,18 +847,18 @@ don't modify the 'data-templateid' unless you are changing template names and up
 <!-- used to display a category within a 'list', usually in the body of a category or the homepage. -->
 <ul>
 <li id="categoryListTemplate">
-	<div onclick="showContent('category',{'navcat':$(this).parent().attr('data-catsafeid')});" class="pointer">
+	<a data-tlc="bind $var '.'; store_routing#seoanchor --type='category' --seo; apply --attrib='href';">
 		<div class="thumbContainer"><img data-tlc="bind $var '.%meta.CAT_THUMB'; if (is $var --notblank){{apply --img --media=$var --width=120 --height=120 --bgcolor='#ffffff' --replace;}};" src="blank.gif" class="catThumb" alt="" height="120" width="120"></div>
 		<div class="catName white2LGray"><span data-tlc="bind $var '.pretty'; quickstart#cattext  --legacy;"></span></div>
-	</div>
+	</a>
 </li>
 
 
 <li id="categoryListTemplateRootCats">
-	<div onclick="showContent('category',{'navcat':$(this).parent().attr('data-catsafeid')});" class="pointer">
+	<a data-tlc="bind $var '.'; store_routing#seoanchor --type='category' --seo; apply --attrib='href';">
 		<div class="thumbContainer"><img data-tlc="bind $var '.%meta.CAT_THUMB'; if (is $var --notblank){{apply --img --media=$var --width=35 --height=35 --bgcolor='#ffffff' --replace;}};" src="blank.gif" class="catThumb" alt="" height="35" width="35"></div>
 		<div class="catName"><span data-tlc="bind $var '.pretty'; quickstart#cattext  --legacy; apply --append;"></span></div>
-	</div>
+	</a>
 </li>
 
 </ul>
@@ -899,7 +899,7 @@ remember to NOT put the button inside the 'onclick' container or two events will
 </li>
 
 <li id="productListTemplateCarousel" class="loadingBG  alignCenter prodListItemCarousel">
-	<div data-tlc="bind $var '.pid'; apply --attrib='data-pid'; " onclick="showContent('product',{'pid':$(this).attr('data-pid')})" class="pointer">
+	<a data-tlc="bind $pid '.pid'; bind $seo '.%attribs.zoovy:prod_name'; bind $href ''; store_routing#productlink --pid=$pid --seo=$seo; apply --attrib='href';" class="blockLink">
 		<div data-tlc="bind $var '.pid'; quickstart#addpicslider  --legacy;" class="prodThumbContainer displayOnly_960">
 			<img data-tlc="bind $var '.%attribs.zoovy:prod_image1'; if (is $var --notblank;) {{ apply --img --media=$var --width=133 --height=133 --bgcolor='#ffffff' --replace;}};" src="blank.gif" class="prodThumb" alt="" height="133" width="133">
 		</div>
@@ -920,7 +920,7 @@ remember to NOT put the button inside the 'onclick' container or two events will
 		<h5 data-tlc="bind $var '.%attribs.zoovy:prod_name'; if (is $var --notblank;) {{format --truncate='40'; apply --append;}};" class="sourceSans name displayNone_960 displayNone_480"></h5>
 
 		<h5 data-tlc="bind $var '.%attribs.zoovy:base_price'; if (is $var --notblank;) {{format --currency='USD'; format --prepend='OUR PRICE: '; apply --append;}};" class="sourceSans price"></h5>
-	</div>
+	</a>
 	
 </li>
 
@@ -961,21 +961,10 @@ container ul should have lineItemProdlist class on it instead of productList
 				<img data-tlc="bind $var '.%attribs.zoovy:prod_image1'; apply --img --media=$var --width=160 --height=160 --bgcolor='#ffffff' --replace;" src="blank.gif" class="prodThumb" alt="" height="160" width="160">
 				<div class="buttonList ui-widget ui-widget-header ui-corner-all alignCenter">
 
-<button class="ui-state-default ui-corner-all" title="add item to cart" onclick="showContent('product',{'pid':$(this).closest('[data-pid]').attr('data-pid')});">
-<span class="ui-icon ui-icon-cart"></span>
-</button>
-
-<button class="ui-state-default ui-corner-all" title="more information" data-app-click="quickstart|quickviewShow" data-loadstemplate="productTemplateQuickView">
-<span class="ui-icon ui-icon-info"></span>
-</button>
-
-<button class="ui-state-default ui-corner-all" title="write a review for this item" data-app-click="store_crm|productReviewShow">
-<span class="ui-icon ui-icon-star"></span>
-</button>
-
-<button class="ui-state-default ui-corner-all" title="remove item from list" data-app-click="store_crm|productBuyerListRemoveExec">
-<span class="ui-icon ui-icon-trash"></span>
-</button>
+<a data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';" class='applyButton' data-text='true' data-icon-primary='ui-icon-cart'>Add To Cart</a>
+<a href='#' data-app-click="quickstart|quickviewShow" class='applyButton' data-text='true' data-icon-primary='ui-icon-info'>Details</a>
+<a href='#' data-app-click="store_crm|productReviewShow" class='applyButton' data-text='true' data-icon-primary='ui-icon-star'>Write Review</a>
+<a href='#' data-app-click="store_crm|productBuyerListRemoveExec" class='applyButton' data-text='true' data-icon-primary='ui-icon-trash'>Remove From List</a>
 
 				</div>
 			</div>
@@ -984,7 +973,7 @@ container ul should have lineItemProdlist class on it instead of productList
 
 		<h5 data-tlc="bind $var '.%attribs.zoovy:prod_name'; if (is $var --notblank;) {{apply --append;}};"></h5>
 
-		<h6 data-tlc="bind $var '.%attribs.zoovy:base_price'; format --prepend='Our Price: '; format --currency='USD'; if (is $var --notblank;) {{apply --append;}};"></h6>
+		<h6 data-tlc="bind $var '.%attribs.zoovy:base_price';  if (is $var --notblank;) {{format --currency='USD'; format --prepend='Our Price: ';  apply --append;}};"></h6>
 
 
 	</div>
@@ -1030,7 +1019,7 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 <li id="productListTemplateResults" class="loadingBG searchResultsProduct ">
 	
 	<div data-tlc="bind $var '.pid'; apply --attrib='data-pid'; ">
-		<div data-tlc="bind $var '.prod_name'; apply --attrib='data-pid'; " onclick="showContent('product',{'pid':$(this).parent().attr('data-pid')});" class="pointer">
+		<a href="#" class="hideInMinimalMode pointer moreDetails" data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';">
 			<div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --hide; }}; if (is $var --notblank;) {{apply --append;}};" class="prodThumbContainer">
 				<!--
 				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ apply --img --media=$var --width=232 --height=232 --bgcolor='#ffffff';}};" src="blank.gif" class="prodThumb">
@@ -1044,7 +1033,7 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 
 			<h4 data-tlc="bind $var '.base_price'; if (is $var --notblank;) {{math --div='100'; format --currency='USD'; apply --append;}};" class="price"></h4>
 			
-		</div>
+		</a>
 	</div>
 	<img data-tlc="bind $var '.tags'; store_sac#showifshipfree  --legacy;" class="tag freeshipTag displayNone" src="images/shipfree.jpg">
 	<img data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="tag imajizeTag displayNone" src="images/360tag.png">
@@ -1052,16 +1041,16 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 </li>
 
 <li id="productListTemplateResultsNoPreview" class="loadingBG searchResultsProduct ">
-	<div onclick="return showContent('product', {'pid' : $(this).parent().attr('data-pid')});" class="pointer">
+	<a data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';" class="pointer">
 		<div class="prodThumbContainer">
-		<img data-tlc="bind $var '.images.0'; apply --img --media=$var --width=120 --height=120 --bgcolor='#ffffff' --replace;" src="blank.gif" class="prodThumb" alt="" height="120" width="120">
+		<img data-tlc="bind $var '.images.0'; if (is $var --notblank;) {{apply --img --media=$var --width=120 --height=120 --bgcolor='#ffffff' --replace;}};" src="blank.gif" class="prodThumb" alt="" height="120" width="120">
 		</div>
 
 		<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{apply --append;}};" class="hideInMinimalMode"></h5>
 
-		<h6 data-tlc="bind $var '.base_price'; format --prepend='Our Price: '; format --currency='USD'; if (is $var --notblank;) {{apply --append;}};" class="hideInMinimalMode"></h6>
-	</div>
-	<div class="hideInMinimalMode pointer moreDetails" onclick="showContent('product',{'pid':$(this).parent().attr('data-pid')});">more details</div>
+		<h6 data-tlc="bind $var '.base_price';  if (is $var --notblank;) {{format --currency='USD'; format --prepend='Our Price: ';  apply --append;}};" class="hideInMinimalMode"></h6>
+	</a>
+	<a class="hideInMinimalMode pointer moreDetails" data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';">more details</a>
 </li>
 </ul>
 
@@ -1394,7 +1383,7 @@ if you change these, you should move them above this comment so that when you (o
 <!--  used in breadcrumb -->
 <ul>
 	<li id="breadcrumbTemplate">
-	<a data-tlc="bind $var '.pretty'; quickstart#cattext  --legacy; apply --append;" href="#" onclick="return showContent('category',{'navcat':$(this).parent().attr('data-catsafeid')});"></a>
+	<a data-tlc="bind $var '.pretty'; quickstart#cattext  --legacy; apply --append;" data-tlc="bind $var '.'; store_routing#seoanchor --type='category' --seo; apply --attrib='href';"></a>
 	</li>
 </ul>
 
