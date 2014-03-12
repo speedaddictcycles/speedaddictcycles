@@ -202,7 +202,7 @@ optional params:
 		
 		renderFormats : {
 			productLink : function($tag, data){
-				var href="#!product/";
+				var href="#!/product/";
 				if(data.bindData.useParentData){
 					href += data.value.pid+"/";
 					if(data.bindData.seoattr){
@@ -225,18 +225,18 @@ optional params:
 					}
 				},
 			productAnchor : function(pid, seo){
-				return "#!product/"+pid+"/"+(seo ? encodeURI(seo) : '');
+				return "#!/product/"+pid+"/"+(seo ? encodeURI(seo) : '');
 				},
 			categoryAnchor : function(path,seo)	{
-				return "#!category/"+path+((seo) ? "/"+encodeURI(seo) : '');
+				return "#!/category/"+path+((seo) ? "/"+encodeURI(seo) : '');
 				},
 			searchAnchor : function(type,value)	{
 				var r;
 				if(type == 'tag')	{
-					r = '#!search/tag/'+value;
+					r = '#!/search/tag/'+value;
 					}
 				else if(type == 'keywords')	{
-					r = '#!search/keywords/'+value;
+					r = '#!/search/keywords/'+value;
 					}
 // ### FUTURE -> support ability to search for a match on a specific attribute.
 //				else if(type == 'attrib')	{
@@ -245,7 +245,7 @@ optional params:
 				else	{
 					//unrecognized type
 					}
-				return "#!category/"+path+((seo) ? "/"+encodeURI(seo) : '');
+				return "#!/category/"+path+((seo) ? "/"+encodeURI(seo) : '');
 				}
 			}, //u [utilities]
 
