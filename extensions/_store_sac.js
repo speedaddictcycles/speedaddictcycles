@@ -162,6 +162,9 @@ var store_sac = function(_app) {
 				else{
 					$tag.text(data.value['%attribs']['zoovy:prod_name']);
 					}
+				if(!_app.ext.store_product.u.productIsPurchaseable(data.value.pid)){
+					$tag.attr('disabled','disabled');
+				}
 				},
 			imajize : function($tag, data){
 				var src = "http://embed.imajize.com/"+data.value;

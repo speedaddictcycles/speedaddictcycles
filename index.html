@@ -634,7 +634,7 @@ the homepageTemplate template is loaded into mainContentArea by default when the
 			<div id="homepageFeaturesCarouselPrev" class="displayNone_320 pointer"></div>
 			<div id="homepageFeaturesCarouselBody">
 				<h3 class="sourceSans carouselHeader alignCenter">SAC BLOWOUTS</h3>
-				<ul data-tlc="bind $var '.$featured_product.@products'; store_prodlist#productlist  --hidesummary='1' --withreviews='1' --templateid='productListTemplateCarousel'  --legacy;" data-sac="carousel" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul>
+				<ul data-tlc="bind $var '.$featured_product.@products'; store_prodlist#productlist  --hidesummary='1' --withReviews='1' --templateid='productListTemplateCarousel'  --legacy;" data-sac="carousel" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul>
 			</div>
 			<div id="homepageFeaturesCarouselNext" class="displayNone_320 pointer"></div>
 		</div>
@@ -690,7 +690,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 
 	<ul data-tlc="bind $var '.@subcategoryDetail'; store_navcats#categorylist  --detail='max' --templateid='categoryListTemplate'  --legacy;" class="listStyleNone fluidList clearfix noPadOrMargin categoryList"></ul><!-- outputs a list of subcategories -->
 
-	<ul data-tlc="bind $var '.@products'; store_prodlist#productlist  --withreviews='1' --withinventory='1' --withvariations='1' --itemsperpage='25' --templateid='productListTemplate'  --legacy;" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul><!-- outputs the product list -->
+	<ul data-tlc="bind $var '.@products'; store_prodlist#productlist  --withReviews='1' --withInventory='1' --withVariations='1' --itemsperpage='25' --templateid='productListTemplate'  --legacy;" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul><!-- outputs the product list -->
 
 	<p data-tlc="bind $var '.%page.description2'; if (is $var --notblank;) {{ render --wiki='quickstart'; apply --append;}};"></p>
 
@@ -1193,7 +1193,7 @@ this will likely become more flexible in the future. ###
 
 			<form data-tlc="bind $var '.pid'; store_product#atcform  --legacy;" class="prodViewerAddToCartForm clearfix" action="#" data-app-submit="store_sac|productAdd2Cart">
 				<div data-tlc="bind $var '.%attribs.zoovy:grp_children'; if(is $var --notblank;) {{ apply --show; }}; " class="prodChildren displayNone">
-					<select data-tlc="bind $var '.%attribs.zoovy:grp_children'; store_prodlist#productlist  --withinventory='1' --withvariations='1' --templateid='productListTemplateChildrenOption'  --legacy;">
+					<select data-tlc="bind $var '.%attribs.zoovy:grp_children'; store_prodlist#productlist  --withInventory='1' --withVariations='1' --templateid='productListTemplateChildrenOption'  --legacy;">
 						<option value="">Choose Option...</option>
 					</select>
 				</div>
@@ -1271,13 +1271,13 @@ this will likely become more flexible in the future. ###
 			</div>
 		
 			<div class="tabContent" data-anytab-content="prodAccessories">
-				<ul data-tlc="bind $var '.%attribs.zoovy:accessory_products'; store_prodlist#productlist  --hidepagination='true' --hidesummary='true' --withreviews='1' --withinventory='1' --withvariations='1' --templateid='productListTemplateATC'  --legacy; apply --append;" class="listStyleNone fluidList clearfix noPadOrMargin lineItemProdlist"></ul>
+				<ul data-tlc="bind $var '.%attribs.zoovy:accessory_products'; store_prodlist#productlist  --hidepagination='true' --hidesummary='true' --withReviews='1' --withInventory='1' --withVariations='1' --templateid='productListTemplateATC'  --legacy; apply --append;" class="listStyleNone fluidList clearfix noPadOrMargin lineItemProdlist"></ul>
 			</div>
 		
 		</div>
 
 		<div class="prodlistRelatedContainer">
-			<ul data-tlc="bind $var '.%attribs.zoovy:related_products'; store_prodlist#productlist  --hidepagination='true' --hidesummary='true' --before='<h2>Similar Items</h2>' --withreviews='1' --templateid='productListTemplate'  --legacy;" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul>
+			<ul data-tlc="bind $var '.%attribs.zoovy:related_products'; store_prodlist#productlist  --hidepagination='true' --hidesummary='true' --before='<h2>Similar Items</h2>' --withReviews='1' --templateid='productListTemplate'  --legacy;" class="listStyleNone fluidList clearfix noPadOrMargin productList"></ul>
 		</div>
 	</div>
 
