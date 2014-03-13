@@ -269,10 +269,10 @@ var store_sac = function(_app) {
 				$banner.append($img);
 				
 				if(bannerJSON.prodLink){
-					$banner.attr("data-onClick", "appLink").attr("href","#!product?pid="+bannerJSON.prodLink);
+					$banner.attr("data-onClick", "appLink").attr("href","#!/"+bannerJSON.prodLink);
 					}
 				else if(bannerJSON.catLink){
-					$banner.attr("data-onClick", "appLink").attr("href","#!category?navcat="+bannerJSON.catLink);
+					$banner.attr("data-onClick", "appLink").attr("href","#!/"+bannerJSON.catLink);
 					}
 				else if(bannerJSON.searchLink){
 					$banner.attr("data-onClick", "appLink").attr("href","#!search?KEYWORDS="+bannerJSON.searchLink);

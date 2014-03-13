@@ -1,16 +1,22 @@
 {
 	"slides": [
 		{
-			"src": "banner/leovince_gp_corsa_exhausts.jpg",
+			"src": "banner/olympia_gloves.jpg",
 			"alt": "",
 			"title": "",
-			"searchLink": "gp corsa"
+			"catLink": "catagory/.brands.olympia.gloves"
 		},
 		{
 			"src": "banner/slideshow_test900x403.jpg",
 			"alt": "",
 			"title": "",
-			"catLink": ".brands.airoh"
+			"catLink": "catagory/.brands.airoh.helmets"
+		},
+		{
+			"src": "banner/kiva_banner_save.jpg",
+			"alt": "",
+			"title": "",
+			"catLink": "company/about/"
 		}
 	],
 	"dims": [
