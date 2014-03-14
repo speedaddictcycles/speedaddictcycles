@@ -1023,25 +1023,27 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 </li>
 
 -->
+<!-- Schad Turned off 360 results, to turn on fix 360 add I to id for viewer id check -->
 <li id="productListTemplateResults" class="loadingBG searchResultsProduct ">
-	
 	<div data-tlc="bind $var '.pid'; apply --attrib='data-pid'; ">
 		<a href="#" class="hideInMinimalMode pointer moreDetails" data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';">
-			<div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --hide; }}; if (is $var --notblank;) {{apply --append;}};" class="prodThumbContainer">
+			<div data-tlc="bind $var '.prod_360_viewer_d'; if(is $var --notblank;) {{ apply --hide; }}; if (is $var --notblank;) {{apply --append;}};" class="prodThumbContainer">
 				<!--
 				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ apply --img --media=$var --width=232 --height=232 --bgcolor='#ffffff';}};" src="blank.gif" class="prodThumb">
 				-->
 				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ store_sac#imageurl --name=$var --w=232 --h=232 --b='ffffff'; apply --attrib='src';}};" src="blank.gif" class="prodThumb">
+			
 			</div>
-			<div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
+			<div data-tlc="bind $var '.prod_360_viewer_d'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
 				<iframe data-tlc="bind $var '.prod_360_viewer_id'; store_sac#imajize  --legacy;" class="prodThumb"></iframe>
 			</div>
-			<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{format --truncate='54'; apply --append;}};" class="name"></h5>
+			<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{format --truncate='80'; apply --append;}};" class="name"></h5>
 
 			<h4 data-tlc="bind $var '.base_price'; if (is $var --notblank;) {{math --div='100'; format --currency='USD'; apply --append;}};" class="price"></h4>
 			
 		</a>
 	</div>
+
 	<img data-tlc="bind $var '.tags'; store_sac#showifshipfree  --legacy;" class="tag freeshipTag displayNone" src="images/shipfree.jpg">
 	<img data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="tag imajizeTag displayNone" src="images/360tag.png">
 	<img data-tlc="bind $var '.videoid'; if(is $var --notblank;) {{ apply --show; }}; " class="tag videoTag displayNone" src="images/videotag.png">
