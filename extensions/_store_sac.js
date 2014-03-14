@@ -695,6 +695,10 @@ var store_sac = function(_app) {
 					"lock_type" : [{"p":"Chain Locks","v":"chain"},{"p":"Armored Locks","v":"armored"},{"p":"Cable Locks","v":"cable"},{"p":"Disc Locks","v":"disc"},{"p":"U-Locks","v":"ulock"}],
 					}
 				},
+			".brands.k-and-n.products" : {
+				"base" : {"term" : {"app_brand" : "k+n"}},
+				"options" : {}
+				},
 			}
 		} //r object.
 	return r;
