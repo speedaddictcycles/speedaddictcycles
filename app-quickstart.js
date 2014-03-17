@@ -2633,6 +2633,7 @@ buyer to 'take with them' as they move between  pages.
 						}
 					infoObj.state = 'init';
 					var parentID = infoObj.parentID || infoObj.templateID+'_'+_app.u.makeSafeHTMLId(catSafeID);
+					dump('parentID: '+parentID);
 					var $parent = $(_app.u.jqSelector('#',parentID));
 					
 					dump(" -> $parent.length: "+$parent.length);
@@ -2649,7 +2650,8 @@ buyer to 'take with them' as they move between  pages.
 						}
 					else	{
 //						var $content = _app.renderFunctions.createTemplateInstance(infoObj.templateID,{"id":parentID,"catsafeid":catSafeID});
-						$parent = $("<div>",{id:parentID,"data-catsafeid":catSafeID}).tlc({templateid:infoObj.templateID,'verb':'template'}).children();
+						$parent = new tlc().getTemplateInstance(infoObj.templateID);
+						$parent.attr({id:parentID,"data-catsafeid":catSafeID});
 //if dialog is set, we've entered this function through showPageInDialog.
 //content gets added immediately to the dialog.
 //otherwise, content is added to mainContentArea and hidden so that it can be displayed with a transition.

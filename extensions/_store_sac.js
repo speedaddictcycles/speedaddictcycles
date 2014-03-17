@@ -52,7 +52,6 @@ var store_sac = function(_app) {
 			onSuccess : function(){
 				dump('attaching custom handlers');
 				_app.templates.homepageTemplate.on('complete.sac',function(event, $context, infoObj){
-					dump('homepageComplete');
 					_app.ext.store_sac.u.startHomepageSlideshow();
 					
 					var $carousel = $('[data-sac=carousel]',$context);
@@ -216,9 +215,11 @@ var store_sac = function(_app) {
 				if(_app.ext.store_sac.vars.bannerJSON){
 					var $slideshow = $('#homepageSlideshow');
 					if($slideshow.hasClass('slideshowRendered')){
+						dump('slideshow already here');
 						//already rendered, do nothing.
 						}
 					else {
+						dump('appending banners');
 						for(var i=0; i < _app.ext.store_sac.vars.bannerJSON.slides.length; i++){
 							var $banner = _app.ext.store_sac.u.makeBanner(_app.ext.store_sac.vars.bannerJSON.slides[i]);
 							$slideshow.append($banner);
