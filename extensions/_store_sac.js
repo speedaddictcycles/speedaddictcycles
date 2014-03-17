@@ -376,11 +376,19 @@ var store_sac = function(_app) {
 				p.preventDefault();
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
+					var cartObj = {"_cartid":_app.model.fetchCartID(),"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()};
 					if($childSelect.val()){
-						_app.ext.cco.calls.cartItemAppend.init({"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()},{},'immutable');
-						_app.model.destroy('cartDetail');
-						_app.calls.cartDetail.init({'callback':function(rd){
-							showContent('cart',{'show':$form.data('show')});
+						_app.ext.cco.calls.cartItemAppend.init(cartObj,{},'immutable');
+						_app.model.destroy('cartDetail|'+cartObj._cartid);
+						_app.calls.cartDetail.init(cartObj._cartid,{'callback':function(rd){
+							if(_app.model.responseHasErrors(rd)){
+								$('#globalMessaging').anymessage({'message':rd});
+								}
+							else	{
+								_app.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'});
+								dump(" ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+								cartMessagePush(cartObj._cartid,'cart.itemAppend',_app.u.getWhitelistedObject(cartObj,['sku','pid','qty','quantity','%variations']));
+								}
 							}},'immutable');
 						_app.model.dispatchThis('immutable');
 						}
