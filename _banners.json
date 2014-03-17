@@ -1,48 +1,31 @@
 {
 	"slides": [
 		{
-			"src": "banner/olympia_gloves.jpg",
+			"name": "banner/olympia_gloves.jpg",
+			"w":"960",
+			"h":"403",
+			"b":"000000",
 			"alt": "",
 			"title": "",
-			"catLink": "category/.brands.olympia.gloves"
+			"href": "#!/category/.brands.olympia.gloves/"
 		},
 		{
-			"src": "banner/slideshow_test900x403.jpg",
+			"name": "banner/slideshow_test900x403.jpg",
+			"w":"960",
+			"h":"403",
+			"b":"000000",
 			"alt": "",
 			"title": "",
-			"catLink": "category/.brands.airoh.helmets"
+			"catLink": "#!/category/.brands.airoh.helmets/"
 		},
 		{
-			"src": "banner/kiva_banner_save.jpg",
+			"name": "banner/kiva_banner_save.jpg",
+			"w":"960",
+			"h":"403",
+			"b":"000000",
 			"alt": "",
 			"title": "",
-			"catLink": "company/payment"
-		}
-	],
-	"dims": [
-		{
-			"param": "479w",
-			"w": "320",
-			"h": "132"
-		},
-		{
-			"param": "639w",
-			"w": "480",
-			"h": "200"
-		},
-		{
-			"param": "767w",
-			"w": "640",
-			"h": "267"
-		},
-		{
-			"param": "959w",
-			"w": "768",
-			"h": "321"
-		},
-		{
-			"w": "960",
-			"h": "403"
+			"catLink": "#!/company/payment/"
 		}
 	],
 	"pagerHTML": "<div class='pager'></div>",

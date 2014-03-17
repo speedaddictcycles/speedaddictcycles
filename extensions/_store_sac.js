@@ -220,7 +220,7 @@ var store_sac = function(_app) {
 						}
 					else {
 						for(var i=0; i < _app.ext.store_sac.vars.bannerJSON.slides.length; i++){
-							var $banner = _app.ext.store_sac.u.makeBanner(_app.ext.store_sac.vars.bannerJSON.slides[i], _app.ext.store_sac.vars.bannerJSON.dims, "000000");
+							var $banner = _app.ext.store_sac.u.makeBanner(_app.ext.store_sac.vars.bannerJSON.slides[i]);
 							$slideshow.append($banner);
 							}
 						$slideshow.append($(_app.ext.store_sac.vars.bannerJSON.pagerHTML));
@@ -242,10 +242,11 @@ var store_sac = function(_app) {
 						_app.u.dump("BANNERS FAILED TO LOAD");
 						});
 				},
-			makeBanner : function(bannerJSON, dims, b){
+			makeBanner : function(bannerJSON){
 				var $banner = $('<a></a>');
 				
 				var $img = $('<img />');
+				/*
 				var srcset = "";
 				for(var i=0; i < dims.length; i++){
 					var src = _app.u.makeImage({
@@ -266,9 +267,14 @@ var store_sac = function(_app) {
 						}
 					}
 				$img.attr('srcset', srcset);
-				$banner.append($img);
+				*/
+				$img.attr('src',_app.u.makeImage(bannerJSON));
 				
-				if(bannerJSON.prodLink){
+				$banner.append($img);
+				if(bannerJSON.href){
+					$banner.attr('href', bannerJSON.href);
+					}
+				/*if(bannerJSON.prodLink){
 					$banner.attr("data-onClick", "appLink").attr("href","#!/"+bannerJSON.prodLink);
 					}
 				else if(bannerJSON.catLink){
@@ -280,6 +286,7 @@ var store_sac = function(_app) {
 				else {
 					//just a banner!
 					}
+				*/
 				return $banner;
 				},
 			initFilteredSearch : function($context, infoObj){
