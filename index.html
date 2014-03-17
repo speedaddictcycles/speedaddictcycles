@@ -197,11 +197,13 @@ $(document).ready(function(){
 					<img src="images/questions_bar_434x13.png" />
 				</a>
 			</div>
-			<div id="searchBar" class="sourceSans floatLeft">
-				<div id="searchBtn" class="alignCenter">SEARCH</div>
+			<form id="searchBar" onSubmit="return false;" class="sourceSans floatLeft" data-app-submit="store_sac|searchFormSubmit">
+				<div id="searchBtn" class="alignCenter" onClick="$(this).parent().trigger('submit');">SEARCH</div>
 				<input name="search" id="searchBarInput" type="text"/>
+				<!--
 				<div id="deptSearchBtn" class="alignCenter displayNone_320">DEPARTMENT SEARCH</div>
-			</div>
+				-->
+			</form>
 		<div id="nav" class="clear sourceSans">
 			<div data-sac="dropdown" class="floatLeft navOption navOptionBorderRight_320 navOptionBorderBottom_320">
 				<a class="navLink" href="#!/category/.motorcycle-helmets/">HELMETS</a>

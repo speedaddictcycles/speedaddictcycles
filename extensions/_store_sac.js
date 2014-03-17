@@ -390,7 +390,12 @@ var store_sac = function(_app) {
 				else {
 					_app.ext.quickstart.e.productAdd2Cart($form, p);
 					}
-				}
+				},
+			searchFormSubmit : function($form, p){
+				p.preventDefault();
+				var json = $form.serializeJSON();
+				window.location.hash = "#!/search/"+json.search+"/";
+			}
 			}, //e [app Events]
 			
 		// A map of navcats to objects containing their base filters and available filters for filtered search.  
