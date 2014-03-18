@@ -155,8 +155,8 @@ var store_sac = function(_app) {
 			prodchildoption: function($tag, data){
 				$tag.val(data.value.pid);
 				dump(data.value);
-				if(data.value['%attribs']['amz:grp_varvalue']){
-					$tag.text(data.value['%attribs']['amz:grp_varvalue']);
+				if(data.value['%attribs']['zoovy:prod_size']){
+					$tag.text(data.value['%attribs']['zoovy:prod_size']);
 					}
 				else{
 					$tag.text(data.value['%attribs']['zoovy:prod_name']);
