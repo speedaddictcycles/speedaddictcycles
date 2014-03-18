@@ -468,7 +468,7 @@ var store_sac = function(_app) {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"helmet_accessories"}}]},
 				"options" : {
 					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					"helmet_parts":[{"p":"Shields","v":"shields"},{"p":"Cheek Pads","v":"cheek_pads"},{"p":"Head Liners","v":"head_liners"},{"p":"Other Parts","v":"other_parts"},{"p":"MX Visors","v":"mx_visors"},{"p":"Helmet Bags","v":"helmet_bags"}]
 					}
 				},
 			".motorcycle-helmets.dirt-bike" : {
