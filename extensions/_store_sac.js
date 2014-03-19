@@ -720,6 +720,10 @@ var store_sac = function(_app) {
 				"base" : {"term" : {"app_brand" : "k+n"}},
 				"options" : {}
 				},
+			".test2" : {
+				"base" : {"term" : {"make_key" : "test"}},
+				"options" : {}
+				},
 			}
 		} //r object.
 	return r;
