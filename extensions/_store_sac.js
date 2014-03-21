@@ -722,7 +722,9 @@ var store_sac = function(_app) {
 				},
 			".test2" : {
 				"base" : {"term" : {"make_key" : "test"}},
-				"options" : {}
+				"options" : {
+					"app_brand" : [{"p":"Cortech","v":"cortech"},{"p":"Tourmaster","v":"tourmaster"},{"p":"Fieldsheer","v":"fieldsheer"},{"p":"Mobile Warming","v":"mobile_warming"},{"p":"Shoei","v":"shoei"},{"p":"Pokerun","v":"pokerun"}],
+				}
 				},
 			}
 		} //r object.
