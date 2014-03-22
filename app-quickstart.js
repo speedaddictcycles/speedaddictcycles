@@ -123,6 +123,7 @@ var quickstart = function(_app) {
 				if(cartID)	{
 					dump(" -> cartID is set, validate.");
 					// the addCart2CM uses the 'appCartExists' datapointer. if it changes here, update the callback.
+					_app.model.addCart2Session(cartID);
 					_app.model.addDispatchToQ({"_cmd":"appCartExists",_cartid:cartID,"_tag":{"datapointer":"appCartExists","cartid":cartID,"callback":"addCart2CM","extension":"quickstart"}},"mutable");
 					//do not set cart ID in session until it validates.
 					}
