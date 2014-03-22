@@ -1100,9 +1100,11 @@ this will likely become more flexible in the future. ###
 		<ul data-tlc="bind $var '.session.recentCategories.0'; store_navcats#breadcrumb  --templateid='breadcrumbTemplate'  --legacy;" class="clearfix noPadOrMargin fluidList breadcrumb"></ul>
 	</div>
 	<div class="floatRight prodSideBar displayOnly_960 alignCenter">
+	<!-- Schad turned off, need to configure banners
 		<div>Free Shipping</div>
 		<div>Special Offer</div>
 		<div>Recently Viewed Items</div>
+		-->
 	</div>
 	<div class="prodViewerContainer">
 		<div class="prodImageContainer floatLeft lowlightText">
@@ -1243,7 +1245,9 @@ this will likely become more flexible in the future. ###
 				<li data-tlc="bind $var '.%attribs.zoovy:prod_detail'; if(is $var --notblank) {{apply --show; }};" class="prodDetailTab displayNone"><a href="#prodSpecs">Specs</a></li>
 				<li data-tlc="bind $var '.%attribs.zoovy:prod_features'; if(is $var --notblank) {{ apply --show; }};" class="prodFeaturesTab displayNone"><a href="#prodFeatures">Features</a></li>
 				<li class="prodReviewsTab"><a href="#prodReviews">Reviews</a></li>
+					<!-- Schad Turned off, not working
 				<li data-tlc="bind $var '.%attribs.youtube:videoid'; if(is $var --notblank) {{ apply --show; }};" class="prodVideoTab displayNone"><a href="#prodVideo">Video</a></li>
+				-->
 				<li data-tlc="bind $var '.%attribs.zoovy:accessory_products'; if(is $var --notblank) {{ apply --show; }};" class="prodAccessoriesTab displayNone"><a href="#prodAccessories">Accessories</a></li>
 			</ul>
 		
@@ -1269,10 +1273,11 @@ this will likely become more flexible in the future. ###
 				<ul data-tlc="bind $var '.reviews.@reviews'; controller#loop --templateid='productReviewsTemplateDetail'; if (is $var --notblank;) {{apply --append;}};" class="listStyleNone clearfix productReviewsList"></ul>
 		
 			</div>
-		
+		<!-- Schad Turned off, not working
 			<div class="tabContent" data-anytab-content="prodVideo">
 				<div data-tlc="bind $var '.%attribs.youtube:videoid'; controller#youtubevideo; if (is $var --notblank;) {{apply --append;}};"></div>
 			</div>
+			-->
 		
 			<div class="tabContent" data-anytab-content="prodAccessories">
 				<ul data-tlc="bind $var '.%attribs.zoovy:accessory_products'; store_prodlist#productlist  --hidepagination='true' --hidesummary='true' --withReviews='1' --withInventory='1' --withVariations='1' --templateid='productListTemplateATC'  --legacy; apply --append;" class="listStyleNone fluidList clearfix noPadOrMargin lineItemProdlist"></ul>
