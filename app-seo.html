@@ -27987,7 +27987,7 @@
 						indexNextPage(maxTimeout);
 					}, parseInt(maxTimeout)*1000);
 				} else {
-					indexNextPage(maxTimeout);
+					setTimeout(function(){indexNextPage(maxTimeout)},1);
 				}
 			} else {
 				console.log("no more pages")
