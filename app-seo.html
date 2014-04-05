@@ -27991,7 +27991,7 @@
 				}
 			} else {
 				console.log("no more pages")
-				 $('#appContainer').get(0).empty().remove();
+				 $('#appContainer').get(0).remove();
 				//Temporarily bypassing this until we have a domain on 201401 to test
 				finishSEO();
 				window.lock = false;
@@ -28010,7 +28010,7 @@
 			var body = /<body[^>]*>((.*\n*\r*\u2028*\u2029*)*)<\/body>/;
 			var removeHtml = body.exec(dochtml)[1];
 			var $tmp = $('<div>'+removeHtml+'</div>');
-			$('.seoStrip', $tmp).each(function(){
+			$('.seoStrip, script', $tmp).each(function(){
 				$(this).empty().remove();
 			});
 			dochtml = dochtml.replace(removeHtml, $tmp.html());
