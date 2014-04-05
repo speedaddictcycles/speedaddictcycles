@@ -28004,27 +28004,23 @@
 			
 			var iframe = $('#appContainer').get(0);
 			
+			var doc = $('#appContainer').get(0).contentWindow.document
+			$(doc.getElementsByTagName('script')).each(function(){$(this).remove()});
+			
+			console.log(doc.getElementsByTagName('script'));
+			console.log(doc.getElementsByTagName('script').length);
+			
 			var doctype = "<!DOCTYPE html>";
-			var dochtml = $('#appContainer').get(0).contentWindow.document.documentElement.outerHTML;
+			var dochtml = doc.documentElement.outerHTML;
 			
 			var body = /<body[^>]*>((.*\n*\r*\u2028*\u2029*)*)<\/body>/;
-			var head = /<head[^>]*>((.*\n*\r*\u2028*\u2029*)*)<\/head>/;
-			
 			var removeHtml = body.exec(dochtml)[1];
 			var $tmp = $('<div>'+removeHtml+'</div>');
 			$('.seoStrip, script', $tmp).each(function(){
 				$(this).empty().remove();
 			});
 			dochtml = dochtml.replace(removeHtml, $tmp.html());
-			$tmp.empty().remove();
-			
-			removeHtml = head.exec(dochtml)[1];
-			$tmp = $('<div>'+removeHtml+'</div>');
-			$('.seoStrip, script', $tmp).each(function(){
-				$(this).empty().remove();
-			});
-			dochtml = dochtml.replace(removeHtml, $tmp.html());
-			$tmp.empty().remove();
+			$tmp.remove();
 			
 			var html = doctype + dochtml;
 			
