@@ -624,6 +624,14 @@ var store_sac = function(_app) {
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
+			".brands.hjc.helmets" : {
+				"base" : {"and" : [{"term" : {"app_brand" : "hjc"}},{"term" : {"prod_is_general":"helmet"}}]},
+				"options" : {
+					"riding_style":[{"p":"Street","v":"street"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"}],
+					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
+					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
+					}
+				},
 			".brands.suomy.helmets" : {
 				"base" : {"and" : [{"term" : {"app_brand" : "suomy"}},{"term" : {"prod_is_general":"helmet"}}]},
 				"options" : {
@@ -723,7 +731,7 @@ var store_sac = function(_app) {
 			".test2" : {
 				"base" : {"term" : {"make_key" : "test"}},
 				"options" : {
-					"app_brand" : [{"p":"Cortech","v":"cortech"},{"p":"Tourmaster","v":"tourmaster"},{"p":"Fieldsheer","v":"fieldsheer"},{"p":"Mobile Warming","v":"mobile_warming"},{"p":"Shoei","v":"shoei"},{"p":"Pokerun","v":"pokerun"}],
+					"app_brand" : [{"p":"HJC","v":"hjc"},{"p":"Cortech","v":"cortech"},{"p":"Tourmaster","v":"tourmaster"},{"p":"Fieldsheer","v":"fieldsheer"},{"p":"Mobile Warming","v":"mobile_warming"},{"p":"Shoei","v":"shoei"},{"p":"Pokerun","v":"pokerun"}],
 				}
 				},
 			}
