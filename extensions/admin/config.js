@@ -105,26 +105,61 @@ var admin_config = function(_app) {
 				_app.u.handleButtons($target);
 				},
 
-			showNotifications : function($target)	{
-				$target.intervaledEmpty();
-				_app.u.addEventDelegation($target);
-				$target.anycontent({
-					'templateID' : 'notificationPageTemplate'
-					}).anyform({'trackEdits':true});
+			passwordUpdate : function($target,P)	{
+				$target.tlc({'templateid':'passwordUpdateTemplate','verb':'template'});
 				_app.u.handleButtons($target);
-				_app.model.addDispatchToQ({
-					'_cmd':'adminConfigDetail',
-					'notifications' : true,
-					'_tag':	{
-						'datapointer' : 'adminConfigDetail|notifications',
-						'callback':'anycontent',
-						'translateOnly' : true,
-						'jqObj' : $target
-						}
-					},'mutable');
-				_app.model.dispatchThis('mutable');
-
+				_app.u.addEventDelegation($target);
 				},
+
+
+			//shows the lists of all blast messages and the means to edit each one individually.
+			showNotifications : function($target,params)	{
+				$target.showLoading({"message":"Fetching notifications"});
+				$target.tlc({'templateid':'notificationPageTemplate','verb':'template'});
+				_app.u.addEventDelegation($target);
+				_app.u.handleButtons($target);
+				$(".slimLeftNav .accordion",$target).accordion({
+					heightStyle: "content"
+					});
+
+				_app.model.addDispatchToQ({'_cmd':'adminConfigDetail','notifications':1,'_tag':{'datapointer':'adminConfigDetail|'+_app.vars.partition+'|notifications',callback : function(rd){
+
+					$target.hideLoading();
+					if(_app.model.responseHasErrors(rd)){
+						$target.anymessage({'message':rd});
+						}
+					else	{
+
+						var notes = _app.data[rd.datapointer]['@NOTIFICATIONS'];
+						
+						for(var i = 0, L = notes.length; i < L; i += 1)	{
+							var e = (notes[i].event ? notes[i].event.split('.')[0] : '');
+							if(e && notes[i])	{
+								$("[data-app-role='notifications_"+e+"']",$target).append("<li data-app-click='admin_config|notificationUpdateShow' class='lookLikeLink' data-event="+notes[i]['event']+"><b>"+notes[i]['event'] +" <\/li>");
+								}
+							else	{
+								//either no verb set or @VERBS was empty.
+								}
+							}
+						//when the accordion is originally generated, there's no content, so the accordion panels have no height. this corrects.
+						// the accordion does get initiated here because the left column looked out of place for too long.
+						$(".slimLeftNav .accordion",$target).accordion('refresh');
+						//handle loading the content. 
+						if(params.msgid)	{
+							$("[data-msgid='"+_app.u.jqSelector('',params.msgid)+"']",$target).trigger('click').closest('.ui-accordion-content').prev('.ui-accordion-header').trigger('click');
+							}
+						else if(params.setting)	{
+							$("[data-setting='"+_app.u.jqSelector('',params.setting)+"']",$target).trigger('click');
+							}
+						else	{
+							$("[data-setting='general']",$target).trigger('click');
+							}
+						}
+
+					}}},'mutable');
+
+				_app.model.dispatchThis("mutable");
+				}, //blastMessagesList
 
 			showBillingHistory : function($target)	{
 				$target.empty();
@@ -148,41 +183,68 @@ var admin_config = function(_app) {
 				_app.model.dispatchThis('mutable');
 				},
 		
-			showPluginManager : function($target)	{
+			showPluginManager : function($target,p)	{
 				$target.showLoading({'message':'Fetching Your Integration Data'});
-
+				_app.u.addEventDelegation($target);
 				_app.model.addDispatchToQ({
 					'_cmd':'adminConfigDetail',
 					'plugins':1,
 					'_tag':{
-						'callback': function(rd)	{
-							if(_app.model.responseHasErrors(rd)){
-								$target.anymessage({'message':rd});
+						'callback': 'tlc',
+						'templateID' : 'pluginManagerPageTemplate',
+						'jqObj' : $target,
+						'onComplete' : function(rd)	{
+							var plugs = _app.data[rd.datapointer]['@PLUGINS'];
+							var $nav = $("[data-app-role='slimLeftNav']",$target); //used to get narrow context.
+							var $tmp = $("<ul>");
+							for(var i = 0, L = plugs.length; i < L; i += 1)	{
+								if($("li[data-plugin='"+plugs[i].plugin+"']",$nav).length)	{}
+								else	{
+									$tmp.append("<li data-plugin='"+plugs[i].plugin+"' data-app-click='admin_config|pluginUpdateShow' class='lookLikeLink'>"+plugs[i].plugin+"</li>");
+									}
 								}
-							else	{
-								$target.anycontent({'templateID' : 'pluginManagerPageTemplate','datapointer':rd.datapointer});
-								_app.u.addEventDelegation($target);
-								_app.u.handleButtons($target);
-								$("[data-app-role='slimLeftNav']",$target).accordion();
+							if($tmp.children().length)	{$("[data-app-role='pluginOtherList']",$nav).append($tmp.children())}
+							$("[data-app-role='slimLeftNav']",$target).accordion({heightStyle: "content"});
+							if(p.plugin)	{
+								$("li[data-plugin='"+p.plugin+"']:first").trigger('click').closest('ul').prev().trigger('click');
 								}
 							},
 						'datapointer':'adminConfigDetail|plugins'
 					}
 				},'mutable');
 				_app.model.dispatchThis('mutable');
-
 				},
 			
 			showPlugin : function($target,vars)	{
 				vars = vars || {};
-				
-				if($target instanceof jQuery && vars.plugin)	{
-//					_app.u.dump(' -> templateID: '+'pluginTemplate_'+vars.plugintype+'_'+vars.plugin);
-					$target.empty().anycontent({'templateID':'pluginTemplate_'+vars.plugin,'data':_app.ext.admin_config.u.getPluginData(vars.plugin)});
+				if($target instanceof jQuery && (vars.plugin || vars.verb == 'create'))	{
+					var dataset, $template;
+					vars.scope='PRT'
+					
+					if(vars.verb == 'create')	{
+						dataset = {};
+						$template = new tlc().getTemplateInstance('pluginTemplate_generic');
+						}
+					else	{
+						//we get a template here for two reasons. 1 is to see if it exists. 2 is because if it does exist, it may have attributes we need for 'settings'
+						$template = new tlc().getTemplateInstance('pluginTemplate_'+vars.plugin);
+						//verify whether or not a specific template exists for this partner. if so, use it. otherwise, defualt to the generic one.
+						if($template instanceof jQuery)	{
+							vars.scope = $template.attr('data-plugin-scope') || 'PRT';
+							}
+						else	{
+							$template = new tlc().getTemplateInstance('pluginTemplate_generic');
+							}
+						dataset = $.extend({},vars,_app.vars,_app.ext.admin_config.u.getPluginData(vars.plugin));
+						}
+
+					$target.empty().append($template);
+					//need to translate the plugin container so that the 'edit' and button tlc is translated.
+					$target.closest("[data-app-role='slimLeftContentSection']").tlc({'verb':'translate','dataset':dataset}).find('.buttonset').show();
+					$target.closest('form').anyform({'trackEdits':true}).data({'verb':vars.verb,'scope':vars.scope.toUpperCase()});
+
 					_app.u.handleCommonPlugins($target);
-					$target.parent().find('.buttonset').show();
-//					_app.u.dump(" -> $target.closest('form').length: "+$target.closest('form').length);
-					_app.ext.admin.u.applyEditTrackingToInputs($target.closest('form'));
+					_app.u.handleButtons($target);
 					}
 				else	{
 					$('#globalMessaging').anymessage({"message":"In admin_config.a.showPlugin, $target was not set or is not an instance of jQuery or vars.plugin ["+vars.plugin+"] no set.","gMessage":true});
@@ -247,11 +309,14 @@ var admin_config = function(_app) {
 							$target.append($("<input \/>",{'name':'tenderGroup','type':'hidden'}).val('OFFLINE'));
 							$target.anycontent({'templateID':'paymentAvailabilityTemplate',data : payData});
 							break;
-						
-						
-						case 'CHECK':
+						// ** 201402 -> these payment types no longer support a handling fee.
 						case 'COD':
 						case 'CHKOD':
+							$target.append($("<input \/>",{'name':'tenderGroup','type':'hidden'}).val('OFFLINE'));
+							$("<div \/>").anycontent({'templateID':'paymentAvailabilityTemplate',data : payData}).appendTo($target);
+							break;
+						
+						case 'CHECK':
 							$target.append($("<input \/>",{'name':'tenderGroup','type':'hidden'}).val('OFFLINE'));
 							$("<div \/>").anycontent({'templateID':'paymentAvailabilityTemplate',data : payData}).appendTo($target);
 							$("<div \/>").anycontent({'templateID':'paymentHandlingFeeTemplate',data : payData}).appendTo($target);
@@ -497,6 +562,8 @@ var admin_config = function(_app) {
 					'header' : 'Coupon Manager', //left off because the interface is in a tab.
 					'className' : 'couponManager',
 					'buttons' : [
+						"<button data-app-click='admin_tools|siteDebugDialog' data-verb='adminDebugPromotion' class='applyButton'>Debug</button>",
+						"<button data-app-click='admin_batchjob|adminBatchJobExec' data-type='EXPORT/RULES' data-element data-export='coupon' data-whitelist='export' class='applyButton' data-text='false' data-icon-primary='ui-icon-arrowthickstop-1-s'>Download Coupon Rules<\/button>",
 						"<button data-app-click='admin|refreshDMI' class='applyButton' data-text='false' data-icon-primary='ui-icon-arrowrefresh-1-s'>Refresh Coupon List<\/button>",
 						"<button data-app-click='admin_config|couponCreateShow' data-text='true' data-icon-primary='ui-icon-plus' class='applyButton'>Add Coupon<\/button>"
 						],
@@ -704,17 +771,28 @@ var admin_config = function(_app) {
 		u : {
 
 			getPluginData : function(plugin)	{
-//				_app.u.dump("BEGIN admin_config.u.getPluginData");
-				var r = {}; //what is returned.
+				_app.u.dump("BEGIN admin_config.u.getPluginData");
+				var r = false; //what is returned.
 				if(plugin)	{
 //					_app.u.dump(" -> plugin: "+plugin);
 					if(_app.data['adminConfigDetail|plugins'] && _app.data['adminConfigDetail|plugins']['@PLUGINS'])	{
-						var L = _app.data['adminConfigDetail|plugins']['@PLUGINS'].length;
-						for(var i = 0; i < L; i += 1)	{
+						var matches = new Array(); //matches for plugin
+						for(var i = 0,L = _app.data['adminConfigDetail|plugins']['@PLUGINS'].length; i < L; i += 1)	{
 							if(_app.data['adminConfigDetail|plugins']['@PLUGINS'][i].plugin == plugin)	{
-								r = _app.data['adminConfigDetail|plugins']['@PLUGINS'][i];
-								break; //match! exit early.
+								matches.push(_app.data['adminConfigDetail|plugins']['@PLUGINS'][i]);
 								}
+							}
+						if(matches.length == 1)	{
+							r = matches[0];
+							}
+						else if(matches.length > 1)	{
+							r = {
+								'plugin' : plugin,
+								'@hosts' : matches
+								};
+							}
+						else	{
+							r = false;
 							}
 						}
 					else	{
@@ -1181,7 +1259,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 					sfo = $form.serializeJSON({'cb':true}), //cb true returns checkboxes w/ 1 or 0 based on whether it's checked/unchecked, respecticely. strings, not ints.
 					$dataTableTbody = $("tbody[data-table-role='content']",$form), //a table used for data such as price breakdowns on a flex priced based ship method (or zip,weight,etc data)
 					macros = new Array(),
-					callback = 'handleMacroUpdate'; //will be changed if in insert mode.
+					callback = 'handleMacroUpdate'; //will be changed if in insert mode. this is in the marketplace extension.
 					
 				if(_app.u.validateForm($form))	{
 					
@@ -1212,12 +1290,14 @@ when an event type is changed, all the event types are dropped, then re-added.
 							});
 						}
 				//currently, only insurance and handling have more than one data table. If that changes, the code below will need updating.
+				//this is used for ALL ship methods tho, so the whitelist must include all the input names for all the ship method data tables.
 					else if($dataTableTbody.length && sfo.provider)	{
 						macros.push("SHIPMETHOD/DATATABLE-EMPTY?provider="+sfo.provider);
 						$('tr',$dataTableTbody).each(function(){
-							if($(this).hasClass('rowTaggedForRemove'))	{} //row is being deleted. do not add. first macro clears all, so no specific remove necessary.
+							if($(this).hasClass('rowTaggedForRemove'))	{ $(this).intervaledEmpty()} //row is being deleted. do not add. first macro clears all, so no specific remove necessary.
 							else	{
-								macros.push("SHIPMETHOD/DATATABLE-INSERT?provider="+sfo.provider+"&"+$.param(_app.u.getWhitelistedObject($(this).data(),['country','type','match','guid'])));
+//								dump(" -> tr.data():"); dump($(this).data());
+								macros.push("SHIPMETHOD/DATATABLE-INSERT?provider="+sfo.provider+"&"+$._app.u.hash2kvp(_app.u.getWhitelistedObject($(this).data(),['country','type','match','guid','subtotal','fee','weight','zip1','zip2','postal','text'])));
 								}
 							});
 						}
@@ -1228,9 +1308,13 @@ when an event type is changed, all the event types are dropped, then re-added.
 				
 					_app.ext.admin.calls.adminConfigMacro.init(macros,{'callback':callback,'extension':'admin_marketplace','jqObj':$form},'immutable');
 //nuke and re-obtain shipmethods so re-editing THIS method shows most up to date info.
-// ** 201401 -> the new callback for navigateTo on the configMacro call will destroy/re-obtain the shipmethods.
-//					_app.model.destroy('adminConfigDetail|shipmethods|'+_app.vars.partition);
-//					_app.ext.admin.calls.adminConfigDetail.init({'shipmethods':true},{datapointer : 'adminConfigDetail|shipmethods|'+_app.vars.partition},'immutable');
+//the new callback for navigateTo on the configMacro call will destroy/re-obtain the shipmethods for handling and insurance.
+					if(sfo.provider == 'HANDLING' || sfo.provider == 'INSURANCE')	{}
+					else	{
+						_app.model.destroy('adminConfigDetail|shipmethods|'+_app.vars.partition);
+						_app.ext.admin.calls.adminConfigDetail.init({'shipmethods':true},{datapointer : 'adminConfigDetail|shipmethods|'+_app.vars.partition},'immutable');
+						
+						}
 				
 				//	_app.u.dump(" -> macros"); _app.u.dump(macros);
 					_app.model.dispatchThis('immutable');
@@ -1493,7 +1577,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 							$('tr',$tbody).each(function(){
 								if($(this).hasClass('rowTaggedForRemove'))	{} //row tagged for delete. do not insert.
 								else	{
-									macros.push("SHIPMETHOD/RULESTABLE-INSERT?provider="+vars.provider+"&table="+vars.table+"&"+$.param(_app.u.getWhitelistedObject($(this).data(),['guid','created','name','match','filter','exec','value','schedule'])));
+									macros.push("SHIPMETHOD/RULESTABLE-INSERT?provider="+vars.provider+"&table="+vars.table+"&"+_app.u.hash2kvp(_app.u.getWhitelistedObject($(this).data(),['guid','created','name','match','filter','exec','value','schedule'])));
 									}
 								});
 							
@@ -1571,6 +1655,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 						$("[name='SCHEDULE']",$panel).val();
 						}
 					_app.u.handleButtons($panel);
+					$panel.anyform(); //form delegation is already present, but this will trigger the defaults.
 					}
 				else	{
 					$DMI.anymessage({'message':'In admin_config.e.showRuleEditorAsPanel, rulesmode ['+$ele.data('rulesmode')+'] on trigger element is either missing or invalid. Only coupons and shipping are acceptable values.','gMessage':true});
@@ -1579,22 +1664,106 @@ when an event type is changed, all the event types are dropped, then re-added.
 
 			pluginUpdateExec : function($ele,p)	{
 				var $form = $ele.closest('form');
-				$form.showLoading({'message':'Saving Changes'});
-				_app.model.addDispatchToQ({
-					'_cmd':'adminConfigMacro',
-					'@updates' : ["PLUGIN/SET?"+$.param($form.serializeJSON({'cb':true}))],
-					'_tag':	{
-						'callback':'showMessaging',
-						'restoreInputsFromTrackingState' : true,
-						'message' : "Your changes have been saved.",
-						'jqObj' : $form
+				if(_app.u.validateForm($form))	{
+					$form.showLoading({'message':'Saving Changes'});
+					var sfo = $form.serializeJSON({'cb':true}), updates = new Array();
+					if($form.data('scope') == 'HOST')	{
+						$("[data-app-role='pluginHostsList']",$form).find('tr').each(function(){
+							var $tr = $(this);
+							if($tr.hasClass('rowTaggedForRemove'))	{
+								updates.push("PLUGIN/REMOVE-HOST?host="+$tr.data('host')+'&plugin='+$tr.data('plugin'));
+								$tr.intervaledEmpty();
+								}
+							else if($('.edited',$tr).length)	{
+								updates.push("PLUGIN/SET-HOST?"+_app.u.hash2kvp($tr.serializeJSON({'cb':true})));
+								}
+							else	{}
+							});
 						}
-					},'immutable');
-				_app.model.dispatchThis('immutable');
+					else	{
+						updates.push("PLUGIN/SET-"+($form.data('scope') || 'PRT')+"?"+_app.u.hash2kvp(sfo));
+						}
+
+					_app.model.addDispatchToQ({
+						'_cmd':'adminConfigMacro',
+						'@updates' : updates,
+						'_tag':	{
+							'callback':($form.data('verb')) == 'create' ? 'navigateTo' : 'showMessaging',
+							'extension':($form.data('verb')) == 'create' ? 'admin' : '',
+							'path' : '#!ext/admin_config/showPluginManager?plugin='+sfo.plugin, //used when new plugins are added.
+							//the following are used w/ showMessaging.
+							'restoreInputsFromTrackingState' : true,
+							'message' : "Your changes have been saved.",
+							'jqObj' : $form
+							}
+						},'immutable');
+					_app.model.dispatchThis('immutable');
+					}
+				else	{} //validate form will handle the error display.
+				},
+
+			pluginHostChooserShow : function($ele,p)	{
+				var plugin = $ele.closest('form').find("input[name='plugin']").val();
+				if(plugin)	{
+					//to switch from a domain specific chooser to ALL hosts, remove the filter.
+					//Could also change DOMAINNAME to PRT for partition specific filtering.
+					adminApp.ext.admin_sites.u.hostChooser({
+						filter : {
+							'by' : 'DOMAINNAME',
+							'for' : _app.vars.domain
+							},
+						saveAction : function($chooser)	{
+							
+							
+							if($( ".ui-selected", $chooser ).length)	{
+								$chooser.showLoading({'message':'Saving hosts to '+plugin});
+								var updates = new Array();
+								$( ".ui-selected", $chooser ).each(function() {
+									//if this changes from a domain specific chooser to all domains, change _app.vars.domain to $(this).closest("[data-domainname]").data('domainname')
+									updates.push("PLUGIN/SET-HOST?plugin="+plugin+"&host="+encodeURIComponent($(this).data('hostname').toLowerCase())+'.'+encodeURIComponent(_app.vars.domain));
+									});
+								
+								_app.model.addDispatchToQ({
+									'_cmd':'adminConfigMacro',
+									'@updates' : updates,
+									'_tag':	{
+										'callback':function(rd){
+											$chooser.hideLoading();
+											if(_app.model.responseHasErrors(rd)){
+												$('#globalMessaging').anymessage({'message':rd});
+												}
+											else	{
+												//sample action. success would go here.
+												$chooser.closest('.ui-dialog-content').dialog('close');
+												navigateTo('#!ext/admin_config/showPluginManager?plugin='+plugin)
+												}
+											}
+										}
+									},'immutable');
+								_app.model.dispatchThis('immutable');
+								}
+							else	{
+								$chooser.anymessage({"message":"Please select at least one host."});
+								}
+
+
+							} //saveAction
+						});
+					}
+				else	{
+					$("#globalMessaging").anymessage({"message":"In admin_config.e.pluginHostChooserShow, unable to ascertain plugin (plugin hidden input probably missing).","gMessage":true});
+					}
+				
+				
+				},
+
+			pluginAddShow : function($ele,p)	{
+				var $target = $ele.closest("[data-app-role='slimLeftContainer']").find("[data-app-role='slimLeftContent']:first");
+				_app.ext.admin_config.a.showPlugin($target,{'verb':'create'});
 				},
 
 			pluginUpdateShow : function($ele,p)	{
-				_app.ext.admin_config.a.showPlugin($ele.closest("[data-app-role='slimLeftContainer']").find("[data-app-role='slimLeftContent']:first"),{'plugin':$ele.data('plugin')})
+				_app.ext.admin_config.a.showPlugin($ele.closest("[data-app-role='slimLeftContainer']").find("[data-app-role='slimLeftContent']:first"),{'plugin' : $ele.data('plugin')});
 				},
 
 //delegated events
@@ -1639,6 +1808,16 @@ when an event type is changed, all the event types are dropped, then re-added.
 				
 				}, //billingInvoiceViewDownload
 			
+			buildGUID : function($ele,p)	{
+				var $form = $ele.closest('form');
+				if($ele.attr('data-input-name') && $("input[name='"+$ele.attr('data-input-name')+"']",$form).length)	{
+					$("input[name='"+$ele.attr('data-input-name')+"']",$form).val(_app.u.guidGenerator()).trigger('keyup')
+					}
+				else	{
+					$form.anymessage({"message":"In admin_config.e.buildGUID, either data-input-name ["+$ele.attr('data-input-name')+"] not set on trigger element or no input matching that name found within parent form."});
+					}
+				},
+
 			billingHandleTabContents : function($ele,p)	{
 				var tab = $ele.closest('.ui-tabs-nav').find('.ui-state-active').data('anytabsTab');
 				var $tabContent = $ele.closest("[data-app-role='billingHistory']").find("[data-anytab-content='"+tab+"']:first");
@@ -1654,6 +1833,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 					else	{} //unrecognized tab.
 					
 					if(cmd)	{
+						$('tbody',$tabContent).empty();
 						$tabContent.showLoading({'message':'Fetching details'});
 						_app.model.addDispatchToQ({
 							'_cmd':cmd,
@@ -1668,7 +1848,49 @@ when an event type is changed, all the event types are dropped, then re-added.
 						}
 					else	{}
 					}
-				} //billingHandleTabContents
+				}, //billingHandleTabContents
+
+			adminPasswordUpdateExec : function($ele,p)	{
+				p.preventDefault();
+				var  $form = $ele.closest('form'), sfo = $form.serializeJSON();
+				
+				if(_app.u.validateForm($form))	{
+					dump(" -> passed standard validation");
+					if(sfo.oldpassword == sfo.newpassword1)	{
+						$form.anymessage({'errtype':'youerr','message':'The old password can not match the new password'});
+						}
+					else if(sfo.newpassword1 != sfo.newpassword2)	{
+						$form.anymessage({'errtype':'youerr','message':'The values you entered for the new password do not match. Please make sure the value for password and password again are exactly the same.'});
+						}
+					else	{
+						_app.model.addDispatchToQ({"_cmd":"adminPasswordUpdate","old":sfo.oldpassword,"new":sfo.newpassword1,"_tag":{"callback":"showMessaging","jqObj":$form,"message":"Your password has been changed."}},"immutable");
+						_app.model.dispatchThis("immutable");
+						}
+					}
+				else	{} //validate handles error display.
+				return false;
+				},
+			
+			notificationUpdateShow : function($ele,p)	{
+				p.preventDefault();
+				var $target = $ele.closest("[data-app-role='notificationsContainer']").find("[data-app-role='slimLeftContentContainer']");
+				
+				if($ele.data('event') && _app.u.thisNestedExists("data.adminConfigDetail|"+_app.vars.partition+"|notifications.@NOTIFICATIONS",_app))	{
+					var dataset = _app.ext.admin.u.getValueByKeyFromArray(_app.data['adminConfigDetail|'+_app.vars.partition+'|notifications']['@NOTIFICATIONS'],'event',$ele.data('event'));
+					$target.empty().anycontent({"templateID":"notificationUpdateTemplate","data":dataset});
+					_app.u.handleButtons($target);
+					$('form',$target).anyform();
+					$("[data-app-role='verb_"+($ele.data('event').split('.')[0])+"']",$target).show();
+					}
+				else if(!$ele.data('event'))	{
+					$target.anymessage({"message":"In admin_config.e.notificationsUpdateShow, data-event not set on trigger element.","gMessage":true});
+					}
+				else	{
+					$target.anymessage({"message":"In admin_config.e.notificationsUpdateShow, adminConfigDetail|"+_app.vars.partition+"|notifications is not in memory.","gMessage":true});
+					}
+				
+				return false;
+				}
 
 
 			} //e [app Events]

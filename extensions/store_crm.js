@@ -103,20 +103,6 @@ obj['softauth'] = "order"; // [OPTIONAL]. if user is logged in, this gets ignore
 				}
 			}, //buyerOrderGet
 
-		setNewsletters : {
-			init : function(obj,tagObj)	{
-				_app.u.dump("BEGIN store_crm.calls.setNewsletters.init");
-				var r = 1;
-				this.dispatch(obj,tagObj);
-				return r;
-				},
-			dispatch : function(obj,tagObj)	{
-				obj['_tag'] = tagObj;
-				obj['_cmd'] = "setNewsletters";
-				_app.model.addDispatchToQ(obj);	
-				}
-			}, //setNewsletters
-
 		buyerAddressList : {
 			init : function(tagObj,Q)	{
 				tagObj = $.isEmptyObject(tagObj) ? {} : tagObj; 
@@ -174,8 +160,10 @@ obj['softauth'] = "order"; // [OPTIONAL]. if user is logged in, this gets ignore
 					if(L > 0)	{
 						for(var i = 0; i < L; i += 1)	{
 							topicID = _app.data[tagObj.datapointer]['@topics'][i]['TOPIC_ID']
-							_app.u.dump(" -> TOPIC ID = "+topicID);
-							$parent.append(_app.renderFunctions.transmogrify({'id':topicID,'topicid':topicID},tagObj.templateID,_app.data[tagObj.datapointer]['@topics'][i]))
+//							_app.u.dump(" -> TOPIC ID = "+topicID);
+// ** 201403 -> transmogrify is data-bind, so this didn't work.
+//							$parent.append(_app.renderFunctions.transmogrify({'id':topicID,'topicid':topicID},tagObj.templateID,_app.data[tagObj.datapointer]['@topics'][i]))
+							$parent.tlc({'templateid':tagObj.templateID,'dataset':_app.data[tagObj.datapointer]['@topics'][i],'dataAttribs':{'topicid':topicID}});
 							}
 						}
 					else	{
@@ -252,37 +240,38 @@ obj['softauth'] = "order"; // [OPTIONAL]. if user is logged in, this gets ignore
 
 			}, //validate
 
+		tlcFormats : {
+			
+			buyersubscribe : function(data,thisTLC)	{
+				dump(" -> data.globals.id: "+data.globals.binds.id);
+				if(_app.u.thisNestedExists("data.buyerDetail.%info.@TAGS",_app))	{
+					if($.inArray(data.globals.binds.id,_app.data.buyerDetail['%info']['@TAGS']) >= 0)	{
+						dump(" -> MATCH!");
+						data.globals.binds[data.globals.focusBind] = 'checked';
+						}
+					}
+				return true;
+				}
+			},
+
 
 		renderFormats : {
-//Displays a list of the merchants newsletters.
-			subscribeCheckboxes : function($tag,data)	{
-//				_app.u.dump('BEGIN _app.ext.store_prodlist.renderFormats.mpPagesAsListItems');
-//				_app.u.dump(data);
-				var o = "";
-				for(var index in data.value)	{
-					o += "<div class='subscribeListItem'><label title='"+data.value[index].EXEC_SUMMARY+"'>";
-					o += "<input type='checkbox' checked='checked' name='newsletter-"+data.value[index].ID+"' \/>";
-					o += data.value[index].NAME+"<\/label><\/div>";
-					}
-				$tag.append(o);
-
-				},
-
 			
 			ordertrackinglinks : function($tag,data)	{
 //				_app.u.dump("BEGIN quickstart.renderFormats.ordertrackinglinks");
-				_app.u.dump(data.value);
-				
-				var L = data.value.length;
-				var o = ''; //what is appended to tag. a compiled list of shipping lineitems.
-				for(var i = 0; i < L; i += 1)	{
-					// ### TODO -> need to get the link to quickstart out of here.
-					o += "<li><a href='"+_app.ext.quickstart.u.getTrackingURL(data.value[i].carrier,data.value[i].track)+"' target='"+data.value[i].carrier+"'>"+data.value[i].track+"</a>";
-					if(_app.u.isSet(data.value[i].cost))
-						o += " ("+_app.u.formatMoney(data.value[i].cost,'$',2,true)+")";
-					o += "<\/li>";
+//				_app.u.dump(data.value);
+				if(data.value)	{
+					var L = data.value.length;
+					var o = ''; //what is appended to tag. a compiled list of shipping lineitems.
+					for(var i = 0; i < L; i += 1)	{
+						// ### TODO -> need to get the link to quickstart out of here.
+						o += "<li><a href='"+_app.ext.quickstart.u.getTrackingURL(data.value[i].carrier,data.value[i].track)+"' target='"+data.value[i].carrier+"'>"+data.value[i].track+"</a>";
+						if(_app.u.isSet(data.value[i].cost))
+							o += " ("+_app.u.formatMoney(data.value[i].cost,'$',2,true)+")";
+						o += "<\/li>";
+						}
+					$tag.show().append("<h4>Tracking Number(s):</h4>").append(o);
 					}
-				$tag.show().append("<h4>Tracking Number(s):</h4>").append(o);
 				}
 
 			},
@@ -307,18 +296,20 @@ if the P.pid and data-pid do not match, empty the modal before openeing/populati
 					var $parent = $('#review-modal');
 //if no review modal has been created before, create one. 
 					if($parent.length == 0)	{
-						_app.u.dump(" -> modal window doesn't exist. create it.");
 						$parent = $("<div \/>").attr({"id":"review-modal",'data-pid':P.pid}).appendTo(document.body);
 						}
 					else	{
-						_app.u.dump(" -> use existing modal. empty it.");
 //this is a new product being displayed in the viewer.
 						$parent.empty();
 						}
 					$parent.dialog({modal: true,width: ($(window).width() > 500) ? 500 : '90%',height:500,autoOpen:false,"title":"Write a review for "+P.pid});
 //the only data needed in the reviews form is the pid.
 //the entire product record isn't passed in because it may not be available (such as in invoice or order history, or a third party site).
-					$parent.dialog('open').append(_app.renderFunctions.transmogrify({id:'review-modal_'+P.pid},P.templateID,{'pid':P.pid}));
+//					$parent.dialog('open').append(_app.renderFunctions.transmogrify({id:'review-modal_'+P.pid},P.templateID,{'pid':P.pid}));
+					$parent.tlc({'templateid' : P.templateID,'dataset' : {'pid':P.pid}});
+					$parent.dialog('open');
+					_app.u.handleButtons($parent);
+					_app.u.addEventDelegation($parent); //1PC doesn't have delegation on the body.
 					}
 				},
 
@@ -372,18 +363,7 @@ will output a newsletter form into 'parentid' using 'templateid'.
 				return numRequests;
 				},
 
-			getBuyerListsAsUL : function(datapointer)	{
 
-				var data = _app.data[datapointer]['@lists']; //shortcut
-				var L = data.length;
-				var $r = $("<ul>");
-				var $li; //recycled
-				for(var i = 0; i < L; i += 1)	{
-					$li = $("<li\/>").data("buyerlistid",data[i].id).text(data[i].id+" ("+data[i].items+" items)");
-					$li.appendTo($r);
-					}
-				return $r;
-				},
 
 /*
 The list object returned on a buyerProductListDetail is not a csv or even a string of skus, it's an array of objects, each object containing information
@@ -419,18 +399,24 @@ This is used to get add an array of skus, most likely for a product list.
 //				_app.u.dump("BEGIN store_crm.u.handleSubscribe");
 				if($form)	{
 //					_app.u.dump(" -> $form is set.");
-					frmObj = $form.serializeJSON();
+					var sfo = $form.serializeJSON();
 					if(_app.u.validateForm($form))	{
 //						_app.u.dump(" -> $form validated.");
-						_app.ext.store_crm.calls.setNewsletters.init(frmObj,{'callback':function(rd){
-							if(_app.model.responseHasErrors(rd)){
-								$form.anymessage({'message':rd});
+						sfo._cmd = 'appBuyerCreate';
+						sfo._tag = {
+							"datapointer":"appBuyerCreate",
+							"callback":function(rd){
+								if(_app.model.responseHasErrors(rd)){
+									$form.anymessage({'message':rd});
+									}
+								else	{
+//* 201404 -> to customize the 'success' message, add a hidden input w/ name of 'message' and set the value to what you want displayed.
+									$form.anymessage(_app.u.successMsgObject(sfo.message || "Thank you, you are now subscribed."));
+									}
 								}
-							else	{
-								$form.anymessage(_app.u.successMsgObject("Thank you, you are now subscribed."));
-								}
-							}});
-						_app.model.dispatchThis();
+							};
+						_app.model.addDispatchToQ(sfo,"immutable");
+						_app.model.dispatchThis('immutable');
 						}
 					else	{}
 					}
@@ -445,11 +431,11 @@ This is used to get add an array of skus, most likely for a product list.
 
 				if(typeof vars === 'object' && vars.addressID && vars.addressType)	{
 					var addressData = _app.ext.cco.u.getAddrObjByID(vars.addressType,vars.addressID);
-					_app.u.dump(addressData);
+					
 					if(addressData)	{
 						r = true;
 						var $editor = $("<div \/>");
-						$editor.anycontent({'templateID':(vars.addressType == 'ship') ? 'chkoutAddressShipTemplate' : 'chkoutAddressBillTemplate','data':addressData});
+						$editor.tlc({'templateid':(vars.addressType == 'ship') ? 'chkoutAddressShipTemplate' : 'chkoutAddressBillTemplate','dataset':addressData});
 						$editor.append("<input type='hidden' name='shortcut' value='"+vars.addressID+"' \/>");
 						$editor.append("<input type='hidden' name='type' value='"+vars.addressType+"' \/>");
 						if(vars.addressType == 'bill')	{
@@ -470,22 +456,20 @@ This is used to get add an array of skus, most likely for a product list.
 								'save' : function(event,ui) {
 									event.preventDefault();
 									var $form = $('form',$(this)).first();
-									
+									var $editor = $(this);
 									if(_app.u.validateForm($form))	{
 										$form.showLoading('Updating Address');
-										var serializedForm = $form.serializeJSON();
-//save and then refresh the page to show updated info.
-										_app.model.addDispatchToQ({
-											'_cmd':'buyerAddressAddUpdate',
-											'_tag':	{
+										var sfo = $form.serializeJSON();
+											sfo._cmd = 'buyerAddressAddUpdate',
+											sfo._tag =	{
 												'callback':function(rd){
 													$form.hideLoading(); //always hide loading, regardless of errors.
 													if(_app.model.responseHasErrors(rd)){
 														$form.anymessage({'message':rd});
 														}
 													else if(typeof onSuccessCallback === 'function')	{
-														onSuccessCallback(rd,serializedForm);
 														$editor.dialog('close');
+														onSuccessCallback(rd,sfo);
 														}
 													else	{
 														//no callback defined 
@@ -493,7 +477,9 @@ This is used to get add an array of skus, most likely for a product list.
 														}
 													}
 												}
-											},'immutable');
+										
+//save and then refresh the page to show updated info.
+										_app.model.addDispatchToQ(sfo,'immutable');
 //dump data in memory and local storage. get new copy up updated address list for display.
 										_app.model.destroy('buyerAddressList');
 										_app.calls.buyerAddressList.init({},'immutable');
@@ -532,16 +518,17 @@ This is used to get add an array of skus, most likely for a product list.
 					var $editor = $("<div \/>");
 					
 					$editor.append("<input type='hidden' name='type' value='"+vars.addressType.toUpperCase()+"' \/>");
-//					$editor.anycontent({'templateID':(vars.addressType == 'ship') ? 'chkoutAddressShipTemplate' : 'chkoutAddressBillTemplate','data':{},'showLoading':false});
-					$editor.tlc({'templateid':(vars.addressType == 'ship') ? 'chkoutAddressShipTemplate' : 'chkoutAddressBillTemplate','verb':'template'});
-//* 201338 -> the address id should be at the bottom of the form, not the top. isn't that important or required.
+// ** 201403 -> need to pass in a blank dataset so translation occurs. required for country dropdown.
+					$editor.tlc({'templateid':(vars.addressType == 'ship') ? 'chkoutAddressShipTemplate' : 'chkoutAddressBillTemplate','dataset':{}});
+//the address id should be at the bottom of the form, not the top. isn't that important or required.
 					$editor.append("<input type='text' maxlength='6' data-minlength='6' name='shortcut' placeholder='address id (6 characters)' \/>");
 					$editor.wrapInner('<form \/>'); //needs this for serializeJSON later.
 
-//** 201338 -> if the placeholder attribute on an input is not supported (thx IE8), then add labels.
+//if the placeholder attribute on an input is not supported (thx IE8), then add labels.
 					if(_app.ext.order_create)	{
 						_app.ext.order_create.u.handlePlaceholder($editor);
 						}
+//adds a tooltip which is displayed on focus. lets the user know what field they're working on once they start typing and placeholder goes away.
 					$(":input",$editor).each(function(index){
 						var $input = $(this);
 						if($input.attr('placeholder') && !$input.attr('title'))	{
@@ -620,6 +607,32 @@ This is used to get add an array of skus, most likely for a product list.
 		
 		
 		e : {
+			//generic event, inteded to support more than tags through the use of the data-update-verb=
+			buyerUpdate : function($ele,p)	{
+				p.preventDefault();
+				if(_app.u.validateForm($ele))	{
+					var cmdObj = {
+						"_cmd":"buyerUpdate",
+						"@updates" : [],
+						"cartid" : _app.model.fetchCartID(),
+						"_tag":{
+							"datapointer":"",
+							"callback":function(rd){}
+							}
+						}
+					
+					$("[data-update-verb='tags']",$ele).find(":checkbox").each(function(){
+						var $cb = $(this);
+						cmdObj['@updates'].push(($cb.is(':checked') ? 'TAG-ADD' : 'TAG-CLEAR')+"?TAG="+$cb.attr('name'));
+						});
+					
+					
+					_app.model.addDispatchToQ(cmdObj,"mutable");
+					_app.model.dispatchThis("mutable");
+					}
+				else	{} //validateForm handles error display.
+				return false;
+				},
 			
 			contactFormSubmit : function($ele,p)	{
 				p.preventDefault();
@@ -638,9 +651,11 @@ This is used to get add an array of skus, most likely for a product list.
 				else	{
 					dump(" -> did not pass validation.");
 					} //validateForm handles error display.
+				return false;
 				},
 			
 			productBuyerListRemoveExec : function($ele,p)	{
+				p.preventDefault();
 				var pid = $ele.closest("[data-stid]").data('stid') || $ele.closest("[data-pid]").data('pid');
 				var listid = $ele.closest("[data-buyerlistid]").data('buyerlistid');
 				if(pid && listid)	{
@@ -665,11 +680,13 @@ This is used to get add an array of skus, most likely for a product list.
 				else	{
 					$('#globalMessaging').anymessage({"message":"In store_crm.e.productByerListRemoveExec, either unable to ascertain pid ["+pid+"] and/or buyerlistid ["+listid+"].","gMessage":true});
 					}
+				return false;
 				},
 			
 			//add this as submit action on the form.
 			productReviewSubmit : function($ele,p)	{
 				p.preventDefault();
+				var $form = $ele.closest('form'); //this way, $ele can be a button within the form or a onSubmit action on the form itself.
 				if(_app.u.validateForm($ele))	{
 					var sfo = $form.serializeJSON();
 					if(sfo.pid)	{
@@ -688,17 +705,20 @@ This is used to get add an array of skus, most likely for a product list.
 						}
 					}
 				else	{} //validateForm will handle error display.
+				return false;
 				},
 			
 			productReviewShow : function($ele,p)	{
 				p.preventDefault();
-				var pid = $ele.closest("data-stid").data('stid') || $ele.closest("[data-pid]").data('pid'); //used on product page
+
+				var pid = $ele.data('pid') || $ele.closest("[data-pid]").data('pid'); //used on product page
 				if(pid)	{
 					_app.ext.store_crm.u.showReviewFrmInModal({"pid":pid,"templateID":"reviewFrmTemplate"});
 					}
 				else	{
 					$('#globalMessaging').anymessage({'message':'In store_crm.e.productReviewShow, unable to determine pid/stid','gMessage':true});
 					}
+				return false;
 				}
 
 			} //e/events

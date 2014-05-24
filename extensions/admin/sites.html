@@ -130,6 +130,7 @@
 	<td data-tlc="bind $var '.PRT'; apply --append;" class="isSearchable"></td>
 	<td></td>
 	<td class="alignRight">
+	<button data-app-click="admin_sites|adminDomainRemoveConfirm" class="applyButton" data-text="false" data-icon-primary="ui-icon-trash">Remove Domain</button>
 	<button data-app-click="admin_batchjob|adminBatchJobExec" class="applyButton" data-text="false" data-icon-primary="ui-icon-refresh" data-type="UTILITY/SITEMAP" data-whitelist="DOMAINNAME,PRT">Update Sitemap</button>
 	<button data-app-click="admin_sites|domainPutInFocus" class="applyButton" data-text="false" data-icon-primary="ui-icon-check" title="Use this domain">Use Domain</button>
 	<button data-app-click="admin_sites|adminDomainDetailShow" class="applyButton" data-text="false" data-icon-primary="ui-icon-pencil" title="Edit this domain">Details</button>
@@ -155,7 +156,7 @@
 <tbody><tr id="domainListHostsRowTemplate" data-element="host">
 	<td data-tlc="bind $var '.HOSTNAME'; apply --append;"></td>
 	<td data-tlc="bind $var '.HOSTTYPE'; apply --append;"></td>
-	<td data-tlc="bind $var '.PROJECT'; admin_sites#projectidpretty  --legacy ; apply --append;"></td>
+	<td data-tlc="bind $var '.PROJECT'; if(is $var --notblank;){{admin_sites#projectidpretty  --legacy ; apply --append;}};"></td>
 	<td class="alignRight width50">
 	<span data-tlc="admin_sites#apphostbuttons  --useParentData='true' --legacy ; apply --append;" data-bind="useParentData:true; format:appHostButtons; extension:admin_sites;"></span>
 	<button class="applyButton" data-app-click="admin|tagRow4Remove" data-text="false" data-icon-primary="ui-icon-close">Delete this Host</button>
@@ -208,37 +209,37 @@
 
 
 <div id='domainCreateTemplate'>
-<form action='#' onSubmit='return false' data-app-submit='admin|submitForm'>
-
-<input type='hidden' name='_macrobuilder' value='admin_sites|adminDomainMacroCreate' />
-<input type='hidden' name='_tag/callback' value='showMessaging' />
-<input type='hidden' name='_tag/restoreInputsFromTrackingState' value='1' />
-<input type='hidden' name='_tag/removeFromDOMItemsTaggedForDelete' value='1' />
-<input type='hidden' name='_tag/jqObjEmpty' value='true' />
-<input type='hidden' name='_tag/message' value='The domain has been added.' />
+<!-- no validate is turned on because there are input flagged as 'required' that are conditionally required. validateForm handles these -->
+<form action='#' onSubmit='return false' data-app-submit='admin_sites|adminDomainCreateExec' novalidate='novalidate'>
 
 <fieldset class='labelsAsBreaks alignedLabels'>
 	
 	<label>
 		<span>Type</span>
 		<select name='domaintype' required='required' data-panel-selector=".domainCreateDomaintype" data-input-change="panel-selector">
-			<option value='DOMAIN-DELEGATE' data-show-panel='domainCreateDomaintypeDelegate'>Delegate domain</option>
-			<option value='DOMAIN-RESERVE'>Reserve test domain</option>
+			<option value='DOMAIN-CREATE' data-show-panel='domainCreateDomaintypeCreate'>I have a domain</option>
+			<option value='DOMAIN-RESERVE' data-show-panel='domainCreateDomaintypeReserve'>Create a temporary domain</option>
 		</select>
 	</label>
 
-	<div data-panel-id='domainCreateDomaintypeDelegate' class='displayNone domainCreateDomaintype'>
+	<div data-panel-id='domainCreateDomaintypeCreate' class='displayNone domainCreateDomaintype'>
 	<label>
 		<span>Domain</span>
 		<input type='text' required data-validation-rules='skipIfHidden' name='DOMAINNAME' value='' />
 	</label>
 	</div>
+	<div data-panel-id='domainCreateDomaintypeReserve' class='displayNone hint domainCreateDomaintype'>
+	If you do not already have a domain or are evaluating the platform, this is a good place to start.<br />
+	A temporary domain will be created and will expire after 90 days.
+	</div>
+
+
 	
 	
 </fieldset>
 
 <div class='buttonset alignRight'>
-	<button class='applyButton'>Save Domain</button>
+	<button class='applyButton'>Add Domain</button>
 </div>
 
 </form>
@@ -332,7 +333,7 @@
 			<input type='url' required='required' name='TARGETURL' value='' />
 		</label>
 		<button data-app-click='admin_config|dataTableAddUpdate' class='applyButton' data-text='true' data-form-skipreset='true'>Apply</button><!-- needs to be within fieldset for taxTableUpdateExec -->
-		
+		<!--
 		<table class='marginTop applyAnytable gridTable fullWidth' data-app-role='dataTable'>
 		<thead>
 		<tr>
@@ -442,7 +443,7 @@ That's also why the template does not contain a form
 			
 			<label>
 				<span>Partition</span>
-				<select data-tlc="bind $var '.@PRTS'; controller#optionsfromlist; apply --append;" name="PRT"></select>
+				<select data-tlc="bind $var '.@PRTS'; controller#optionsfromlist --legacy --value='id' --text='id'; apply --append;" name="PRT"></select>
 			</label>
 			
 		</fieldset>
@@ -459,7 +460,7 @@ That's also why the template does not contain a form
 		<li><a href="#domainHosts">Hosts</a></li>
 		<li><a href="#domainEmail">Email</a></li>
 		<li><a href="#domainEvents">Events</a></li>
-		<li><a data-tlc="bind $var '.DOMAINNAME'; apply --attrib='data-domainname'; apply --append;" href="#domainDiagnostics" data-app-click="admin_sites|adminDomainDiagnosticsShow">Diagnostics</a></li>
+		<li><a data-tlc="bind $var '.DOMAINNAME'; apply --attrib='data-domainname'; apply --append;" href="#domainDiagnostics" data-app-click="admin_sites|adminDomainDiagnosticsShow">Diagnostics </a></li>
 <!--		<li><a href='#domainRewriteRules'>Rewrite Rules</a></li> -->
 	</ul>
 	
@@ -587,6 +588,7 @@ That's also why the template does not contain a form
 	<td colspan="3">
 	<div class="marginLeft">
 		<div data-tlc="bind $var '.ID'; format --prepend='ID: '; apply --append;"></div>
+		<div data-tlc="bind $var '.UUID'; format --prepend='Project ID: '; apply --append;"></div>
 		<div data-tlc="bind $var '.TYPE'; format --prepend='Type: '; apply --append;"></div>
 		<div data-tlc="bind $var '.CREATED_TS'; format --prepend='Created: '; apply --append;"></div>
 		<div data-tlc="bind $var '.UPDATED_TS'; format --prepend='Last update: '; apply --append;"></div>
@@ -608,7 +610,7 @@ That's also why the template does not contain a form
 
 <div id="projectCreateTemplate">
 
-<form onsubmit="return false">
+<form onsubmit="return false" novalidate>
 <fieldset class="labelsAsBreaks alignedLabels alignedInputs">
 	<label>
 	<span>Project title</span>
@@ -628,14 +630,20 @@ That's also why the template does not contain a form
 	</select>
 	</label>
 
+	<label>
+	<span>Project ID</span>
+	<input name="UUID" maxlength="40" data-minlength='10' type="text" required='required' data-input-keyup="format" data-input-format='pid, uppercase'>
+	<span class='toolTip' title="An alpha-numeric (plus dashes and underscores) project id with a minimum of ten characters. Should be informative as this is used for troubleshooting (maybe the domain and/or name of the git repo). The id should be unique.">?</span>
+	</label>
 
 	<label>
 	<span>GitHub repo</span>
 	<input name="repo" maxlength="128" required type="url">
 	</label>
-	<p class="hint">ex: http://github.com/yourname/project.git<br>
-	At this time only GITHUB hosted projects with public http urls are supported.
-	</p>
+	<p class="hint">ex: https://github.com/yourname/project.git OR ssh://github.com/yourname/project.git<br>
+	You can find this link on the right side of the repo in a box that says 'https clone url'.</p>
+
+
 
 	<label>
 	<span>GitHub branch</span>
@@ -650,3 +658,18 @@ That's also why the template does not contain a form
 </form>
 
 </div>
+
+
+
+<!-- HOST CHOOSER -->
+
+<div id='hostChooserDomainListTemplate' data-tlc="bind $domains '.@DOMAINS'; controller#loop --templateid='hostChooserDomainTemplate'; apply --append;" class='hostChooser'></div>
+<div id='hostChooserDomainTemplate'>
+	<h5 data-tlc="bind $domain '.DOMAINNAME'; apply --append;"></h5>
+	<ul data-tlc="bind $hosts '.@HOSTS'; controller#loop --templateid='hostChooserHostTemplate'; apply --append;" class='hostChooserHostList'></ul>
+</div>
+
+<ul>
+	<li id='hostChooserHostTemplate'  class='hostChooserHostListItem' data-tlc="bind $hostname '.HOSTNAME'; apply --append; bind $chkout '.CHKOUT'; if(is $chkout --notblank;) {{format --prepend=' - '; apply --append; }}; "></li>
+</ul>
+

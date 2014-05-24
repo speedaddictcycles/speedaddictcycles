@@ -67,18 +67,13 @@ var admin_tools = function(_app) {
 //				$("input",$picker).each(function(){});
 				},
 			
-			siteDebugger : function()	{
-				var $SD = $('#siteDebugger');
-				if($SD.length)	{
-					$SD.dialog('open');
-					}
-				else	{
-					$SD = $("<div \/>").attr({'id':'siteDebugger','title':'Site Debug Tools'}).anycontent({'templateID':'siteDebugTemplate','showLoading':false}).dialog();
-					_app.u.handleButtons($SD);
-					_app.u.handleCommonPlugins($SD);
-					_app.u.addEventDelegation($SD);
-					$SD.anyform();
-					}
+			siteDebugger : function($target,P)	{
+				P = P || {};
+				$target.tlc({'templateid':'siteDebugTemplate','dataset':P})
+				_app.u.handleButtons($target);
+				_app.u.handleCommonPlugins($target);
+				_app.u.addEventDelegation($target);
+				$target.anyform();
 				},
 
 			showManageFlexedit : function($target)	{
@@ -211,9 +206,10 @@ var admin_tools = function(_app) {
 //utilities are typically functions that are exected by an event or action.
 //any functions that are recycled should be here.
 		u : {
-
-			objExplore : function(obj)	{
+//depth should never be passed. it's defaulted to 0 (zero) and incremented w/ each nested object.
+			objExplore : function(obj,depth)	{
 // 				_app.u.dump("BEGIN analyzer.u.objExplore");
+				depth = depth || 0;
 				var keys = new Array();
 				for (var n in obj) {
 					keys.push(n);
@@ -224,11 +220,12 @@ var admin_tools = function(_app) {
 
 				for(var i = 0; i < L; i += 1)	{
 					var $li = $('<li>');
+					$li.addClass('objExplore_'+depth)
 					var $value;
 					$('<span>').addClass('prompt').text(keys[i]).appendTo($li);
 					
 					if(typeof obj[keys[i]] == 'object')	{
-						$value = _app.ext.admin_tools.u.objExplore(obj[keys[i]]);
+						$value = _app.ext.admin_tools.u.objExplore(obj[keys[i]],depth++);
 						}
 					else	{
 						$value = $('<span>').addClass('value').text(obj[keys[i]]);
@@ -844,9 +841,18 @@ var admin_tools = function(_app) {
 				cmdObj._tag = {
 					'datapointer' : cmdObj._cmd,
 					'callback' : function(rd)	{
-var data = _app.data[rd.datapointer];
-$ele.closest('form').find("[data-app-role='siteDebugContent']").empty().append(JSON.stringify(data)); // ### TODO -> make this pretty.
+						var data = _app.data[rd.datapointer], $target = $ele.closest('form').find("[data-app-role='siteDebugContent']").empty();
+						if(_app.model.responseHasErrors(rd)){
+							$target.anymessage({'message':rd});
+							}
 
+						if(!$.isEmptyObject(data['@MSGS']))	{
+							data.persistent = true;
+							$target.anymessage(data);
+							}
+						if(!$.isEmptyObject(data['@RESULTS']))	{
+							$("<div \/>").css({'max-height':'300px','overflow':'auto'}).append(_app.ext.admin_tools.u.objExplore(data['@RESULTS'])).appendTo($target);
+							}
 						}
 					};
 				_app.model.addDispatchToQ(cmdObj,'mutable');
@@ -856,6 +862,21 @@ $ele.closest('form').find("[data-app-role='siteDebugContent']").empty().append(J
 			//for forcing a product into the product task list
 			forcePIDIntoPTL : function($ele,p)	{
 				_app.ext.admin_prodedit.u.addProductAsTask({'pid':$ele.closest('form').find("[name='pid']").val(),'tab':'product','mode':'add'});
+				},
+			
+			siteDebugDialog : function($ele,p)	{
+				p.preventDefault();
+				var $SD = $('#siteDebugger');
+				if($SD.length)	{
+					$SD.empty().dialog('open');
+					}
+				else	{
+					$SD = $("<div \/>").attr({'id':'siteDebugger','title':'Site Debug Tools'}).dialog({
+						width : '50%'
+						});
+					}
+				adminApp.ext.admin_tools.a.siteDebugger($SD,{'verb':$ele.data('verb')});
+				return false;
 				}
 				
 			} //e [app Events]

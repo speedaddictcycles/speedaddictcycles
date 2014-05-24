@@ -179,7 +179,8 @@ calls should always return the number of dispatches needed. allows for cancellin
 				}
 			}, //cartSet
 
-
+/*
+201403 -> this is no longer necessary. this call is inline.
 //uses the cart ID, which is passed on the parent/headers.
 //always immutable.
 		cartOrderCreate : {
@@ -201,7 +202,7 @@ calls should always return the number of dispatches needed. allows for cancellin
 				_app.model.addDispatchToQ({'_cartid':cartID,'_cmd':'cartOrderCreate','_tag':_tag,'iama':_app.vars.passInDispatchV, 'domain' : (_app.vars.thisSessionIsAdmin ? 'www.'+_app.vars.domain : '')},'immutable');
 				}
 			},//cartOrderCreate
-
+*/
 
 		cartPaypalSetExpressCheckout : {
 			init : function(obj,_tag,Q)	{
@@ -215,11 +216,11 @@ calls should always return the number of dispatches needed. allows for cancellin
 				var extras = "";
 				if(window.debug1pc)	{extras = "&sender=jcheckout&fl=checkout-"+_app.model.version+debug1pc} //set debug1pc to a,p or r in console to force this versions 1pc layout on return from paypal
 				obj._cmd = "cartPaypalSetExpressCheckout";
-				obj.cancelURL = (_app.vars._clientid == '1pc') ? zGlobals.appSettings.https_app_url+"c="+_app.model.fetchCartID()+"/cart.cgis?parentID="+parentID+extras : zGlobals.appSettings.https_app_url+"?_session="+_app.vars._session+"&parentID="+parentID+"&cartID="+_app.model.fetchCartID()+"#!/cart/";
-				obj.returnURL =  (_app.vars._clientid == '1pc') ? zGlobals.appSettings.https_app_url+"c="+_app.model.fetchCartID()+"/checkout.cgis?parentID="+parentID+extras : zGlobals.appSettings.https_app_url+"?_session="+_app.vars._session+"&parentID="+parentID+"&cartID="+_app.model.fetchCartID()+"#!/checkout/";
+				obj.cancelURL = (_app.vars._clientid == '1pc') ? zGlobals.appSettings.https_app_url+"c="+_app.model.fetchCartID()+"/cart.cgis?parentID="+parentID+extras : zGlobals.appSettings.https_app_url+"?_session="+_app.vars._session+"&parentID="+parentID+"&cartID="+_app.model.fetchCartID()+"#!cart";
+				obj.returnURL =  (_app.vars._clientid == '1pc') ? zGlobals.appSettings.https_app_url+"c="+_app.model.fetchCartID()+"/checkout.cgis?parentID="+parentID+extras : zGlobals.appSettings.https_app_url+"?_session="+_app.vars._session+"&parentID="+parentID+"&cartID="+_app.model.fetchCartID()+"#!checkout?"; //? at end because paypal is going to add key value pairs to this url.
 				
 				obj._tag.datapointer = "cartPaypalSetExpressCheckout";
-				
+//				dump(" -> cartPaypalSetExpressCheckout obj: "); dump(obj);
 				_app.model.addDispatchToQ(obj,Q || 'immutable');
 				}
 			}, //cartPaypalSetExpressCheckout	
@@ -395,13 +396,17 @@ left them be to provide guidance later.
 //will fetch an entirely new copy of the cart from the server.
 //still requires a dispatch be sent OUTSIDE this
 					$cart.on('fetch.cart',function(event,P){
-						var $c = $(this);
-						$c.empty().showLoading({'message':'Updating cart contents'});
+						var $c = $(this); P = P || {};
+						$c.showLoading({'message':'Updating cart contents'});
 						_app.model.destroy('cartDetail|'+$c.data('cartid'));
 						_app.calls.cartDetail.init($c.data('cartid'),{
 							'callback':'tlc',
-							'onComplete' : function(){
-								$cart.trigger('complete',$.extend(true,{},P,event));
+							'before' : function(r)	{
+								r.jqObj.empty();
+								},
+							'onComplete' : function(r){
+								P.state = 'complete';
+								_app.renderFunctions.handleTemplateEvents(r.jqObj,$.extend(true,{},P,event));
 								},
 							'templateID' : $c.data('templateid'),
 							'jqObj' : $c
@@ -409,14 +414,15 @@ left them be to provide guidance later.
 						});
 //will update the cart based on what's in memory.
 					$cart.on('refresh.cart',function(event,P){
-						var $c = $(this);
+						var $c = $(this); P = P || {};
 						$c.intervaledEmpty();
 						if($c.data('tlc'))	{$c.tlc('destroy')}
 						//w/ no destroy here, refresh will use what's in memory IF it's available. If not, it will fetch the cart.
 						_app.calls.cartDetail.init($c.data('cartid'),{
 							'callback':'tlc',
 							'onComplete' : function(){
-								$cart.trigger('complete',$.extend(true,{},P,event));
+								P.state = 'complete';
+								_app.renderFunctions.handleTemplateEvents($c,$.extend(true,{},P,event));
 								},
 							'templateID' : $c.data('templateid'),
 							'jqObj' : $c
@@ -439,40 +445,33 @@ left them be to provide guidance later.
 
 		u : {
 
-//NOTE TO SELF:
-//use if/elseif for payments with special handling (cc, po, etc) and then the else should handle all the other payment types.
-//that way if a new payment type is added, it's handled (as long as there's no extra inputs).
-			buildPaymentQ : function($form,cartid)	{
-//				_app.u.dump("BEGIN cco.u.buildPaymentQ");
-				var r = false;
+			getPaymentQArray : function($form,cartid){
+				var payments = new Array();
 //				_app.u.dump(" -> payby: "+payby);
 				if($form instanceof jQuery && cartid)	{
 					var sfo = $form.serializeJSON() || {}, payby = sfo["want/payby"];
 					if(payby)	{
 						if(payby.indexOf('WALLET') == 0)	{
-							_app.ext.cco.calls.cartPaymentQ.init($.extend({'cmd':'insert','_cartid':cartid},_app.ext.cco.u.getWalletByID(payby,cartid)));
+							payments.push("insert?TN=WALLET&"+_app.u.hash2kvp(_app.ext.cco.u.getWalletByID(payby,cartid)));
 							}
 						else if(payby == 'CREDIT')	{
-							_app.ext.cco.calls.cartPaymentQ.init({"cmd":"insert",'_cartid':cartid,"TN":"CREDIT","CC":sfo['payment/CC'],"CV":sfo['payment/CV'],"YY":sfo['payment/YY'],"MM":sfo['payment/MM']});
+							payments.push("insert?TN=CREDIT&CC="+encodeURIComponent(sfo['payment/CC'])+"&CV="+encodeURIComponent(sfo['payment/CV'])+"&YY="+encodeURIComponent(sfo['payment/YY'])+"&MM="+encodeURIComponent(sfo['payment/MM']));
 							}				
 						else if(payby == 'PO')	{
-							_app.ext.cco.calls.cartPaymentQ.init({"cmd":"insert",'_cartid':cartid,"TN":"PO","PO":sfo['payment/PO']});
+							payments.push("insert?TN=PO&PO="+encodeURIComponent(sfo['payment/PO']));
 							}				
 						else if(payby == 'ECHECK')	{
-							_app.ext.cco.calls.cartPaymentQ.init({
-								"cmd":"insert",
-								'_cartid':cartid,
-								"TN":"ECHECK",
-								"EA":sfo['payment/EA'],
-								"ER":sfo['payment/ER'],
-								"EN":sfo['payment/EN'],
-								"EB":sfo['payment/EB'],
-								"ES":sfo['payment/ES'],
-								"EI":sfo['payment/EI']
-								});
+							payments.push("insert?TN=ECHECK"
+								+"&EA"+encodeURIComponent(sfo['payment/EA'])
+								+"&ER"+encodeURIComponent(sfo['payment/ER'])
+								+"&EN"+encodeURIComponent(sfo['payment/EN'])
+								+"&EB"+encodeURIComponent(sfo['payment/EB'])
+								+"&ES"+encodeURIComponent(sfo['payment/ES'])
+								+"&EI"+encodeURIComponent(sfo['payment/Ei'])
+								);
 							}
 						else	{
-							_app.ext.cco.calls.cartPaymentQ.init({"cmd":"insert",'_cartid':cartid,"TN":payby });
+							payments.push("insert?TN="+encodeURIComponent(payby));
 							}
 						r = true;
 						}
@@ -482,10 +481,12 @@ left them be to provide guidance later.
 						}
 					}
 				else	{
-					$("#globalMessaging").anymessage({'message':'In cco.u.buildPaymentQ, either form was not a valid jquery instance ['+($form instanceof jQuery)+'] or no cart id ['+cartid+'] was passed.','gMessage':true});
+					payments = false;
+					$("#globalMessaging").anymessage({'message':'In cco.u.getPaymentQArray, either form was not a valid jquery instance ['+($form instanceof jQuery)+'] or no cart id ['+cartid+'] was passed.','gMessage':true});
 					}
-				return r;
+				return payments;
 				},
+
 
 
 			paymentMethodsIncludesGiftcard : function(datapointer)	{
@@ -544,16 +545,17 @@ left them be to provide guidance later.
 				},
 
 //will get the items from a cart and return them as links. used for social marketing.
-			cartContentsAsLinks : function(cartid)	{
+			cartContentsAsLinks : function(cartObj)	{
 //				_app.u.dump('BEGIN cco.u.cartContentsAsLinks.');
 //				_app.u.dump(' -> datapointer = '+datapointer);
-				var r = "";
-				if(cartid && _app.u.thisNestedExists("data.cartDetail|"+cartid+".@items",_app))	{
-					var items = _app.data[datapointer]['@ITEMS'], L = items.length;
+				var r = false;
+				if(!$.isEmptyObject(cartObj))	{
+					var items = cartObj['@ITEMS'] || [], L = items.length;
+					if(L)	{r = ''}; //set to blank so += doesn't start with undefined. 
 					for(var i = 0; i < L; i += 1)	{
 						//if the first character of a sku is a %, then it's a coupon, not a product.
 						if(items[i].sku.charAt(0) != '%')	{
-							r += "http://"+_app.vars.sdomain+"/product/"+items[i].sku+"/\n";
+							r +=  (_app.vars._clientid == '1pc') ? "http://"+_app.vars.sdomain+"/product/"+items[i].sku+"/\n" : "http://"+_app.vars.sdomain+"#!product/"+items[i].sku+"/\n";
 							}
 						}
 					}
@@ -622,7 +624,7 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 						} //paymentQ is empty. no error or warning.
 					}
 				else	{
-					_app.u.dump("WARNING! getPaymentQidByTender failed because tender ["+tender+"] or cartID ["+cartID+"] not set or @PAYMENTQ does not exist.");
+					_app.u.dump("WARNING! modifyPaymentQbyTender failed because tender ["+tender+"] or cartID ["+cartID+"] not set or @PAYMENTQ does not exist.");
 					}
 //				_app.u.dump(" -> num tender matches: "+r);
 				return returned;
@@ -727,17 +729,19 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 							if(data['payment/CC']){tmp += data['payment/CC']}
 							tmp += "' required='required' /><\/label><\/div>";
 							
-							tmp += "<div><label>Expiration<\/label><select name='payment/MM' class='creditCardMonthExp' required='required'><option><\/option>";
+							tmp += "<div><label>Expiration<\/label><select name='payment/MM' class='creditCardMonthExp' required='required'><option value=''>month<\/option>";
 							tmp += _app.u.getCCExpMonths(data['payment/MM']);
 							tmp += "<\/select>";
-							tmp += "<select name='payment/YY' class='creditCardYearExp'  required='required'><option value=''><\/option>"+_app.u.getCCExpYears(data['payment/YY'])+"<\/select><\/div>";
+							tmp += "<select name='payment/YY' class='creditCardYearExp'  required='required'><option value=''>year<\/option>"+_app.u.getCCExpYears(data['payment/YY'])+"<\/select><\/div>";
 							
-							tmp += "<div><label for='payment/CV'>CVV/CID<input data-format-rules='CV' type='text' size='4' name='payment/CV' class=' creditCardCVV' data-input-format='numeric' data-input-keyup='input-format' value='";
+							tmp += "<div><label for='payment/CV'>CVV/CID <input data-format-rules='CV' type='text' size='4' name='payment/CV' class=' creditCardCVV' data-input-format='numeric' data-input-keyup='input-format' value='";
 							if(data['payment/CV']){tmp += data['payment/CV']}
+							tmp += "' ";
 							if(!_app.u.thisIsAnAdminSession())	{
 								tmp += " required='required' " //merchant has option of acquiring cvv/cid.
 								}
-							tmp += "'  /><\/label> <span class='ui-icon ui-icon-help creditCardCVVIcon' onClick=\"$('#cvvcidHelp').dialog({'modal':true,height:400,width:550});\"></span><\/div>";
+
+							tmp += " /><\/label> <span class='ui-icon ui-icon-help creditCardCVVIcon' onClick=\"$('#cvvcidHelp').dialog({'modal':true,width:"+($(window).width < 400 ? '90%' : 400)+"});\"></span><\/div>";
 							
 							if(isAdmin === true)	{
 								tmp += "<div><label><input type='radio' name='VERB' value='AUTHORIZE'>Authorize<\/label><\/div>"
@@ -820,7 +824,7 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 //run this just prior to creating an order.
 //will clean up cart object.
 			sanitizeAndUpdateCart : function($form,_tag)	{
-				dump("BEGIN cco.u.sanitizeAndUpdateCart");
+//				dump("BEGIN cco.u.sanitizeAndUpdateCart");
 				if($form instanceof jQuery)	{
 					_tag = _tag || {};
 					var formObj = $form.serializeJSON({cb:true});
@@ -867,8 +871,10 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 					else if(formObj['want/bill_to_ship'] && formObj['bill/shortcut'])	{
 						populateAddressFromShortcut('bill','ship');	
 						}
-//bill to ship, but no short cut (not logged in)
-					else if(formObj['want/bill_to_ship'])	{
+//bill to ship, but no short cut (not logged in).
+// ** 201402 -> was hitting on else if((formObj['want/bill_to_ship']) so > 0 added.
+					else if(formObj['want/bill_to_ship'] > 0)	{
+						dump(" -> want/bill_to_ship = "+formObj['want/bill_to_ship']);
 						for(var index in formObj)	{
 //copy billing fields into shipping. not email tho.
 							if(index.indexOf('bill/') == 0 && index != 'bill/email')	{ 
@@ -881,9 +887,9 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 //these aren't valid checkout field. used only for some logic processing.
 					delete formObj['want/reference_number'];
 					delete formObj['want/bill_to_ship_cb'];
-//cc and cv should never go. They're added as part of cartPaymentQ
-					delete formObj['payment/cc'];
-					delete formObj['payment/cv'];
+//CC and CV should never go. They're saved in memory and added as part of cartPaymentQ
+					delete formObj['payment/CC'];
+					delete formObj['payment/CV'];
 /* these fields are in checkout/order create but not 'supported' fields. don't send them */				
 					delete formObj['giftcard'];
 					delete formObj['want/bill_to_ship_cb'];
@@ -896,6 +902,10 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 					delete formObj['qty']; //admin UI for line item editing.	
 					delete formObj['price']; //admin UI for line item editing.
 
+					delete formObj['sum/shp_carrier']; //admin UI custom ship cost.
+					delete formObj['sum/shp_method'];
+					delete formObj['sum/shp_total'];
+					
 					_app.ext.cco.calls.cartSet.init(formObj,_tag); //adds dispatches.
 					}
 				else	{
@@ -971,6 +981,7 @@ in a reorder, that data needs to be converted to the variations format required 
 //callback is executed as part of the cartDetail call, which is piggy backed w/ the append calls.
 //skuArr is an optional param. if set, only the items in skuArr will be appended to the cart.
 			appendOrderItems2Cart : function(vars,callback,skuArr)	{
+//				dump("BEGIN cco.u.appendOrderItems2Cart. skuArr: "); dump(skuArr);
 				vars = vars || {};
 				if(vars.orderid && vars.cartid)	{
 					var cmd; //the command used for the dispatch. varies based on whether this is admin or buyer.
@@ -994,7 +1005,10 @@ in a reorder, that data needs to be converted to the variations format required 
 								else	{
 									var items = (cmd == 'adminOrderDetail') ? _app.data[rd.datapointer]['@ITEMS'] : _app.data[rd.datapointer].order['@ITEMS'], L = items.length;
 									for(var i = 0; i < L; i += 1)	{
-										if(skuArr.length && !$.inArray(items[i].sku,skuArr))	{} //skuArr is defined and this item is NOT in the array. do nothing.
+										dump(i+") items[i].sku: "+items[i].sku+" and inArray: "+$.inArray(items[i].sku,skuArr));
+										if(skuArr.length && $.inArray(items[i].sku,skuArr) < 0)	{
+											 //skuArr is defined and this item is NOT in the array. do nothing.
+											}
 										else	{
 											//skuArr is either not defined (append all sku's from order) OR skuArr is defined and this item is in that array. Either way, proceed w/ append.
 											var appendObj = _app.ext.cco.u.buildCartItemAppendObj(items[i],vars.cartid); //will generate a new uuid.
@@ -1099,17 +1113,17 @@ in a reorder, that data needs to be converted to the variations format required 
 //will tell you which third party checkouts are available. does NOT look to see if merchant has them enabled,
 // just checks to see if the cart contents would even allow it.
 //currently, there is only a google field for disabling their checkout, but this is likely to change.
-			which3PCAreAvailable :	function(cart){
-					_app.u.dump("BEGIN control.u.which3PCAreAvailable");
+			which3PCAreAvailable :	function(cartID){
+	//				_app.u.dump("BEGIN control.u.which3PCAreAvailable");
 					var obj = {};
-					if(cart)	{
+					if(_app.data['cartDetail|'+cartID])	{
 		//by default, everything is available
 						obj = {
 							paypalec : true,
 							amazonpayment : true,
 							googlecheckout : true
 							}
-						var items = cart['@ITEMS'], L = items.length;
+						var items = _app.data['cartDetail|'+cartID]['@ITEMS'], L = items.length;
 						for(var i = 0; i < L; i += 1)	{
 							if(items[i]['%attribs'] && items[i]['%attribs']['gc:blocked'])	{obj.googlecheckout = false}
 							if(items[i]['%attribs'] && items[i]['%attribs']['paypalec:blocked'])	{obj.paypalec = false}
@@ -1142,9 +1156,15 @@ in a reorder, that data needs to be converted to the variations format required 
 		renderFormats : {
 // pass in parent data object (entire cart). need to get both the cart ID and the country that has already been selected.
 			countriesasoptions : function($tag,data)	{
-				var r = '';
+				var r = '', cartid;
+				
 				if(data.value.cart && data.value.cart.cartid){
-					var cartid = data.value.cart.cartid;
+					cartid = data.value.cart.cartid;
+					}
+				else	{
+					cartid = _app.model.fetchCartID(); //in some cases, such as an address editor, the cartid may not be in the data.
+					}
+				if(cartid)	{
 					if(_app.data['appCheckoutDestinations|'+cartid] && _app.data['cartDetail|'+cartid] && data.bindData.shiptype)	{
 						var destinations = _app.data['appCheckoutDestinations|'+cartid]['@destinations'], L = destinations.length, cartData = _app.data['cartDetail|'+cartid];
 						for(var i = 0; i < L; i += 1)	{
@@ -1160,6 +1180,9 @@ in a reorder, that data needs to be converted to the variations format required 
 						$tag.parent().append($("<div \/>").anymessage({'persistent':true,'message':'in cco.renderFormats.countriesasoptions, _app.data[appCheckoutDestinations|'+cartid+'] or _app.data.cartDetail|'+cartid+' and both are required. is not available in memory.','gMessage':true}));
 						}
 
+					}
+				else	{
+					dump("For countriesasoptions renderFormat in CCO, cartID could not be obtained.",'warn');
 					}
 				},
 
@@ -1189,17 +1212,15 @@ in a reorder, that data needs to be converted to the variations format required 
 					var payObj = _app.ext.cco.u.which3PCAreAvailable(data.value);
 					if(payObj.paypalec)	{
 						$tag.empty().append("<img width='145' id='paypalECButton' height='42' border='0' src='"+(document.location.protocol === 'https:' ? 'https:' : 'http:')+"//www.paypal.com/en_US/i/btn/btn_xpressCheckoutsm.gif' alt='' />").addClass('pointer').off('click.paypal').on('click.paypal',function(){
-							_app.ext.cco.calls.cartPaypalSetExpressCheckout.init({'getBuyerAddress':1, '_cartid':data.value.cart.cartid},{'callback':function(rd){
-								dump('paypal click');
-								$('body').showLoading({'message':'Obtaining secure PayPal URL for transfer...','indicatorID':'paypalShowLoading'});
+							$(document.body).showLoading({'message':'Obtaining secure PayPal URL for transfer...'});
+							_app.ext.cco.calls.cartPaypalSetExpressCheckout.init({'getBuyerAddress':1, '_cartid':_app.model.fetchCartID(),'useMobile':($(document.body).width() < 500 ? 1 : 0)},{'callback':function(rd){
+								$(document.body).hideLoading();
 								if(_app.model.responseHasErrors(rd)){
-									$(this).removeClass('disabled').attr('disabled','').removeAttr('disabled');
 									$('#globalMessaging').anymessage({'message':rd});
 									}
 								else	{
 									if(_app.data[rd.datapointer] && _app.data[rd.datapointer].URL)	{
-										$('.ui-loading-message','#loading-indicator-paypalShowLoading').text("Transferring you to PayPal to authorize payment. See you soon!");
-										document.location = _app.data[rd.datapointer].URL;
+										document.location = _app.data[rd.datapointer].URL+'&useraction=commit'; //commit returns user to website for order confirmation. otherwise they stay on paypal.
 										}
 									else	{
 										$('#globalMessaging').anymessage({"message":"In paypalecbutton render format, dispatch to obtain paypal URL was successful, but no URL in the response.","gMessage":true});
@@ -1248,25 +1269,20 @@ in a reorder, that data needs to be converted to the variations format required 
 //for displaying order balance in checkout order totals.
 //changes value to 0 for negative amounts. Yes, this can happen.			
 			orderbalance : function($tag,data)	{
-				var o = '';
-				var amount = data.value;
-//				_app.u.dump('BEGIN _app.renderFunctions.format.orderBalance()');
-//				_app.u.dump('amount * 1 ='+amount * 1 );
+				if(data.value)	{
+					var o = '';
+					var amount = data.value;
 //if the total is less than 0, just show 0 instead of a negative amount. zero is handled here too, just to avoid a formatMoney call.
 //if the first character is a dash, it's a negative amount.  JS didn't like amount *1 (returned NAN)
-				
-				if(amount * 1 <= 0){
-//					_app.u.dump(' -> '+amount+' <= zero ');
-					o += data.bindData.currencySign ? data.bindData.currencySign : '$';
-					o += '0.00';
+					if(amount * 1 <= 0){
+						o += data.bindData.currencySign ? data.bindData.currencySign : '$';
+						o += '0.00';
+						}
+					else	{
+						o += _app.u.formatMoney(amount,data.bindData.currencySign,'',data.bindData.hideZero);
+						}
+					$tag.text("Balance due: "+o);  //update DOM.
 					}
-				else	{
-//					_app.u.dump(' -> '+amount+' > zero ');
-					o += _app.u.formatMoney(amount,data.bindData.currencySign,'',data.bindData.hideZero);
-					}
-				
-				$tag.text("Balance due: "+o);  //update DOM.
-//				_app.u.dump('END _app.renderFunctions.format.orderBalance()');
 				}, //orderBalance
 
 //displays the shipping method followed by the cost.
@@ -1317,7 +1333,15 @@ in a reorder, that data needs to be converted to the variations format required 
 		
 		e : {
 			
+			cartFetchExec : function($ele,p)	{
+				p.preventDefault();
+				$ele.closest("[data-template-role='cart']").trigger('fetch',{'Q':'immutable'}); //will work if getCartAsJqObj was used to create the cart.
+				_app.model.dispatchThis('immutable');
+				return false;
+				},
+			
 			cartItemRemove	: function($ele,p)	{
+				p.preventDefault();
 				var stid = $ele.closest('[data-stid]').data('stid'), cartid = $ele.closest("[data-template-role='cart']").data('cartid');
 				if(stid && cartid)	{
 					_app.ext.cco.calls.cartItemUpdate.init({'stid':stid,'quantity':0,'_cartid':cartid},{
@@ -1325,25 +1349,24 @@ in a reorder, that data needs to be converted to the variations format required 
 						'message' : 'Item '+stid+' removed from your cart',
 						'jqObj' : $ele.closest('form')
 						},'immutable');
-					$ele.closest('[data-stid]').intervaledEmpty();
+
+					// these needs to be before the empty below OR the button can't look up the foodchain for the cart container.
 					$ele.closest("[data-template-role='cart']").trigger('fetch',{'Q':'immutable'}); //will work if getCartAsJqObj was used to create the cart.
+						
+					$ele.closest('[data-stid]').intervaledEmpty();
 					_app.model.dispatchThis('immutable');
 					}
 				else	{
 					$ele.closest('form').anymessage({'message':'In cco.e.cartItemRemove, unable to ascertain item STID ['+stid+'] and/or the cart id ['+cartid+'].','gMessage':true})
 					}
+				return false;
 				}, //cartItemRemove
 			
-			cartShipmethodSelect : function($ele,p)	{
-				p.preventDefault();
-				// ### TODO -> wrap this up once template on completes are ready.
-				},
 			//this update could get triggered by a quantity update, a button or a price change (admin).
 			//$container will contain the qty and, if present, the price.
-			
-			
 			//this can be used to update a store or admin session. the callback here is fixed and will update the cart IF the cart was generated using getCartAsJqObj
 			cartItemUpdateExec : function($ele,p){
+				p.preventDefault();
 				var
 					$container = $ele.closest('[data-stid]'),
 					$cart = $ele.closest("[data-template-role='cart']"),
@@ -1366,9 +1389,11 @@ in a reorder, that data needs to be converted to the variations format required 
 				else	{
 					//cartItemUpdate will handle error display.
 					}
+				return false;
 				}, //cartItemUpdateExec
 			//will post the input to the cart, passively.
 			cartSetAttrib : function($ele,p)	{
+				p.preventDefault();
 				var cartid = $ele.data('cartid') || $ele.closest("[data-cartid]").data('cartid');
 				if(cartid)	{
 					var cmdObj = {
@@ -1380,13 +1405,16 @@ in a reorder, that data needs to be converted to the variations format required 
 				else	{
 					$("#globalMessaging").anymessage({"message":"In cco.e.cartSetAttib, unable to ascertain cart id. Be sure data-cartid is set on/above trigger element.","gMessage":true});
 					}
+				return false;
 				},
 
 			cartZipUpdateExec : function($ele,p)	{
+				p.preventDefault();
 				_app.ext.cco.calls.cartSet.init({'ship/postal':$ele.val(), 'ship/region':'','_cartid': $ele.closest("[data-template-role='cart']").data('cartid')},{},'immutable');
 				$ele.closest("[data-template-role='cart']").trigger('fetch',{'Q':'immutable'});
 				_app.model.dispatchThis('immutable');
-				}, //cartZipUpdateExec
+				return false;
+				} //cartZipUpdateExec
 
 			}
 		

@@ -139,27 +139,27 @@ var admin_prodedit = function(_app) {
 //					_app.u.dump("BEGIN admin_prodedit.callbacks.flex2HTMLEditor");
 					var pid = _rtag.pid;
 					_app.u.dump(" -> PID: "+pid);
-if(_rtag.jqObj)	{
-//	_app.u.dump(" -> jqObj IS defined");
-	_rtag.jqObj.hideLoading();
-	_rtag.jqObj.anycontent(_rtag);
-
-	_rtag.jqObj.find("[data-app-role='flexContainer']").append(_app.ext.admin_prodedit.u.flexJSON2JqObj(_app.data[_rtag.datapointer].contents,_app.data['adminProductDetail|'+pid]));
-	
-//hidden pid input is used by save. must come after the 'anycontent' above or form won't be set.
-	_rtag.jqObj.find('form').append("<input type='hidden' name='pid' value='"+pid+"' \/>");
-
-
-	_app.u.addEventDelegation(_rtag.jqObj.anyform({'trackEdits':true}));
-	_app.u.handleCommonPlugins(_rtag.jqObj);
-	_app.u.handleButtons(_rtag.jqObj);
-	
-	if(_rtag.jqObj.hasClass('ui-dialog-content'))	{
-		_rtag.jqObj.dialog('option','height',($('body').height() - 200));
-		_rtag.jqObj.dialog('option','position','center');
-		}
-
-	}
+					if(_rtag.jqObj)	{
+					//	_app.u.dump(" -> jqObj IS defined");
+						_rtag.jqObj.hideLoading();
+						_rtag.jqObj.anycontent(_rtag);
+					
+						_rtag.jqObj.find("[data-app-role='flexContainer']").append(_app.ext.admin_prodedit.u.flexJSON2JqObj(_app.data[_rtag.datapointer].contents,_app.data['adminProductDetail|'+pid]));
+						
+					//hidden pid input is used by save. must come after the 'anycontent' above or form won't be set.
+						_rtag.jqObj.find('form').append("<input type='hidden' name='pid' value='"+pid+"' \/>");
+					
+					
+						_app.u.addEventDelegation(_rtag.jqObj.anyform({'trackEdits':true}));
+						_app.u.handleCommonPlugins(_rtag.jqObj);
+						_app.u.handleButtons(_rtag.jqObj);
+						
+						if(_rtag.jqObj.hasClass('ui-dialog-content'))	{
+							_rtag.jqObj.dialog('option','height',($('body').height() - 200));
+							_rtag.jqObj.dialog('option','position','center');
+							}
+					
+						}
 					}
 				},
 
@@ -167,44 +167,65 @@ if(_rtag.jqObj)	{
 			handleProductEditor : {
 				onSuccess : function(_rtag)	{
 	
-var pid = _app.data[_rtag.datapointer].pid;
-
-//this will render the 'quickview' above the product itself. This is only run if 'edit' is clicked directly from the search results.
-if(_rtag.renderTaskContainer)	{
-	_app.u.handleButtons(_rtag.jqObj.closest("[data-app-role='taskItemContainer']").find("[data-app-role='taskItemPreview']").anycontent({'datapointer':_rtag.datapointer}));
-	}
-
-_rtag.jqObj.hideLoading();
-_rtag.jqObj.anycontent({'templateID':'productEditorTabbedTemplate','data':$.extend(true,{},_app.data[_rtag.datapointer],_app.data['adminProductReviewList|'+pid])});
-
-
-//check to see if item has inventoryable variations.
-if(_app.ext.admin_prodedit.u.thisPIDHasInventorableVariations(pid))	{
-	//this product has inventoryable options.
-	$("[data-app-role='showProductWithVariations']",_rtag.jqObj).show();
-	$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).hide();
-	}
-else {
-	// no variations
-	$("[data-app-role='showProductWithVariations']",_rtag.jqObj).hide();
-	$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).show();
-	$("[data-app-role='prodEditSkuImagesFieldset']",_rtag.jqObj).hide(); //hide sku-specific images. That code is designed to only have three images and could inadvertantly remove product imagery. ## TODO -> test this.
-	}
-
-
-$('form',_rtag.jqObj).each(function(){
-	$(this).append("<input type='hidden' name='pid' value='"+pid+"' \/>");
-	});
-
-_app.ext.admin_prodedit.u.handleImagesInterface($("[data-app-role='productImages']",_rtag.jqObj),pid);
-_app.u.handleCommonPlugins(_rtag.jqObj);
-_app.u.handleButtons(_rtag.jqObj);
-_app.u.addEventDelegation(_rtag.jqObj);
-
-_rtag.jqObj.anyform({
-	trackEdits:true,
-	trackSelector:'form'
-	});
+					var pid = _app.data[_rtag.datapointer].pid;
+					
+					//this will render the 'quickview' above the product itself. This is only run if 'edit' is clicked directly from the search results.
+					if(_rtag.renderTaskContainer)	{
+						_app.u.handleButtons(_rtag.jqObj.closest("[data-app-role='taskItemContainer']").find("[data-app-role='taskItemPreview']").anycontent({'datapointer':_rtag.datapointer}));
+						}
+					
+					_rtag.jqObj.hideLoading();
+// ** 201404 -> product with > 100 skus get a modified interface. This is done to improve performance.
+//					_rtag.jqObj.anycontent({'templateID':'productEditorTabbedTemplate','data':$.extend(true,{},_app.data[_rtag.datapointer],_app.data['adminProductReviewList|'+pid])});
+					if(_rtag.jqObj.data('anycontent'))	{
+						_rtag.jqObj.anycontent('destroy');
+						}
+					_rtag.jqObj.anycontent({'templateID':'productEditorTabbedTemplate'}); //create the template instance.
+					//need to do a little modification to the template based on whether or not there are > 100 skus.
+					//once the interface is upgraded to TLC, this can be perfomed inline.
+					
+					if(_app.data[_rtag.datapointer]['@skus'].length <= 10)	{
+						$("[data-skufinder-role='finderContainer']",_rtag.jqObj).hide(); //no point showing the sku finder if there's only a few skus.
+						}
+					else if(_app.data[_rtag.datapointer]['@skus'].length > 40)	{
+//remove the data-bind so the entire list doesn't load. the skufinder still shows up, it's still useful for locating a specific product.
+						$("[data-skufinder-role='target']",_rtag.jqObj).removeAttr('data-bind')
+						}
+					else	{}
+					
+					
+					//now translate the data.
+					_rtag.jqObj.anycontent({'translateOnly' : true,'data':$.extend(true,{},_app.data[_rtag.datapointer],_app.data['adminProductReviewList|'+pid])});
+					
+					
+					
+					//check to see if item has inventoryable variations.
+					if(_app.ext.admin_prodedit.u.thisPIDHasInventorableVariations(pid))	{
+						//this product has inventoryable options.
+						$("[data-app-role='showProductWithVariations']",_rtag.jqObj).show();
+						$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).hide();
+						}
+					else {
+						// no variations
+						$("[data-app-role='showProductWithVariations']",_rtag.jqObj).hide();
+						$("[data-app-role='showProductWithoutVariations']",_rtag.jqObj).show();
+						$("[data-app-role='prodEditSkuImagesFieldset']",_rtag.jqObj).hide(); //hide sku-specific images. That code is designed to only have three images and could inadvertantly remove product imagery. ## TODO -> test this.
+						}
+					
+					
+					$('form',_rtag.jqObj).each(function(){
+						$(this).append("<input type='hidden' name='pid' value='"+pid+"' \/>");
+						});
+					
+					_app.ext.admin_prodedit.u.handleImagesInterface($("[data-app-role='productImages']",_rtag.jqObj),pid);
+					_app.u.handleCommonPlugins(_rtag.jqObj);
+					_app.u.handleButtons(_rtag.jqObj);
+					_app.u.addEventDelegation(_rtag.jqObj);
+					
+					_rtag.jqObj.anyform({
+						trackEdits:true,
+						trackSelector:'form'
+						});
 					}
 				} //handleProductEditor
 			}, //callbacks
@@ -218,7 +239,6 @@ _rtag.jqObj.anyform({
 	
 //$target -> a jquery instance of where the manager should show up.
 //P -> an object of params.
-//  -> currently supports 'pid' which, if set, will open the product editor for that pid.
 //This code should NOT bring the product tab into focus. That should be done by the code that executes this.
 //  -> allows this code build the product manager interface in the background so that the product task list 'add' works prior to the product editor being opened.
 			showProductManager : function(P)	{
@@ -233,6 +253,11 @@ _rtag.jqObj.anyform({
 				else	{
 					$target.anycontent({'templateID':'productManagerLandingContentTemplate','showLoading':false});
 					_app.u.addEventDelegation($("[data-app-role='productManagerResultsContent']",$target)); //this delegate is just on the results. each product get's it's own in quickview.
+					//add the tasks to the list.
+					var tasks = _app.model.dpsGet('tab_pref_product','tasklistitems');
+					for(var i = 0, L = tasks.length; i < L; i += 1)	{
+						_app.ext.admin_prodedit.u.addProductAsTask({'pid':tasks[i],'tab':'product','mode':'add'});
+						}
 					}
 				}, //showProductManager
 
@@ -307,6 +332,7 @@ _rtag.jqObj.anyform({
 						});
 					}
 				$modal.empty().append(_app.renderFunctions.createTemplateInstance('ProductCreateNewTemplate'));
+				$modal.anyform();
 				_app.u.handleButtons($modal);
 				_app.u.addEventDelegation($modal); 
 				$modal.dialog('open');
@@ -412,6 +438,7 @@ _app.u.addEventDelegation($target);
 //in 'select' based varations editors and in product edit mode, need to show the list of options available in the sog
 						if(mode == 'product' && ((varObj.isnew && varObj.ispog) || (varObj.id && varObj.id.indexOf('#') == -1)))	{
 							var $tbody = $("[data-app-role='storeVariationsOptionsContainer'] tbody",$r);
+							$("[data-app-role='productOptionsFilterInput']",$r).show(); //this is only displayed in the product editor. in store variations edit, the list is empty.
 							$tbody.attr("data-bind","var: sog(@options); format:processList;loadsTemplate:optionsEditorRowTemplate;");
 							$tbody.parent().show().anycontent({'data':_app.data.adminSOGComplete['%SOGS'][varObj.id]});
 							$("[data-app-click='admin_prodedit|variationsOptionToggle']",$tbody).show(); //toggle button only shows up when in right side list.
@@ -419,14 +446,7 @@ _app.u.addEventDelegation($target);
 							$tbody.sortable({
 								connectWith: '.sortGroup',
 								stop : function(event,ui){
-									var $tr = $(ui.item);
-									if($tr.closest('table').data('app-role') == "storeVariationsOptionsContainer")	{} //same parent. do nothing.
-									else	{
-										//moved to new parent.
-										$('button',$tr).show();
-										$("[data-app-click='admin_prodedit|variationsOptionToggle']",$tr).hide();
-										_app.u.handleButtons($tr);
-										}
+									_app.ext.admin_prodedit.u.handleOptionsSortableStop($(ui.item));
 									//optionsEditorRowTemplate
 									}
 								});
@@ -529,6 +549,38 @@ _app.u.addEventDelegation($target);
 	
 	
 		renderFormats : {
+
+// in this case, we aren't modifying an attribute of $tag, we're appending to it. a lot.
+//this code requires the includes.js file.
+//it loops through the products options and adds them to the fieldset (or whatever $tag is, but a fieldset is a good idea).
+//In this case, ONLY inventory-able variations are output.
+			skufindervariations : function($tag,data)	{
+				_app.u.dump("BEGIN admin_prodedit.renderFormats.skufindervariations");
+				var pid = data.value.pid; 
+				var formID = $tag.closest('form').attr('id'); //move up the dom tree till the parent form is found
+				if(!$.isEmptyObject(data.value['@variations']) && _app.model.countProperties(data.value['@variations']) > 0)	{
+					$tag.attr('data-pid',pid);
+					$("<div \/>").attr('id','JSONpogErrors_'+pid).addClass('zwarn').appendTo($tag);
+					var $display = $("<div \/>").addClass('skuFinder'); //holds all the pogs and is appended to at the end.
+					pogs = new handlePogs(data.value['@variations'],{"formId":formID,"sku":pid});
+					var pog;
+					if(typeof pogs.xinit === 'function')	{pogs.xinit()}  //this only is needed if the class is being extended (custom sog style).
+					var ids = pogs.listOptionIDs();
+					for ( var i=0, len=ids.length; i<len; ++i) {
+						pog = pogs.getOptionByID(ids[i]);
+						if(pog.inv)	{
+							$display.append(pogs.renderOption(pog,pid));
+							}
+						}
+					//skipTracks keeps this change from updating the save button.
+					$(':input',$display).addClass('skipTrack').attr('required','required');
+					if(data.bindData.appclick)	{
+						$display.append("<button class='applyButton' data-app-click='"+data.bindData.appclick+"'>load</button>");
+						}
+					$display.appendTo($tag);	
+					}
+				}, //skufindervariations
+
 
 			link2eBayByID : function($tag,data)	{
 				$tag.off('click.link2eBayByID').on('click.link2eBayByID',function(){
@@ -640,6 +692,18 @@ _app.u.addEventDelegation($target);
 	
 		u : {
 
+			handleOptionsSortableStop : function($tr)	{
+				if($tr.closest('table').data('app-role') == "storeVariationsOptionsContainer")	{} //same parent. do nothing.
+				else	{
+					//moved to new parent.
+					$('button',$tr).show();
+					$("[data-app-click='admin_prodedit|variationsOptionToggle']",$tr).hide();
+					$tr.addClass('edited');
+					$tr.closest('.anyformEnabled').anyform('updateChangeCounts');
+					_app.u.handleButtons($tr);
+					}
+				},
+
 //will go through the list of sogs that are enabled and disable the sog in the 'store variations' list.
 			handleApply2ProdButton : function($container)	{
 				var $storeOptions = $("[data-app-role='productVariationManagerStoreContainer']",$container);
@@ -657,14 +721,17 @@ _app.u.addEventDelegation($target);
 //product must be in memory with sku:1 passed for this to work.
 			thisPIDHasInventorableVariations : function(pid)	{
 				var r = false;
-				if(pid && _app.data['adminProductDetail|'+pid] && _app.data['adminProductDetail|'+pid]['@skus'] && _app.data['adminProductDetail|'+pid]['@skus'].length)	{
+				if(pid && _app.data['adminProductDetail|'+pid] && _app.data['adminProductDetail|'+pid]['@variations'])	{
+					for(var i = 0, L = _app.data['adminProductDetail|'+pid]['@variations'].length; i < L; i+=1)	{
+						if(_app.data['adminProductDetail|'+pid]['@variations'][i].inv >= 1)	{r = true; break;} //once a single inventory-able variation is found, no reason to continue.
+						}
 //					_app.u.dump(" -> sku: "+_app.data['adminProductDetail|'+pid]['@skus'][0].sku);
-					if(_app.data['adminProductDetail|'+pid]['@skus'][0].sku.indexOf(':') > 0 )	{r = true}
 					}
 				else	{
 					//missing something we need.
 					$('#globalMessaging').anymessage({"message":"in admin_prodedit.u.thisPIDHasInventorableVariations, either pid ["+pid+"] not set or product record ["+typeof _app.data['adminProductDetail|'+pid]+"](with sku detail) not in memory.","gMessage":true});
 					}
+				dump(" -> pid has inventory-able variations: "+r);
 				return r;
 				},
 
@@ -797,6 +864,24 @@ _app.u.addEventDelegation($target);
 				},
 
 
+/*
+** 201404 -> for product with a lot of skus, rather than show all X skus, a pid finder is displayed.
+the pid finder allows a merchant to choose by variation options which pid they want to edit.
+*/
+			addSKUFinderTo : function($target,opts)	{
+				opts = opts || {};
+				
+				if($target instanceof jQuery && opts.pid)	{
+					
+					}
+				else if(!opts.pid)	{
+					$target.anymessage({"message":"In admin_prodedit.u.addSKUFinderTo, no pid was defined in opts","gMessage":true});
+					}
+				else	{
+					$("#globalMessaging").anymessage({"message":"In admin_prodedit.u.addSKUFinderTo, $target is not an instance of jquery.","gMessage":true});
+					}
+				
+				},
 
 
 
@@ -1523,103 +1608,143 @@ Required params include:
  -> tab: which tab's list this product should be added to. currently, only product is suppported
  -> pid: the product id in question.
  -> mode: add, edit, remove
+
+$ele is the element which contained the 'add to product task list' button. probably a tr.
 */
 
 			addProductAsTask : function(P,$ele)	{
 //				_app.u.dump("BEGIN admin_prodedit.u.addProductAsTask");
 				if(P.pid && P.tab && P.mode)	{
-					
+					this.manageProductTaskArr(P);
 					var $taskList = $("ul[data-app-role='"+P.tab+"ContentTaskResults']",_app.u.jqSelector('#',P.tab+'Content'));
-//					_app.u.dump(" -> $taskList.length: "+$taskList.length);
-					var $li = $("li[data-pid='"+P.pid+"']",$taskList);
-					if(P.mode == 'remove')	{
-						$li.slideUp('fast',function(){
-							$li.empty().remove();
-							});
-//if the product is in the search results list, make sure the toggle button is not highlighted.
-						$(_app.u.jqSelector('#','prodManager_'+P.pid)).find("[data-app-click='admin_prodedit|productTaskPidToggle']").removeClass('ui-state-highlight');
-						}
-					else if(P.mode == 'close')	{
-						$("[data-app-role='productEditorContainer']",$li).slideUp('fast',function(){
-							$(this).empty(); //empty this so that data is re-obtained when re-opened (allows for a fairly easy refresh process)
-							});
-						$("button[data-taskmode='close']",$li).hide();
-						$("button[data-taskmode='edit']",$li).show();
-						}
-					else	{
-						//to get here, we are in 'add' or 'edit' mode.
-						if($li.length)	{}//product is already in list.
-						else	{
-							var $li = _app.renderFunctions.createTemplateInstance($taskList.data('loadstemplate'));
-							$li.hide();
-							$li.attr('data-pid',P.pid);
-							_app.u.addEventDelegation($li);
-							}
-						$taskList.prepend($li); //always put at top of the list.
 
-//when simply adding to the list, we can use product data from localStorage/memory if it's available.
-						if(P.mode == 'add')	{
+function handleAnimation()	{
+	var r = false;
+	if($ele instanceof jQuery && $ele.is('tr'))	{
+		r = true;
+		var $tmpTable = $("<table \/>"); //need a tmp table. orphan TR's are treated inconsistently between browsers.
+		var $tr = $ele.data('clone') ? $ele.clone() : $ele; //setting data-clone allows for the item to be left in the row (ex: amazon marketplace status) or removed from row (ex: search results) when being animated.
+		
+		$tmpTable.addClass('gridTable').css({'z-index':'1000','position':'absolute','width':$ele.width()}).css($ele.offset());
+		$tmpTable.appendTo($('body'));
+		$tr.appendTo($tmpTable);
+	
+		$tmpTable.animate((_app.ext.admin.vars.tab == 'product') ? $li.parent().offset() : $.extend({'width':100},$('.productTab:first','#mastHead').offset()),'slow',function(){
+			if($li instanceof jQuery)	{$li.show()}
+			$tmpTable.hide().intervaledEmpty();
+			});
+		}
+	return r;
+	}
+					
+					
+//it's possible the product editor hasn't been opened yet and the task list ul doesn't exist. 'list' is still managed thru manageProductTaskArr.					
+					if($taskList.length)	{
 							
-							if($ele && $ele.is('tr'))	{
-								//_app.u.dump(" -> $ele.data(): "); _app.u.dump($ele.data());
-								//This is the search result tr.
-								var $tmpTable = $("<table \/>"); //need a tmp table. orphan TR's are treated inconsistently between browsers.
-								var $tr = $ele.data('clone') ? $ele.clone() : $ele; //setting data-clone allows for the item to be left in the row (ex: amazon marketplace status) or removed from row (ex: search results) when being animated.
-								
-								$tmpTable.addClass('gridTable').css({'z-index':'1000','position':'absolute','width':$ele.width()}).css($ele.offset());
-								$tmpTable.appendTo($('body'));
-								$tr.appendTo($tmpTable);
-
-								$tmpTable.animate((_app.ext.admin.vars.tab == 'product') ? $li.parent().offset() : $.extend({'width':100},$('.productTab:first','#mastHead').offset()),'slow',function(){
-									$li.show();
-									$tmpTable.hide().intervaledEmpty();
-									});
-								}
-							else	{
-								$li.show();
-								}
+	//					_app.u.dump(" -> $taskList.length: "+$taskList.length);
+						var $li = $("li[data-pid='"+P.pid+"']",$taskList);
+						if(P.mode == 'remove')	{
+							$li.slideUp('fast',function(){
+								$li.empty().remove();
+								});
+	//if the product is in the search results list, make sure the toggle button is not highlighted.
+							$(_app.u.jqSelector('#','prodManager_'+P.pid)).find("[data-app-click='admin_prodedit|productTaskPidToggle']").removeClass('ui-state-highlight');
+							}
+						else if(P.mode == 'close')	{
+							$("[data-app-role='productEditorContainer']",$li).slideUp('fast',function(){
+								$(this).empty(); //empty this so that data is re-obtained when re-opened (allows for a fairly easy refresh process)
+								});
 							$("button[data-taskmode='close']",$li).hide();
 							$("button[data-taskmode='edit']",$li).show();
-
-							$li.showLoading({'message':'Fetching Product Detail'});
-							_app.model.addDispatchToQ({
-								'_cmd':'adminProductDetail',
-								'inventory':1,
-								'skus':1,
-								'pid':P.pid,
-								_tag : {
-									'datapointer':'adminProductDetail|'+P.pid,
-									'jqObj' : $li,
-									'callback' : 'anycontent'
-									}
-								},'passive');
-							_app.model.dispatchThis('passive');
-							}
-//determine if the item is already in the list and, if so, just edit it.  If not, add and edit.
-//when opening the editor immediately, trigger the 'edit' button. no need to fetch the product data, the editor will do that.
-						else if(P.mode == 'edit')	{
-							$("[data-app-role='productManagerLandingContent']",'#productContent').hide(); //make sure default content is hidden once in editor.
-							$("button[data-taskmode='close']",$li).show();
-							$("button[data-taskmode='edit']",$li).hide();
-							//if the li was in the list (already visible), just open the editor.
-							//If it wasn't, animate the LI coming into the list. The animate will mask a bit of the loading time.
-							if($li.is(':visible'))	{}
-							else	{
-								$li.slideDown();
-								}
-							_app.ext.admin_prodedit.a.showProductEditor($("[data-app-role='productEditorContainer']",$li).show(),P.pid,{'renderTaskContainer':true});
 							}
 						else	{
-							//error. unrecognized mode.
-							$('#globalMessaging').anymessage({"message":"In admin_prodedit.u.addProductAsTask, unrecognized mode ["+P.mode+"] passed.","gMessage":true});
+							dump(" -> in 'add' or 'edit' mode");
+							//to get here, we are in 'add' or 'edit' mode.
+							if($li.length)	{}//product is already in list.
+							else	{
+								var $li = _app.renderFunctions.createTemplateInstance($taskList.data('loadstemplate'));
+								$li.hide();
+								$li.attr('data-pid',P.pid);
+								_app.u.addEventDelegation($li);
+								}
+							$taskList.prepend($li); //always put at top of the list.
+	
+	//when simply adding to the list, we can use product data from localStorage/memory if it's available.
+							if(P.mode == 'add')	{
+								if(!handleAnimation())	{$li.show();}
+								$("button[data-taskmode='close']",$li).hide();
+								$("button[data-taskmode='edit']",$li).show();
+
+								$li.showLoading({'message':'Fetching Product Detail'});
+								_app.model.addDispatchToQ({
+									'_cmd':'adminProductDetail',
+									'inventory':1,
+									'skus':1,
+									'pid':P.pid,
+									_tag : {
+										'datapointer':'adminProductDetail|'+P.pid,
+										'jqObj' : $li,
+										'callback' : 'anycontent',
+										'onMissing' : function(rd)	{
+											_app.ext.admin_prodedit.u.addProductAsTask({'pid':P.pid,'tab':'product','mode':'remove'},$li);
+											$('#globalMessaging').anymessage({'message' : 'Product '+P.pid+' was removed from the product task list because it no longer exists'});
+											}
+										}
+									},'passive');
+								_app.model.dispatchThis('passive');
+								}
+	//determine if the item is already in the list and, if so, just edit it.  If not, add and edit.
+	//when opening the editor immediately, trigger the 'edit' button. no need to fetch the product data, the editor will do that.
+							else if(P.mode == 'edit')	{
+								$("[data-app-role='productManagerLandingContent']",'#productContent').hide(); //make sure default content is hidden once in editor.
+								$("button[data-taskmode='close']",$li).show();
+								$("button[data-taskmode='edit']",$li).hide();
+								//if the li was in the list (already visible), just open the editor.
+								//If it wasn't, animate the LI coming into the list. The animate will mask a bit of the loading time.
+								if($li.is(':visible'))	{}
+								else	{
+									$li.slideDown();
+									}
+								_app.ext.admin_prodedit.a.showProductEditor($("[data-app-role='productEditorContainer']",$li).show(),P.pid,{'renderTaskContainer':true});
+								}
+							else	{
+								//error. unrecognized mode.
+								$('#globalMessaging').anymessage({"message":"In admin_prodedit.u.addProductAsTask, unrecognized mode ["+P.mode+"] passed.","gMessage":true});
+								}
 							}
+
+						
 						}
+					else	{
+						handleAnimation();
+						}
+					
+
 					}
 				else	{
 					$('#globalMessaging').anymessage({"message":"In admin_prodedit.u.addProductAsTask, required param(s) missing.  P.pid ["+P.pid+"] and P.tab ["+P.tab+"] are required.","gMessage":true});
 					}
 				}, //addProductAsTask
-
+//the tab content area gets continually nuked. so a 'list' is kept. Allows the product task list(s) to be persistent.
+//P.pid && P.tab && P.mode
+			manageProductTaskArr : function(P)	{
+				var taskArr = _app.model.dpsGet('tab_pref_'+P.tab,'tasklistitems') || [], index = $.inArray(P.pid,taskArr);
+				//only add the pid if it is not already in the list.
+				if(P.mode == 'add' && index < 0)	{
+					taskArr.push(P.pid);
+					}
+				//only remove the item if it is already in the list.
+				else if(P.mode == 'remove' && index >= 0)	{
+					taskArr.splice(index, 1);
+					}
+				else	{
+					//there are modes that are supported, but do not update the array (close and edit, for instance.) They could get you here.
+					// could also get here if mode is add and item is already in the list or mode is remove and item is not in the list.
+					}
+				_app.model.dpsSet('tab_pref_'+P.tab,'tasklistitems',taskArr);
+				return taskArr;
+				},
+			
 //$target is where the inventory detail report is going to show up.  must be a valid jquery object.
 //vars can contain a mode. Right now, it's optional. may be necessary when it comes time to save.
 			handleInventoryDetail : function($target,sku,vars)	{
@@ -1789,9 +1914,48 @@ Required params include:
 					r = false;
 					}
 				return r;
-				}
+				},
+				
+			//variations is the @variations object.
+			//optionsObj is what selections for each variation have been made.
+			buildSKU : function(pid,variations,optionsObj)	{
+				var r = false; //what is returned. false if no sku can be built.
+				if(pid)	{
+					r = pid;
+					if($.isEmptyObject(variations) && $.isEmptyObject(optionsObj))	{} //it's valid to have no variations. pid = sku in this case.
+					else	{
+						for(var i = 0; i < variations.length; i++)	{
+							if(variations[i]['inv'] == 1)	{
+								r += ':'+variations[i]['id']+optionsObj[variations[i]['id']];
+								}
+							}
+						}
+					}
+				else	{
+					r = false;
+					}
+//				dump(" -> buildSKU: "+r);
+				return r;
+				},
 			
-	
+			getSKUDataset : function(sku,skus)	{
+				var r = false;
+				if(sku && !$.isEmptyObject(skus))	{
+					dump(" -> sku: "+sku);
+					for(var i = 0; i < skus.length; i++)	{
+						dump(i+") "+skus[i]['sku']);
+						if(skus[i]['sku'] == sku)	{
+							r = skus[i];
+							break; //exit once a match is found.
+							}
+						}
+					}
+				else	{
+					//error display should be handled the code that calls this function. sometimes a 'false' may be exceptable.
+					dump(" -> in admin_prodedit.u.getSKUDataset, either sku not set ["+sku+"] or skus was empty ["+(typeof skus)+"]");
+					}
+				return r;
+				}
 			}, //u
 
 //kinda like a macrobuilder, but the params are different.
@@ -2267,7 +2431,7 @@ else	{} //no changes in sku attribs.
 				var keywords = $("[name='KEYWORDS']","#navTabs").val();
 				var query = {
 					'type' : 'product',
-					"mode" : "elastic-native",
+					"mode" : "elastic-search",
 					"size" : $("select[name='size']",'#navTabs').val() || 25,
 					"filter" : _app.ext.admin_prodedit.u.buildElasticFilters($ele.closest('form'))
 					}//query
@@ -2377,6 +2541,7 @@ function type2class(type)	{
 // the utility will need to support whether or not to immediately translate. 
 // -> because if we go straight into edit, we are always going to get a clean copy of the product record and should use that to translate.
 			productTaskPidToggle : function($ele,p) {
+				dump("BEGIN prodedit.e.productTaskPidToggle (click!)");
 //pid may be set on the button (product interface) or on the parent row (supplier, orders, etc)
 				var pid = $ele.data('pid') || $ele.closest("[data-pid]").data('pid');
 				if(pid)	{
@@ -3231,12 +3396,12 @@ function type2class(type)	{
 			
 			variationSearchByIDExec : function($ele,p)	{
 				var varID = $ele.closest('tr').data('id');
+				navigateTo('#!tab/product');
 				_app.ext.admin_prodedit.u.prepContentArea4Results($('#productContent'));
-
 				$("[data-app-role='productManagerSearchResults']",$('#productContent')).showLoading({'message':'Performing search...'});
 
 				_app.model.addDispatchToQ({
-					"mode":"elastic-native",
+					"mode":"elastic-search",
 					"size":250,
 					"filter":{"term":{"pogs":varID}},
 					"_cmd":"appPublicSearch",
@@ -3249,7 +3414,6 @@ function type2class(type)	{
 						},
 					"type":"product"
 					},"mutable");
-				navigateTo('#:product');
 				_app.model.dispatchThis("mutable");
 				}, //variationSearchByIDExec
 
@@ -3423,7 +3587,7 @@ function type2class(type)	{
 				var $div = $("<div \/>").css({'width':200,'height':100}).appendTo($D);
 				$div.showLoading({"message":"Fetching # of items using this variation"});
 				_app.model.addDispatchToQ({
-					"mode":"elastic-native",
+					"mode":"elastic-search",
 					"size":3,
 					"filter":{"term":{"pogs":data.id}},
 					"_cmd":"appPublicSearch",
@@ -3545,10 +3709,12 @@ function type2class(type)	{
 						}));
 					}
 				else if($ele.data('variationmode') == 'product')	{
-					var data, variationID = $ele.closest('tr').data('id'), pid = $ele.closest("[data-pid]").data('pid');
-					
-					if(pid)	{
-
+					var 
+						data, 
+						variationID = $ele.closest('tr').data('id'), 
+						pid = $ele.closest("[data-app-role='taskItemContainer']").data('pid'); // a sog 'could' have a data-pid w/ the wrong pid. Get the right pid from the container.
+					dump(" -> pid: "+pid);
+					if(pid && _app.data['adminProductDetail|'+pid])	{
 
 						var L = _app.data['adminProductDetail|'+pid]['@variations'].length;
 // if isnew is true, that means this is a sog or pog that was just added to the product.
@@ -3583,7 +3749,7 @@ function type2class(type)	{
 						$D.dialog('open');
 						}
 					else	{
-						$ele.closest('form').anymessage({"message":"In admin_prodedit.e.variationUpdateShow, unable to ascertain pid.","gMessage":true});
+						$ele.closest('form').anymessage({"message":"In admin_prodedit.e.variationUpdateShow, unable to ascertain pid ["+pid+"] or product is not in memory ["+(typeof _app.data['adminProductDetail|'+pid])+"].","gMessage":true});
 						}
 					}
 				else	{
@@ -3782,8 +3948,6 @@ function type2class(type)	{
 						$ele.closest('form').anymessage({"message":"In admin_prodedit.e.variationCreateExec, either variationmode ["+mode+"] was unable to be determined or was an invalid value (only store and product are supported) or mode was set to product and PID ["+pid+"] was unable to be determined. ","gMessage":true});
 						}
 
-
-
 					}
 				else if(!sfo.type)	{
 					$form.anymessage({'message':'Please select a type'});
@@ -3795,18 +3959,53 @@ function type2class(type)	{
 
 //a button for toggling was added for two reasons: people may not like/have drag and drop and if no options were enabled, hard to get placement exactly right.
 			variationsOptionToggle : function($ele,p)	{
+				p.preventDefault();
 				var $tr = $ele.closest('tr');
 				var $editor = $ele.closest("[data-app-role='variationOptionEditorContainer']"); //used for context.
 				if($ele.closest("[data-app-role='variationsOptionsTbody']").length)	{
-//					if($ele.is('button')){$ele.button({icons: {primary: "ui-icon-arrowthick-1-w"},text: false});}
 					$("[data-app-role='storeVariationsOptionsTbody']",$editor).append($tr);
 					}
 				else	{
-//					if($ele.is('button')){$ele.button({icons: {primary: "ui-icon-arrowthick-1-e"},text: false});}
 					$("[data-app-role='variationsOptionsTbody']",$editor).append($tr);
 					}
-				_app.u.handleButtons($tr);
-				} //variationsOptionToggle
+				_app.ext.admin_prodedit.u.handleOptionsSortableStop($tr);
+				return false;
+				}, //variationsOptionToggle
+
+			skuFinderLoadTemplate : function($ele,p)	{
+				p.preventDefault();
+				var $variations = $ele.closest("[data-skufinder-role='variations']");
+				if(_app.u.validateForm($variations))	{
+					var
+						$templateParent = $ele.closest("[data-skufinder-role='container']"),
+						pid = $variations.data('pid');
+
+					dump(" ------------> PID: "+pid);
+					if($templateParent.length && $templateParent.attr('data-skufinder-templateid') && pid)	{
+						var sku = _app.ext.admin_prodedit.u.buildSKU(pid,_app.data['adminProductDetail|'+pid]['@variations'],$variations.serializeJSON());
+						var optionDataset = _app.ext.admin_prodedit.u.getSKUDataset(sku,_app.data['adminProductDetail|'+pid]['@skus']);
+						var $target = $("[data-skufinder-role='target']",$templateParent);
+						if(sku && optionDataset && $target.length)	{
+							if($("[data-sku='"+sku+"']",$target).length)	{
+								//sku is already in the list. 
+								$("[data-sku='"+sku+"']",$target).effect( 'highlight');
+								}
+							else	{
+								$target.anycontent({'templateID':$templateParent.attr('data-skufinder-templateid'),'data':optionDataset,'dataAttribs':{'sku':sku}});
+								}
+							}
+						else	{
+							$templateParent.anymessage({"message":"In admin_prodedit.e.skuFinderLoadTemplate, either unable to determine sku ["+sku+"] and/or optionDataset ["+(typeof optionDataset)+"] and/or $target has no length ["+$target.length+"] (which means data-skufinder-role='target' not found withing skufinder-role='container').","gMessage":true});
+							}
+						}
+					else	{
+						$variations.anymessage({"message":"In admin_prodedit.e.skuFinderLoadTemplate, either unable to locate data-skufinder-role='container' ["+$templateParent.length+"] or it did not have an data-skufinder-templateid attribute on it or unable to ascertain pid ["+pid+"].","gMessage":true});
+						}
+					}
+				else	{} //validateForm handles error display.
+				
+				return false;
+				}
 
 			} //Events
 		

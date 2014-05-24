@@ -1,6 +1,41 @@
 //this file merges three formerly separate files: variations.js, json2.js and wiki.js
 
 
+// POLYFILL FOR MAP.  required for peg.
+// *** 201402 -> added to make peg more backwards compatible (run in IE8)
+if (!Array.prototype.map)
+{
+  Array.prototype.map = function(fun /*, thisArg */)
+  {
+    "use strict";
+
+    if (this === void 0 || this === null)
+      throw new TypeError();
+
+    var t = Object(this);
+    var len = t.length >>> 0;
+    if (typeof fun !== "function")
+      throw new TypeError();
+
+    var res = new Array(len);
+    var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
+    for (var i = 0; i < len; i++)
+    {
+      // NOTE: Absolute correctness would demand Object.defineProperty
+      //       be used.  But this method is fairly new, and failure is
+      //       possible only if Object.prototype or Array.prototype
+      //       has a property |i| (very unlikely), so use a less-correct
+      //       but more portable alternative.
+      if (i in t)
+        res[i] = fun.call(thisArg, t[i], i, t);
+    }
+
+    return res;
+  };
+}
+
+
+
 
 /*
 ############################################################
@@ -113,12 +148,12 @@ getOptionByID: function(id) {
 
 //upgraded to jquery.
 renderOptionSELECT: function(pog) {
-//	dump('BEGIN renderOptionSELECT for pog '+pog.id+' and safe id = '+safeid);
+//	dump('BEGIN renderOptionSELECT for pog'); dump(pog);
 	var pogid = pog.id;
 	var $parentDiv = $("<span \/>");
 	var $selectList = $("<select>").attr({"name":pogid});
     var i = 0;
-    var len = pog['@options'].length;
+    var len = $.isEmptyObject(pog['@options']) ? 0 : pog['@options'].length;
 
 	var selOption; //used to hold each option added to the select
 	var optionTxt;
@@ -155,7 +190,7 @@ renderOptionBIGLIST: function(pog) {
 	var selOptions = '';
 	var lastOptGrp,selValues;
 	var inc = 0;
-    var len = pog['@options'].length;
+     var len = $.isEmptyObject(pog['@options']) ? 0 : pog['@options'].length;
 	var $parentDiv = $("<span \/>");
 	var $selectList = $("<select \/>").attr({"name":pogid}).addClass("zform_select zform_biglist");
 //sets the first options on both select lists.
@@ -212,7 +247,7 @@ renderOptionIMGSELECT: function(pog) {
 		$(this).closest('.imgSelectContainer').find('img').attr('src',makeImage({"w":pog.width,"h":pog.height,"name":thumbnail,"b":"FFFFFF","tag":false}));
 		});
     var i = 0;
-    var len = pog['@options'].length;
+     var len = $.isEmptyObject(pog['@options']) ? 0 : pog['@options'].length;
 
 	var selOption; //used to hold each option added to the select
 	var optionTxt;
@@ -253,7 +288,7 @@ renderOptionRADIO: function(pog)	{
 //display ? with hint in hidden div IF ghint is set
 	if(pog['ghint']) {$parentDiv.append(pogs.showHintIcon(pogid,pog['ghint']))}
     var i = 0;
-    var len = pog['@options'].length;
+     var len = $.isEmptyObject(pog['@options']) ? 0 : pog['@options'].length;
 	while (i < len) {
 		$parentDiv.append($("<label \/>").append($('<input>').attr({type: "radio", name: pogid, value: pog['@options'][i]['v']})).append(pog['@options'][i]['prompt']));
 		i++;
@@ -408,7 +443,7 @@ renderOptionIMGGRID: function(pog)	{
 	var radioLabel; //used to create the radio button label.
 	var thumbnail; //guess what this holds
     var i = 0;
-    var len = pog['@options'].length;
+    var len = $.isEmptyObject(pog['@options']) ? 0 : pog['@options'].length;
 	while (i < len) {
 		thumbnail = makeImage({"w":pog.width,"h":pog.height,"name":pog['@options'][i]['img'],"b":"FFFFFF","tag":true});
 		radioLabel = "<label>"+pog['@options'][i]['prompt']+"<\/label>";
@@ -1590,6 +1625,7 @@ if (!this.JSON) {
             if (replacer && typeof replacer !== 'function' &&
                     (typeof replacer !== 'object' ||
                      typeof replacer.length !== 'number')) {
+
                 throw new Error('JSON.stringify');
             }
 

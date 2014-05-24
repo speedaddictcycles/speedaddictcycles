@@ -85,13 +85,14 @@ $(document).ready(function(){
 		"addjQueryPointer" : true,
 		"initComplete" : function(t){
 			dump(" -> init is complete");
-			t.u.loadScript('app-quickstart-init.js',function(){
-				var progress = t.u.loadResources(); //the object returns by loadResources will get updated as the resources finish loading.
-				t.u.showProgress(progress);
+			myApp.u.loadScript('app-quickstart-init.js',function(){
+				var progress = myApp.u.loadResources(); //the object returns by loadResources will get updated as the resources finish loading.
+				myApp.u.showProgress(progress);
 				});
-			$('#appversion').text(t.vars.release);
+			$('#appversion').text(myApp.vars.release);
 			}
 		});
+	myApp.vars.initComplete();
 	myCreole = new Parse.Simple.Creole();
 	});
 </script>
@@ -1870,7 +1871,26 @@ subscribeListsArticle is used for authenticated buyers
 </div>
 
 
+<ul>
 
+<li id='subscriberListItemTemplate'>
+	<label data-tlc="bind $var '.EXEC_SUMMARY'; apply --attrib='title';" >
+	<input type='checkbox'  data-tlc="bind $id '.ID'; format --prepend='USER#SUB'; apply --attrib='name'; set $checked ''; store_crm#buyersubscribe --id=$id; if(is $checked --notblank;) {{ apply --attrib='checked';}};" />
+	<span data-tlc="bind $var '.NAME'; apply --append;"></span>
+</li>
+
+</ul>
+
+<h2 id='buyerListTemplate' data-tlc="bind $id '.id'; apply --append; bind $items '.items'; if (is $items --notblank;) {{format --prepend=' (' --append=')'; apply --append;}};"></h2>
+
+
+
+<div id='buyerListProdlistContainerTemplate' class='buyerList' data-tlc="bind $id '.id'; apply --attrib='data-buyerlistid';">
+	<!--
+	the UL is generated automatically because the tlc bind is specific to the list id. trying to use tlc to generate tlc would probably get me committed.
+	the div is NOT added dynamically so the accordion can be generated.
+	-->
+</div>
 
 
 <div id="searchTemplate" class="searchResultsPage clearfix">

@@ -196,10 +196,11 @@ A special translate template for product so that reviews can be merged into the 
 					tmp['reviews']['@reviews'] = _app.data['appReviewsList|'+pid]['@reviews']
 					}
 
-				var $product = tagObj.jqObj.removeClass().attr('data-pid',pid);
+				var $product = tagObj.jqObj.removeClass('loadingBG').attr('data-pid',pid);
 				var $prodlist = $product.parent();
 
 				$product.tlc({'dataset':tmp,'verb':'translate'}).attr('data-template-role','listitem');
+				_app.u.handleButtons($product);
 				
 
 				$prodlist.data('pageProductLoaded',($prodlist.data('pageProductLoaded') + 1)); //tracks if page is done.
@@ -446,7 +447,9 @@ the object created here is passed as 'data' into the mulitpage template. that's 
 					}
 //				_app.u.dump(" -> typeof csv: "+typeof csv);
 				csv = $.grep(csv,function(n){return(n);}); //remove blanks. commonly occurs in product attributes cuz of extra comma
-				csv = $.map(csv,function(n){return(n.trim());}); //remove blanks. commonly occurs in product attributes cuz of extra comma
+// *** 201404 ->  IE8 does NOT support trim().
+				csv = $.map(csv,function(n){return(n.replace(/^\s+|\s+$/g, ''));}); //remove blanks. commonly occurs in product attributes cuz of extra comma.
+//				csv = $.map(csv,function(n){return(n.trim());}); //remove blanks. commonly occurs in product attributes cuz of extra comma
 				return csv;
 				},
 
