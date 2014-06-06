@@ -36,6 +36,7 @@ myApp.rq.push(['extension',0,'quickstart','app-quickstart.js','startMyProgram'])
 
 myApp.rq.push(['extension',0,'store_sac','extensions/_store_sac.js', 'attachEventHandlers']);
 myApp.rq.push(['extension',0,'store_filter','extensions/_store_filter.js', 'attachEventHandlers']);
+myApp.rq.push(['extension',0,'prodlist_infinite','extensions/prodlist_infinite.js']);
 myApp.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.min.js']); 
 myApp.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
 myApp.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);
