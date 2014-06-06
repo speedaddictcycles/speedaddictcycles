@@ -139,14 +139,75 @@ var store_filter = function(_app) {
 
 			}, //Actions
 
-////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+////////////////////////////////////   TLCFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-//renderFormats are what is used to actually output data.
-//on a data-bind, format: is equal to a renderformat. extension: tells the rendering engine where to look for the renderFormat.
-//that way, two render formats named the same (but in different extensions) don't overwrite each other.
-		renderFormats : {
+		tlcFormats : {
+			filterrange : function(data, thisTLC){
+				var args = thisTLC.args2obj(data.command.args, data.globals);
+				if(typeof args.filterType === "undefined"){
+					args.filterType = 'range';
+					}
+				if(args.index){
+					
+					var range = data.globals.binds[data.globals.focusBind];
+					range.min = range.min || 0;
+					range.step = range.step || 1;
+					var $tag = data.globals.tags[data.globals.focusTag];
 
-			}, //renderFormats
+					$tag.attr('data-filter-index',args.index);
+					$tag.attr('data-filter-type',args.filterType);
+					
+					$tag.slider({
+						range : true,
+						min : range.min,
+						max : range.max,
+						step : range.step,
+						values : [range.min, range.max],
+						change : function(event, ui){_app.ext.store_swc.e.execFilteredSearch($(this), event);},
+						slide : function(event, ui){$('.sliderVal', ui.handle).text(ui.value);},
+						create : function(event, ui){
+							$(this).find(".ui-slider-handle").each(function(i){
+								var vals = $tag.slider('values');
+								var $tooltip = $('<span class="sliderValContainer ui-state-default">$<span class="sliderVal">'+vals[i]+'</span></span>');
+								$(this).append($tooltip);
+								});
+							}
+						})
+					}
+				else {
+					return false;
+					}
+				return true;
+				},
+			filtercheckboxlist : function(data, thisTLC){
+				var args = thisTLC.args2obj(data.command.args, data.globals);
+				if(typeof args.filterType === "undefined"){
+					args.filterType = 'checkboxList';
+					}
+				if(args.index){
+					var list = data.globals.binds[data.globals.focusBind];
+					var $tag = data.globals.tags[data.globals.focusTag];
+					if(args.filterType){
+						$tag.attr('data-filter-type',args.filterType);
+						}
+					$tag.attr('data-filter-index',args.index);
+					for(var i in list){
+						var o = list[i];
+						var $t = $('<div data-filter="inputContainer"></div>');
+						$t.append('<label><input data-filter="filterCheckbox" type="checkbox" name="'+o.v+'" '+(o.checked ? 'checked="checked"' : '')+' />'+o.p+' <span data-filter="count"></span></label>');
+						$('input', $t).on('change', function(event){
+							_app.ext.store_swc.e.execFilteredSearch($(this), event);
+							});
+						if(o.hidden){$t.addClass('displayNone');}
+						$tag.append($t);
+						}
+					return true;
+					} 
+				else {
+					return false;
+					}
+				},
+			}, //tlcFormats
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 //utilities are typically functions that are exected by an event or action.
@@ -160,6 +221,126 @@ var store_filter = function(_app) {
 //while no naming convention is stricly forced, 
 //when adding an event, be sure to do off('click.appEventName') and then on('click.appEventName') to ensure the same event is not double-added if app events were to get run again over the same template.
 		e : {
+			execFilteredSearch : function($form, p){
+				var $page = $form.data('jqContext');
+				p.preventDefault();
+				var $resultsContainer = $page.closest('[data-filter=parent]').find('[data-filter=resultsList]');
+				var filterBase = JSON.parse($form.attr('data-filter-base'));
+				var elasticsearch = {
+					"filter" : {
+						"and" : [filterBase]
+						},
+					"facets" : {}
+					}
+				$('[data-filter-type=sort]', $form).each(function(){
+					var $selectedOption = $('option:selected',$(this));
+					if($selectedOption.attr('data-filter-sort-attribute')){
+						elasticsearch.sort = elasticsearch.sort || [];
+						var sort = {};
+						sort[$selectedOption.attr('data-filter-sort-attribute')] = {"order":$selectedOption.attr('data-filter-sort-direction')};
+						elasticsearch.sort.push(sort);
+						}
+					});
+				$('[data-filter-type=range]', $form).each(function(){
+					var f = {"range" : {}};
+					var vals = $(this).slider('values');
+					var m =$(this).attr('data-filter-range-mult')
+					if(m){
+						vals = $.map(vals, function(e, i){ return e*m; });
+						}
+					f.range[$(this).attr('data-filter-index')] = {
+						"gte" : vals[0],
+						"lte" : vals[1]
+						}
+					elasticsearch.filter.and.push(f);
+					});
+				$('[data-filter-type=checkboxList]', $form).each(function(){
+					var filter = {"or" : []};
+					$('[data-filter=count]', $(this)).empty();
+					$('input[data-filter=filterCheckbox]', $(this)).each(function(){
+						var index = $(this).closest('[data-filter-index]').attr('data-filter-index');
+						if(!elasticsearch.facets[index]){
+							elasticsearch.facets[index] = {"terms" : {"field":index}}
+							}
+						if($(this).is(":checked")){
+							var f = {"term" : {}};
+							f.term[index] = $(this).attr('name');
+							filter.or.push(f);
+							}
+						});
+					
+					if(filter.or.length > 0){
+						elasticsearch.filter.and.push(filter);
+						}
+					else {
+						}
+					});
+				/*
+				var es;
+				if(!elasticsearch.sort){
+					var tmp = {
+						"query" :{
+							"function_score" : {"filter":elasticsearch.filter}
+							},
+						"facets" : elasticsearch.facets
+						}
+					tmp.query.function_score.boost_mode = "sum";
+					tmp.query.function_score.script_score = {"script":"doc['boost'].value"};
+					es = _app.ext.store_search.u.buildElasticRaw(tmp);
+					}
+				else {
+					es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
+					}
+				*/
+				var es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
+				es.size = 30;
+				$resultsContainer.empty();
+				
+				_app.ext.store_search.u.updateDataOnListElement($resultsContainer,_app.u.getBlacklistedObject(es, ["facets"]),1);
+				//dump(es);
+				_app.model.dispatchThis();
+				_app.ext.store_search.calls.appPublicSearch.init(es, {'callback':function(rd){
+					if(_app.model.responseHasErrors(rd)){
+						_app.u.throwMessage(rd);
+						}
+					else {
+						_app.ext.prodlist_infinite.callbacks.handleInfiniteElasticResults.onSuccess(rd);
+						if(_app.data[rd.datapointer].facets){
+							$('[data-filter-type=checkboxList]',rd.filterList).each(function(){
+								$('input', $(this)).each(function(){
+									var index = $(this).closest('[data-filter-index]').attr('data-filter-index');
+									var val = $(this).attr('name');
+									
+									var $fg = $(this).closest('.filterGroup')
+									var $ic = $(this).closest('[data-filter=inputContainer]');
+									
+									var summary = $.grep(_app.data[rd.datapointer].facets[index].terms, function(e, i){
+										return e.term === val;
+										})[0];
+									if(summary){
+										$fg.show();
+										$ic.show();
+										$('[data-filter=count]', $ic).text("("+summary.count+")");
+										}
+									else {
+										if($fg.hasClass('countHideImmune')){/*Don't hide it if it's immune*/}
+										else {
+											$ic.hide();
+											$(this).prop('checked',false);
+											if($('[data-filter=inputContainer]:visible',$fg).length < 1){
+												$fg.hide();
+												}
+											}
+										}
+									});
+								
+								});
+							}
+						}
+					}, 'datapointer':'appFilteredSearch','templateID':'productListTemplateResults','list':$resultsContainer, 'filterList' : $form});
+				_app.model.dispatchThis();
+				
+				}
 			} //e [app Events]
 		} //r object.
 	return r;
