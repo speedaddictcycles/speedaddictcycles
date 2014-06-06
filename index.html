@@ -720,7 +720,8 @@ don't modify the 'data-templateid' unless you are changing template names and up
 </div>
 
 <div id="filteredSearchTemplate">
-
+	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
+	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
 </div>
 
 <form id="filterListTemplate" onSubmit="return false;">
