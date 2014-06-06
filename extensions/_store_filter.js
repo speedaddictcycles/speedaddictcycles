@@ -30,6 +30,7 @@ var store_filter = function(_app) {
 		templates : [
 			"filteredSearchTemplate",
 			],
+		filterPages : [],
 		elasticFields : {} // will get populated with data from appResource call
 		},
 
@@ -41,6 +42,20 @@ var store_filter = function(_app) {
 				
 				_app.model.addDispatchToQ({"_cmd":"appResource","filename":"elastic_public.json","_tag":{"datapointer":"appResource|elastic_public", "callback":"handleElasticFields","extension":"store_filter"}},'mutable');
 				_app.model.dispatchThis('mutable');
+				
+				function loadPage(pageObj){
+					$.getJSON(pageObj.path+"?_v="+(new Date()).getTime(), function(json){
+						_app.ext.store_filter.filterData[pageObj.id] = json;
+						}).fail(function(){
+							dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.path);
+							});
+					};
+				
+				for(var i in _app.ext.store_filter.vars.filterPages){
+					loadPage(_app.ext.store_filter.vars.filterPages[i]);
+					}
+				_app.ext.store_filter.vars.filterPages = {push : loadPage}
+				
 				
 				//if there is any functionality required for this extension to load, put it here. such as a check for async google, the FB object, etc. return false if dependencies are not present. don't check for other extensions.
 				r = true;
