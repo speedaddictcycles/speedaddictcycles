@@ -50,6 +50,14 @@ var store_filter = function(_app) {
 				_app.u.dump('BEGIN store_filter.callbacks.init.onError');
 				}
 			},
+		attachEventHandlers : {
+			onSuccess : function(){
+				
+				},
+			onError : function(){
+				_app.u.dump('BEGIN store_filter.callbacks.attachEventHandlers.onError');
+				}
+			}
 		handleElasticFields : {
 			onSuccess : function(rd){
 				var data = _app.data[rd.datapointer];
@@ -58,7 +66,7 @@ var store_filter = function(_app) {
 					_app.ext.store_swc.vars.elasticFields[field.id] = field;
 					}
 				},
-			onSuccess : function(){
+			onError : function(){
 				_app.u.dump('BEGIN store_filter.callbacks.handleElasticFields.onError');
 				}
 			}

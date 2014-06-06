@@ -35,6 +35,7 @@ myApp.rq.push(['extension',0,'quickstart','app-quickstart.js','startMyProgram'])
 //myApp.rq.push(['extension',0,'magicToolBox_mzp','extensions/partner_magictoolbox_mzp.js','startExtension']); // (not working yet - ticket in to MTB)
 
 myApp.rq.push(['extension',0,'store_sac','extensions/_store_sac.js', 'attachEventHandlers']);
+myApp.rq.push(['extension',0,'store_filter','extensions/_store_filter.js', 'attachEventHandlers']);
 myApp.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.min.js']); 
 myApp.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
 myApp.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);
