@@ -80,6 +80,15 @@ var store_sac = function(_app) {
 				_app.templates.categoryTemplateFilteredSearch.on('depart.sac',function(event, $context, infoObj){
 					_app.ext.store_sac.u.destroyFilteredSearch(infoObj);
 					});
+					
+				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
+					var $fc = $('#filterContainer');
+					$('form', $fc).trigger('submit');
+					});	
+				_app.templates.filteredSearchTemplate.on('depart.filter', function(event, $context, infoObj){
+					var $fc = $('#filterContainer');
+					$fc.removeClass('expand').removeClass('active');
+					});
 				},
 			onError : function(){
 				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');
@@ -118,6 +127,26 @@ var store_sac = function(_app) {
 				var args = thisTLC.args2obj(data.command.args, data.globals);
 				data.globals.binds[data.globals.focusBind] = _app.u.makeImage(args);
 				return true;
+				},
+			filterform : function(data, thisTLC){
+				var $context = data.globals.tags[data.globals.focusTag];
+				
+				var $fc = $('#filterContainer');
+				var $fl = $('#filterList', $fc);
+				var timer = $fc.data('filter-list-clear-timer');
+				if(timer){
+					clearTimeout(timer);
+					$fl.removeData().empty();
+					$fc.removeData('filter-list-clear-timer');
+				}
+				
+				
+				$fl.tlc({'dataset':data.value, 'templateid':'filterListTemplate'});
+				$('button', $fl).button();
+				$fc.addClass('active');
+				
+				$('form',$fl).data('jqContext',$context);
+				$('form', $fl).trigger('submit');
 				}
 			},
 		
