@@ -62,6 +62,38 @@ var store_filter = function(_app) {
 				_app.ext.store_filter.vars.filterPages = {push : loadPage}
 				
 				
+				_app.router.appendHash({'type':'match','route':'filter/{{id}}*','callback':function(routeObj){
+					if(_app.ext.store_filter.filterData[routeObj.params.id]){
+						routeObj.params.templateID = "filteredSearchTemplate";
+						routeObj.params.dataset = $.extend(true, {}, _app.ext.store_filter.filterData[routeObj.params.id]);
+						
+						var optStrs = routeObj.params.dataset.optionList;
+						routeObj.params.dataset.options = routeObj.params.dataset.options || {};
+						for(var i in optStrs){
+							var o = optStrs[i];
+							if(_app.ext.store_filter.vars.elasticFields[o]){
+								routeObj.params.dataset.options[o] = $.extend(true, {}, _app.ext.store_filter.vars.elasticFields[o]);
+								if(routeObj.hashParams[o]){
+									var values = routeObj.hashParams[o].split('|');
+									for(var i in routeObj.params.dataset.options[o].options){
+										var option = routeObj.params.dataset.options[o].options[i];
+										if($.inArray(option.v, values) >= 0){
+											option.checked = "checked";
+											}
+										}
+									}
+								}
+							else {
+								dump("Unrecognized option "+o+" on filter page "+routeObj.params.id);
+								}
+							}
+						showContent('static',routeObj.params)
+						}
+					else {
+						showContent('404');
+						}
+					}});
+				
 				//if there is any functionality required for this extension to load, put it here. such as a check for async google, the FB object, etc. return false if dependencies are not present. don't check for other extensions.
 				r = true;
 
