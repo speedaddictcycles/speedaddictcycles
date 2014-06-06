@@ -719,46 +719,62 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<ul data-sac="output" class='listStyleNone fluidList noPadOrMargin productList'></ul>
 </div>
 
-<div id="filteredSearchTemplate">
+<div id="filteredSearchTemplate" data-tlc="store_sac#filterform;" data-filter="parent">
 	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
 	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
 </div>
 
-<form id="filterListTemplate" onSubmit="return false;">
+<form id="filterListTemplate" onSubmit="return false;" data-app-submit="store_filter|execFilteredSearch" data-tlc="bind $bf '.baseFilter'; stringify; apply --attrib='data-filter-base';">
 	<input data-tlc="bind $var '.base'; store_sac#assigndata  --attribute='filter-base' --legacy;" data-sac="filterBase" type="hidden">
 	
 	<!-- Has Video and Has 360 filters are shown on all filter lists- no need for data-binds -->
 	<div class="marginBottom">
 		<h5 class="highlightText">
-			<input name="videoid" data-filter-index="videoid" data-filter-type="hasAttribute" type="checkbox"> Has Video
+			<input name="videoid" data-filter-type="checkboxList" data-filter-index="videoid" data-filter-type="hasAttribute" type="checkbox"> Has Video
 		</h5>
 	</div>
 	<div class="marginBottom">
 		<h5 class="highlightText">
-			<input name="prod_360_viewer_id" data-filter-index="prod_360_viewer_id" data-filter-type="hasAttribute" type="checkbox"> Has 360 View
+			<input name="prod_360_viewer_id" data-filter-type="checkboxList" data-filter-index="prod_360_viewer_id" data-filter-type="hasAttribute" type="checkbox"> Has 360 View
 		</h5>
 	</div>
 	
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.app_brand'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Brand:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='app_brand' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:app_brand'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Brand:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:app_brand.index';
+				bind $cbl '.options.user:app_brand.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.helmet_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Helmet Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='helmet_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:helmet_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Helmet Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:helmet_type.index';
+				bind $cbl '.options.user:helmet_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.part_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:part_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Part Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:part_type.index';
+				bind $cbl '.options.user:part_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.part_helper'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_helper' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:part_helper'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Part Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:part_helper.index';
+				bind $cbl '.options.user:part_helper.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.part_sub_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Part Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='part_sub_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:part_sub_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Part Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:part_sub_type.index';
+				bind $cbl '.options.user:part_sub_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
+	
 	<div class="marginBottom">
 		<h5 data-tlc="bind $var '.options.progressive_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Progressive Model:</h5>
 		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='progressive_model' --legacy;"></div>
