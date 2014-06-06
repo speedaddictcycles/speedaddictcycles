@@ -36,7 +36,7 @@ var store_sac = function(_app) {
 				_app.ext.store_sac.u.initDropDowns();
 				_app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				
-				
+				_app.ext.store_filter.vars.filterPages.push({id:'helmets',path:'filters/helmets.json'});
 				
 				
 				r = true;

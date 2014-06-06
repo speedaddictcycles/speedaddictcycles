@@ -33,7 +33,9 @@ var store_filter = function(_app) {
 		filterPages : [],
 		elasticFields : {} // will get populated with data from appResource call
 		},
-
+	
+	filterData : {}, //will get populated with data from filterPages, pushed from other extensions
+	
 	callbacks : {
 //executed when extension is loaded. should include any validation that needs to occur.
 		init : {
@@ -44,13 +46,16 @@ var store_filter = function(_app) {
 				_app.model.dispatchThis('mutable');
 				
 				function loadPage(pageObj){
+					dump('Loading Page');
+					dump(pageObj);
+					dump(pageObj.path+"?_v="+(new Date()).getTime());
 					$.getJSON(pageObj.path+"?_v="+(new Date()).getTime(), function(json){
 						_app.ext.store_filter.filterData[pageObj.id] = json;
-						}).fail(function(){
+						}).fail(function(a,b,c){
 							dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.path);
 							});
 					};
-				
+				dump(_app.ext.store_filter.vars.filterPages.length);
 				for(var i in _app.ext.store_filter.vars.filterPages){
 					loadPage(_app.ext.store_filter.vars.filterPages[i]);
 					}
