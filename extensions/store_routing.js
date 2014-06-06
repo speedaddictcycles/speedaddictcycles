@@ -40,7 +40,14 @@ var store_routing = function(_app) {
 				
 				
 				_app.router.addAlias('homepage', 	function(routeObj){showContent('homepage',	routeObj.params);});
-				_app.router.addAlias('category', 	function(routeObj){showContent('category',	routeObj.params);});
+				_app.router.addAlias('category', 	function(routeObj){
+					//* 201403 -> chrome on iOS doesn't like /. in hashbang.
+					if(routeObj.params && routeObj.params.navcat && routeObj.params.navcat.charAt(0) != '.')	{
+						routeObj.params.navcat = '.'+routeObj.params.navcat;
+						}
+					showContent('category',	routeObj.params);
+					});
+
 				_app.router.addAlias('product', 	function(routeObj){showContent('product',	routeObj.params);});
 				_app.router.addAlias('company', 	function(routeObj){showContent('company',	routeObj.params);});
 				_app.router.addAlias('customer', 	function(routeObj){showContent('customer',	routeObj.params);});
@@ -49,20 +56,22 @@ var store_routing = function(_app) {
 				_app.router.addAlias('search', 		function(routeObj){showContent('search',	routeObj.params);});
 
 
-				_app.router.appendHash({'type':'exact','route':'/cart','callback':function(routeObj){showContent('cart',routeObj.params);}});
-				_app.router.appendHash({'type':'exact','route':'/home','callback':'homepage'});
+				_app.router.appendHash({'type':'exact','route':'cart','callback':function(routeObj){showContent('cart',routeObj.params);}});
+				_app.router.appendHash({'type':'exact','route':'cart/','callback':function(routeObj){showContent('cart',routeObj.params);}});
+				_app.router.appendHash({'type':'exact','route':'home','callback':'homepage'});
+				_app.router.appendHash({'type':'exact','route':'home/','callback':'homepage'});
 				_app.router.appendHash({'type':'exact','route':'','callback':'homepage'});
 				_app.router.appendHash({'type':'exact','route':'/','callback':'homepage'});
-				_app.router.appendHash({'type':'match','route':'/category/{{navcat}}*','callback':'category'});
-				_app.router.appendHash({'type':'match','route':'/product/{{pid}}/{{name}}*','callback':'product'});
-				_app.router.appendHash({'type':'match','route':'/product/{{pid}}*','callback':'product'});
-				_app.router.appendHash({'type':'match','route':'/company/{{show}}*','callback':'company'});
-				_app.router.appendHash({'type':'exact','route':'/company','callback':'company'});
-				_app.router.appendHash({'type':'match','route':'/customer/{{show}}*','callback':'customer'});
-				_app.router.appendHash({'type':'exact','route':'/customer','callback':'company'});
-				_app.router.appendHash({'type':'match','route':'/checkout*','callback':'checkout'});
-				_app.router.appendHash({'type':'match','route':'/search/tag/{{tag}}*','callback':'search'});
-				_app.router.appendHash({'type':'match','route':'/search/{{KEYWORDS}}*','callback':'search'});
+				_app.router.appendHash({'type':'match','route':'category/{{navcat}}*','callback':'category'});
+				_app.router.appendHash({'type':'match','route':'product/{{pid}}/{{name}}*','callback':'product'});
+				_app.router.appendHash({'type':'match','route':'product/{{pid}}*','callback':'product'});
+				_app.router.appendHash({'type':'match','route':'company/{{show}}*','callback':'company'});
+				_app.router.appendHash({'type':'exact','route':'company','callback':'company'});
+				_app.router.appendHash({'type':'match','route':'customer/{{show}}*','callback':'customer'});
+				_app.router.appendHash({'type':'exact','route':'customer','callback':'company'});
+				_app.router.appendHash({'type':'match','route':'checkout*','callback':'checkout'});
+				_app.router.appendHash({'type':'match','route':'search/tag/{{tag}}*','callback':'search'});
+				_app.router.appendHash({'type':'match','route':'search/keywords/{{KEYWORDS}}*','callback':'search'});
 
 
 /*
@@ -86,53 +95,54 @@ _app.router.appendHash({'type':'match','route':'modal/product/{{pid}}*','callbac
 			},
 		attachEventHandlers : {
 			onSuccess : function(){
-				_app.templates.homepageTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/");});
+				var callback = function(event, $context, infoObj){
+					dump('--> store_seo complete event'); 
+					event.stopPropagation(); 
+					if(infoObj){
+						var hash = "";
+						var $routeEle = $('[data-routing-hash]',$context);
+						if($routeEle.length){
+							hash = $routeEle.attr('data-routing-hash');
+							}
+						else {
+							switch(infoObj.pageType){
+								case 'homepage':
+									hash = "#!/";
+									break;
+								case 'product':
+									hash = "#!product/"+infoObj.pid+"/";
+									break;
+								case 'category':
+									hash = "#!category/"+infoObj.navcat+"/";
+									break;
+								case 'search':
+									hash = window.location.hash;
+									break;
+								case 'company':
+									hash = "#!company/"+infoObj.show+"/";
+									break;
+								case 'customer':
+									hash = "#!customer/"+infoObj.show+"/";
+									break;
+								case 'cart':
+									hash = "#!cart/";
+									break;
+								case 'checkout':
+									hash = "#!checkout/";
+									break;
+								}
+							}
+						_app.ext.store_routing.u.setHash(hash);
+						}
+					}
 				
-				_app.templates.categoryTemplate.on('complete.routing', function(event, $context, infoObj){
-					var hash = "";
-					var $routeEle = $('[data-routing-hash]',$context)
-					if($routeEle.length){
-						hash = $routeEle.attr('data-routing-hash');
-						}
-					else {
-						hash = "#!/category/"+infoObj.navcat+"/";
+				for(var i in _app.templates){
+					_app.templates[i].on('complete.routing', callback);
 					}
-					_app.ext.store_routing.u.setHash(hash);
-					});
-					
-				_app.templates.categoryTemplateFilteredSearch.on('complete.routing', function(event, $context, infoObj){
-					var hash = "";
-					var $routeEle = $('[data-routing-hash]',$context)
-					if($routeEle.length){
-						hash = $routeEle.attr('data-routing-hash');
-						}
-					else {
-						hash = "#!/category/"+infoObj.navcat+"/";
-					}
-					_app.ext.store_routing.u.setHash(hash);
-					});
-					
-				_app.templates.productTemplate.on('complete.routing', function(event, $context, infoObj){
-					dump('here');
-					dump('here');
-					dump('here');
-					var hash = "";
-					var $routeEle = $('[data-routing-hash]',$context)
-					if($routeEle.length){
-						hash = $routeEle.attr('data-routing-hash');
-						}
-					else {
-						hash = "#!/product/"+infoObj.pid+"/";
-					}
-					dump(hash);
-					_app.ext.store_routing.u.setHash(hash);
+				$('#appTemplates').children().each(function(){
+					$(this).on('complete.routing', callback);
 					});
 				
-				_app.templates.companyTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/company/"+infoObj.show+"/");});
-				_app.templates.customerTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/customer/"+infoObj.show+"/");});
-				_app.templates.searchTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/search/"+encodeURI(infoObj.KEYWORDS)+"/");});
-				_app.templates.cartTemplate.on('complete.routing', function(event, $context, infoObj){if(infoObj.show == "inline"){_app.ext.store_routing.u.setHash("#!/cart/");}});
-				//_app.templates.checkoutTemplate.on('complete.routing', function(event, $context, infoObj){_app.ext.store_routing.u.setHash("#!/checkout/");});
 				},
 			onError : function(){}
 			}
@@ -202,7 +212,7 @@ optional params:
 		
 		renderFormats : {
 			productLink : function($tag, data){
-				var href="#!/product/";
+				var href="#!product/";
 				if(data.bindData.useParentData){
 					href += data.value.pid+"/";
 					if(data.bindData.seoattr){
@@ -219,24 +229,32 @@ optional params:
 
 		u : {
 			setHash : function(hash){
+				dump('setting hash to: '+hash);
+				var $canonical = $('link[rel=canonical]')
+				if(!$canonical.length){
+					dump('NO CANONICAL IN THE DOCUMENT');
+					$canonical = $('<link rel="canonical" href="" />');
+					$('head').append($canonical);
+					}
+				$canonical.attr('href', hash);
 				if(_app.vars.showContentHashChange){
 					dump('forcing a hash change');
 					window.location.href = window.location.href.split("#")[0]+hash;
 					}
 				},
 			productAnchor : function(pid, seo){
-				return "#!/product/"+pid+"/"+(seo ? encodeURI(seo) : '');
+				return "#!product/"+pid+"/"+(seo ? encodeURIComponent(seo) : '');
 				},
 			categoryAnchor : function(path,seo)	{
-				return "#!/category/"+path+((seo) ? "/"+encodeURI(seo) : '');
+				return "#!category/"+path+"/"+((seo) ? encodeURIComponent(seo) : '');
 				},
 			searchAnchor : function(type,value)	{
 				var r;
 				if(type == 'tag')	{
-					r = '#!/search/tag/'+value;
+					r = '#!search/tag/'+value;
 					}
 				else if(type == 'keywords')	{
-					r = '#!/search/keywords/'+value;
+					r = '#!search/keywords/'+value;
 					}
 // ### FUTURE -> support ability to search for a match on a specific attribute.
 //				else if(type == 'attrib')	{
@@ -245,7 +263,7 @@ optional params:
 				else	{
 					//unrecognized type
 					}
-				return "#!/category/"+path+((seo) ? "/"+encodeURI(seo) : '');
+				return "#!category/"+path+((seo) ? "/"+encodeURIComponent(seo) : '');
 				}
 			}, //u [utilities]
 
