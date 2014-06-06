@@ -74,10 +74,10 @@ var store_sac = function(_app) {
 						}
 					});
 				
-				_app.templates.categoryTemplateFilteredSearch.on('complete',function(event, $context, infoObj){
+				_app.templates.categoryTemplateFilteredSearch.on('complete.sac',function(event, $context, infoObj){
 					_app.ext.store_sac.u.initFilteredSearch($context, infoObj);
 					});
-				_app.templates.categoryTemplateFilteredSearch.on('depart',function(event, $context, infoObj){
+				_app.templates.categoryTemplateFilteredSearch.on('depart.sac',function(event, $context, infoObj){
 					_app.ext.store_sac.u.destroyFilteredSearch(infoObj);
 					});
 				},
