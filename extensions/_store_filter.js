@@ -27,6 +27,9 @@ var store_filter = function(_app) {
 ////////////////////////////////////   CALLBACKS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 	vars : {
+		templates : [
+			"filteredSearchTemplate",
+			],
 		elasticFields : {} // will get populated with data from appResource call
 		},
 
@@ -52,12 +55,14 @@ var store_filter = function(_app) {
 			},
 		attachEventHandlers : {
 			onSuccess : function(){
-				
+				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
+					$('form[data-filter=filterList]', $context).trigger('submit');
+					});
 				},
 			onError : function(){
 				_app.u.dump('BEGIN store_filter.callbacks.attachEventHandlers.onError');
 				}
-			}
+			},
 		handleElasticFields : {
 			onSuccess : function(rd){
 				var data = _app.data[rd.datapointer];
