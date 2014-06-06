@@ -68,7 +68,7 @@ var store_filter = function(_app) {
 				var data = _app.data[rd.datapointer];
 				for(var i in data.contents['@products']){
 					var field = data.contents['@products'][i];
-					_app.ext.store_swc.vars.elasticFields[field.id] = field;
+					_app.ext.store_filter.vars.elasticFields[field.id] = field;
 					}
 				},
 			onError : function(){
