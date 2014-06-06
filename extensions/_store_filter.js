@@ -163,7 +163,7 @@ var store_filter = function(_app) {
 						max : range.max,
 						step : range.step,
 						values : [range.min, range.max],
-						change : function(event, ui){_app.ext.store_swc.e.execFilteredSearch($(this), event);},
+						//change : function(event, ui){_app.ext.store_filter.e.execFilteredSearch($(this), event);},
 						slide : function(event, ui){$('.sliderVal', ui.handle).text(ui.value);},
 						create : function(event, ui){
 							$(this).find(".ui-slider-handle").each(function(i){
@@ -195,9 +195,9 @@ var store_filter = function(_app) {
 						var o = list[i];
 						var $t = $('<div data-filter="inputContainer"></div>');
 						$t.append('<label><input data-filter="filterCheckbox" type="checkbox" name="'+o.v+'" '+(o.checked ? 'checked="checked"' : '')+' />'+o.p+' <span data-filter="count"></span></label>');
-						$('input', $t).on('change', function(event){
-							_app.ext.store_swc.e.execFilteredSearch($(this), event);
-							});
+						//$('input', $t).on('change', function(event){
+						//	_app.ext.store_filter.e.execFilteredSearch($(this), event);
+						//	});
 						if(o.hidden){$t.addClass('displayNone');}
 						$tag.append($t);
 						}
