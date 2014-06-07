@@ -275,7 +275,7 @@ var store_filter = function(_app) {
 					else {
 						}
 					});
-				/*
+				
 				var es;
 				if(!elasticsearch.sort){
 					var tmp = {
@@ -284,15 +284,16 @@ var store_filter = function(_app) {
 							},
 						"facets" : elasticsearch.facets
 						}
-					tmp.query.function_score.boost_mode = "sum";
-					tmp.query.function_score.script_score = {"script":"doc['boost'].value"};
+					//tmp.query.function_score.boost_mode = "sum";
+					//tmp.query.function_score.script_score = {"script":"doc['boost'].value"};
+					//tmp.query.function_score.script_score = {"script":"_score"};
 					es = _app.ext.store_search.u.buildElasticRaw(tmp);
 					}
 				else {
 					es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
 					}
-				*/
-				var es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
+				
+				//var es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
 				es.size = 30;
 				$resultsContainer.empty();
 				
@@ -317,7 +318,8 @@ var store_filter = function(_app) {
 									var summary = $.grep(_app.data[rd.datapointer].facets[index].terms, function(e, i){
 										return e.term === val;
 										})[0];
-									if(summary){
+									if(summary || $(this).prop('checked')){
+										summary = summary || {count:0};
 										$fg.show();
 										$ic.show();
 										$ic.addClass('show');
@@ -325,10 +327,10 @@ var store_filter = function(_app) {
 										}
 									else {
 										if($fg.hasClass('countHideImmune')){/*Don't hide it if it's immune*/}
-										else {
+										else{
 											$ic.hide();
 											$ic.removeClass('show');
-											$(this).prop('checked',false);
+											//$(this).prop('checked',false);
 											if($('[data-filter=inputContainer].show',$fg).length < 1){
 												$fg.hide();
 												}
