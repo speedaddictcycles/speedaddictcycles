@@ -320,14 +320,16 @@ var store_filter = function(_app) {
 									if(summary){
 										$fg.show();
 										$ic.show();
+										$ic.addClass('show');
 										$('[data-filter=count]', $ic).text("("+summary.count+")");
 										}
 									else {
 										if($fg.hasClass('countHideImmune')){/*Don't hide it if it's immune*/}
 										else {
 											$ic.hide();
+											$ic.removeClass('show');
 											$(this).prop('checked',false);
-											if($('[data-filter=inputContainer]:visible',$fg).length < 1){
+											if($('[data-filter=inputContainer].show',$fg).length < 1){
 												$fg.hide();
 												}
 											}
