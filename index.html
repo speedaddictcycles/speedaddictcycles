@@ -774,100 +774,167 @@ don't modify the 'data-templateid' unless you are changing template names and up
 				bind $cbl '.options.user:part_sub_type.options'; 
 				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.progressive_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Progressive Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='progressive_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:progressive_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Progressive Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:progressive_model.index';
+				bind $cbl '.options.user:progressive_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.make_key'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Fits:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='make_key' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:make_key'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Fits:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:make_key.index';
+				bind $cbl '.options.user:make_key.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.apparel_accessories'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Apparel or Accessory Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='apparel_accessories' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:apparel_accessories'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Apparel or Accessory Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:apparel_accessories.index';
+				bind $cbl '.options.user:apparel_accessories.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.suomy_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Suomy Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='suomy_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:suomy_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Suomy Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:suomy_model.index';
+				bind $cbl '.options.user:suomy_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.sas_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">SS Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='sas_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:sas_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">SS Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:sas_model.index';
+				bind $cbl '.options.user:sas_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.arai_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Arai Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='arai_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:arai_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Arai Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:arai_model.index';
+				bind $cbl '.options.user:arai_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.shoei_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Shoei Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='shoei_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:shoei_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Shoei Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:shoei_model.index';
+				bind $cbl '.options.user:shoei_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.hjc_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">HJC Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='hjc_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:hjc_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">HJC Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:hjc_model.index';
+				bind $cbl '.options.user:hjc_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.chain_kit_gearing'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Kit Gearing:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_kit_gearing' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:chain_kit_gearing'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Chain Kit Gearing:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:chain_kit_gearing.index';
+				bind $cbl '.options.user:chain_kit_gearing.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.chain_pitch'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Pitch:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_pitch' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:chain_pitch'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Chain Pitch:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:chain_pitch.index';
+				bind $cbl '.options.user:chain_pitch.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.chain_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:chain_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Chain Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:chain_type.index';
+				bind $cbl '.options.user:chain_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.chain_links'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Links:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_links' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:chain_links'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Chain Links:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:chain_links.index';
+				bind $cbl '.options.user:chain_links.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.chain_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Chain Color:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='chain_color' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:chain_color'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Chain Color:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:chain_color.index';
+				bind $cbl '.options.user:chain_color.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.burly_model'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Burly Model:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='burly_model' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:burly_model'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Burly Model:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:burly_model.index';
+				bind $cbl '.options.user:burly_model.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.glove_style'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Glove Style:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='glove_style' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:glove_style'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Glove Style:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:glove_style.index';
+				bind $cbl '.options.user:glove_style.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.riding_style'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Riding Style:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='riding_style' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:riding_style'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Riding Style:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:riding_style.index';
+				bind $cbl '.options.user:riding_style.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.primary_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Color:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='primary_color' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:primary_color'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Color:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:primary_color.index';
+				bind $cbl '.options.user:primary_color.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.accent_color'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Accent Color:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='accent_color' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:accent_color'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Accent Color:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:accent_color.index';
+				bind $cbl '.options.user:accent_color.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.finish'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Finish:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='finish' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:finish'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Finish:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:finish.index';
+				bind $cbl '.options.user:finish.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.measures'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Shock Length:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='measures' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:measures'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Shock Length:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:measures.index';
+				bind $cbl '.options.user:measures.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.luggage_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Luggage Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='luggage_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:luggage_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Luggage Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:luggage_type.index';
+				bind $cbl '.options.user:luggage_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.lock_type'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Luggage Type:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='lock_type' --legacy;"></div>
+	<div data-tlc="bind $var '.options.user:lock_type'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Lock Type:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:lock_type.index';
+				bind $cbl '.options.user:lock_type.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div class="marginBottom">
-		<h5 data-tlc="bind $var '.options.helmet_parts'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone highlightText">Helmet Accessories:</h5>
-		<div data-tlc="bind $var '.options'; store_sac#filtercheckboxlist  --index='helmet_parts' --legacy;"></div>
-	</div>
-	
+	<div data-tlc="bind $var '.options.user:helmet_parts'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Helmet Accessories:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:helmet_parts.index';
+				bind $cbl '.options.user:helmet_parts.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
+	</div>	
 	
 	
 	<!--
