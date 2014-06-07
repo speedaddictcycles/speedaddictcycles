@@ -1067,7 +1067,7 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 			
 			</div>
 			<div data-tlc="bind $var '.prod_360_viewer_d'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
-				<iframe data-tlc="bind $var '.prod_360_viewer_id'; store_sac#imajize  --legacy;" class="prodThumb"></iframe>
+				<iframe data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{store_sac#imajize  --legacy;}};" class="prodThumb"></iframe>
 			</div>
 			<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{format --truncate='80'; apply --append;}};" class="name"></h5>
 
