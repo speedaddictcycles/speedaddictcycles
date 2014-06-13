@@ -21,12 +21,15 @@ myApp.rq.push(['extension',0,'store_search','extensions/store_search.js']);
 myApp.rq.push(['extension',0,'store_product','extensions/store_product.js']);
 myApp.rq.push(['extension',0,'cart_message','extensions/cart_message/extension.js']);
 myApp.rq.push(['extension',0,'store_crm','extensions/store_crm.js']);
+myApp.rq.push(['extension',0,'store_tracking','extensions/store_tracking.js']);
 myApp.rq.push(['extension',0,'quickstart','app-quickstart.js','startMyProgram']);
 
 //myApp.rq.push(['extension',0,'entomologist','extensions/entomologist/extension.js']);
 //myApp.rq.push(['extension',0,'tools_animation','extensions/tools_animation.js']);
 
+// 201405 - Deprecated for Universal Analytics
 //myApp.rq.push(['extension',1,'google_analytics','extensions/partner_google_analytics.js','startExtension']);
+
 //myApp.rq.push(['extension',1,'tools_ab_testing','extensions/tools_ab_testing.js']);
 //myApp.rq.push(['extension',0,'partner_addthis','extensions/partner_addthis.js']);
 //myApp.rq.push(['extension',1,'resellerratings_survey','extensions/partner_buysafe_guarantee.js','startExtension']); /// !!! needs testing.
@@ -90,10 +93,12 @@ myApp.u.showProgress = function(progress)	{
 		if(progress.passZeroResourcesLength == progress.passZeroResourcesLoaded)	{
 			//All pass zero resources have loaded.
 			//the app will handle hiding the loading screen.
+			myApp.u.appInitComplete();
 			}
 		else if(attempt > 150)	{
 			//hhhhmmm.... something must have gone wrong.
 			clearTimeout(progress.passZeroTimeout); //end the resource loading timeout.
+			$('.appMessaging','#appPreView').anymessage({'message':'Init failed to load all the resources within a reasonable number of attempts.','gMessage':true,'persistent':true});
 			}
 		else	{
 			var percentPerInclude = (100 / progress.passZeroResourcesLength);
@@ -112,24 +117,53 @@ myApp.u.showProgress = function(progress)	{
 //Any code that needs to be executed after the app init has occured can go here.
 //will pass in the page info object. (pageType, templateID, pid/navcat/show and more)
 myApp.u.appInitComplete = function()	{
-	myApp.u.dump("Executing myAppIsLoaded code...");
+//	myApp.u.dump("Executing myAppIsLoaded code...");
 	
 	myApp.ext.order_create.checkoutCompletes.push(function(vars,$checkout){
+		dump(" -> begin checkoutCOmpletes code: "); dump(vars);
+		
+		var cartContentsAsLinks = encodeURIComponent(myApp.ext.cco.u.cartContentsAsLinks(myApp.data[vars.datapointer].order));
+	
 //append this to 
 		$("[data-app-role='thirdPartyContainer']",$checkout).append("<h2>What next?</h2><div class='ocm ocmFacebookComment pointer zlink marginBottom checkoutSprite  '></div><div class='ocm ocmTwitterComment pointer zlink marginBottom checkoutSprit ' ></div><div class='ocm ocmContinue pointer zlink marginBottom checkoutSprite'></div>");
 		$('.ocmTwitterComment',$checkout).click(function(){
 			window.open('http://twitter.com/home?status='+cartContentsAsLinks,'twitter');
-			_gaq.push(['_trackEvent','Checkout','User Event','Tweeted about order']);
+			window[myApp.vars.analyticsPointer]('send', 'event','Checkout','User Event','Tweeted about order');
 			});
 		//the fb code only works if an appID is set, so don't show banner if not present.				
 		if(myApp.u.thisNestedExists("zGlobals.thirdParty.facebook.appId") && typeof FB == 'object')	{
 			$('.ocmFacebookComment',$checkout).click(function(){
 				myApp.ext.quickstart.thirdParty.fb.postToWall(cartContentsAsLinks);
 				_gaq.push(['_trackEvent','Checkout','User Event','FB message about order']);
+				window[myApp.vars.analyticsPointer]('send', 'event','Checkout','User Event','FB message about order');
 				});
 			}
 		else	{$('.ocmFacebookComment').hide()}
 		});
+	
+	//Cart Messaging Responses.
+	myApp.cmr.push(['chat.join',function(message){
+		if(message.FROM == 'ADMIN')	{
+			var $ui = myApp.ext.quickstart.a.showBuyerCMUI();
+			$("[data-app-role='messageInput']",$ui).show();
+			$("[data-app-role='messageHistory']",$ui).append("<p class='chat_join'>"+message.FROM+" has joined the chat.<\/p>");
+			$('.show4ActiveChat',$ui).show();
+			$('.hide4ActiveChat',$ui).hide();
+			}
+		}]);
+
+	myApp.cmr.push(['goto',function(message,$context){
+		var $history = $("[data-app-role='messageHistory']",$context);
+		$P = $("<P>")
+			.addClass('chat_post')
+			.append("<span class='from'>"+message.FROM+"<\/span> has sent over a "+(message.vars.pageType || "")+" link for you within this store. <span class='lookLikeLink'>Click here<\/span> to view.")
+			.on('click',function(){
+				showContent(myApp.ext.quickstart.u.whatAmIFor(message.vars),message.vars);
+				});
+		$history.append($P);
+		$history.parent().scrollTop($history.height());
+		}]);
+
 	}
 
 
@@ -138,15 +172,16 @@ myApp.u.appInitComplete = function()	{
 
 //this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
 //it'll also handle the old 'meta' uri params.
+//this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
+//it'll also handle the old 'meta' uri params.
 myApp.router.appendInit({
 	'type':'function',
 	'route': function(v){
 		return {'init':true} //returning anything but false triggers a match.
 		},
 	'callback':function(f,g){
+		dump(" -> triggered callback for appendInit");
 		g = g || {};
-		dump('here');
-		dump(document.location.hash);
 		if(g.uriParams.seoRequest){
 			showContent(g.uriParams.pageType, g.uriParams);
 			}
@@ -158,7 +193,8 @@ myApp.router.appendInit({
 			myApp.router.handleHashChange();
 			}
 		else	{
-			showContent('homepage');
+			//IE8 didn't like the shortcut to showContent here.
+			myApp.ext.quickstart.a.showContent('homepage');
 			}
 		if(g.uriParams && g.uriParams.meta)	{
 			myApp.ext.cco.calls.cartSet.init({'want/refer':infoObj.uriParams.meta,'cartID':_app.model.fetchCartID()},{},'passive');

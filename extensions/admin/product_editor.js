@@ -427,6 +427,10 @@ _app.u.addEventDelegation($target);
 					
 					_app.u.handleButtons($r);
 					$('.toolTip',$r).tooltip();
+					if(varObj.inv >= 1)	{
+						$r.addClass('isInventoryable');
+						}
+					
 	
 	//for 'select' based variations, need to add some additional UI functionality.
 					if(_app.ext.admin_prodedit.u.variationTypeIsSelectBased(varObj.type))	{
@@ -572,8 +576,9 @@ _app.u.addEventDelegation($target);
 							$display.append(pogs.renderOption(pog,pid));
 							}
 						}
-					//skipTracks keeps this change from updating the save button.
-					$(':input',$display).addClass('skipTrack').attr('required','required');
+					//skipTracks keeps this change from updating the save button. 
+					// $(':input',$display).addClass('skipTrack').attr('required','required');	 // why was this *required* (breaks when skufinder hidden + non-inventoriable options)																					
+					$(':input',$display).addClass('skipTrack');
 					if(data.bindData.appclick)	{
 						$display.append("<button class='applyButton' data-app-click='"+data.bindData.appclick+"'>load</button>");
 						}
@@ -1600,6 +1605,7 @@ _app.model.dispatchThis('immutable');
 	//				_app.u.dump(" -> type is image based. show image inputs.");
 					$('.imgOnly',$target).removeClass('displayNone');
 					}
+				$('.toolTip',$target).tooltip();
 				}, //handleOptionEditorInputs
 
 /*
@@ -2016,7 +2022,7 @@ function handleAnimation()	{
 					$("[data-app-role='pidSchedulesContainer'] tbody",$form).children().each(function(){
 						var $tr = $(this);
 						if($('.edited',$tr).length)	{
-							cmdObj['@updates'].push("SET-SCHEDULE-PROPERTIES?schedule="+$tr.data('schedule')+"&"+$.param($tr.serializeJSON()))
+							cmdObj['@updates'].push("SET-SCHEDULE-PROPERTIES?schedule="+$tr.data('schedule')+"&"+_app.u.hash2kvp($tr.serializeJSON()));
 							}
 						//if any input for the record has been updated, update qty and loc.
 						else {
@@ -2599,6 +2605,8 @@ function type2class(type)	{
 						}
 					else	{
 						$("[data-app-role='pidSchedulesContainer']",$PE).show();
+						// remove skuSchedulesContainer so it doesn't trigger validation
+						$("[data-app-role='skuSchedulesContainer']",$PE).remove();
 						}
 
 
