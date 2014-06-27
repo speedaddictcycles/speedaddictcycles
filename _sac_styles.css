@@ -52,6 +52,10 @@ body {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffe2b0', endColorstr='#ffe2b0',GradientType=0 ); /* IE6-9 */
 }
 
+#inStoreCheckoutButton a.checkoutButton{
+  color: #363636;
+}
+
 #appView {margin: 0px auto;}
 
 #header, #mainBody, #footer{

@@ -1,0 +1,9 @@
+{
+	"title" : "Tank Pads - Motorcycle Apparel & Accessories",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"tank_pads"}}]},
+	"optionList" : [
+		"user:app_brand",
+		"user:primary_color",
+		"user:accent_color"
+	]
+}

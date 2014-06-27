@@ -1,0 +1,9 @@
+{
+	"title" : "Luggage - Motorcycle Apparel & Accessories",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"luggage"}}]},
+	"optionList" : [
+		"user:app_brand",
+		"user:riding_style",
+		"user:luggage_type"
+	]
+}

@@ -1,0 +1,7 @@
+{
+	"title" : "Tools - Motorcycle Apparel & Accessories",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"tools"}}]},
+	"optionList" : [
+		
+	]
+}

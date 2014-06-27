@@ -13,7 +13,8 @@ myApp.rq.push(['extension',0,'order_create','extensions/checkout/extension.js'])
 myApp.rq.push(['extension',0,'cco','extensions/cart_checkout_order.js']);
 
 myApp.rq.push(['extension',0,'store_routing','extensions/store_routing.js', 'attachEventHandlers']);
-myApp.rq.push(['extension',0,'store_seo','extensions/store_seo.js']);
+myApp.rq.push(['extension',0,'store_seo','extensions/store_seo.js', 'attachHandlers']);
+myApp.rq.push(['extension',0,'store_tracking','extensions/store_tracking.js', 'attachHandlers']);
 
 myApp.rq.push(['extension',0,'store_prodlist','extensions/store_prodlist.js']);
 myApp.rq.push(['extension',0,'store_navcats','extensions/store_navcats.js']);

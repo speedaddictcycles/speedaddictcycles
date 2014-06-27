@@ -1,0 +1,8 @@
+{
+	"title" : "Full Face Motorcycle Helmets",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"full_face"}}]},
+	"optionList" : [
+		"user:app_brand",
+		"user:primary_color"
+	]
+}

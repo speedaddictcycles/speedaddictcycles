@@ -1,0 +1,8 @@
+{
+	"title" : "Half Shell Motorcycle Helmets",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"half_shell"}}]},
+	"optionList" : [
+		"user:app_brand",
+		"user:primary_color"
+	]
+}
