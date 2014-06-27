@@ -82,7 +82,7 @@ var store_sac = function(_app) {
 					$fc.removeClass('expand').removeClass('active');
 					});
 				
-				_app.router.appendHash({'type':'exact','route':'helmets/', 'callback':function(routeObj){
+				_app.router.appendHash({'type':'exact','route':'motorcycle-helmets/', 'callback':function(routeObj){
 					showContent('static',{'templateID':'helmetsTemplate'});
 					}});
 				_app.router.appendHash({'type':'exact','route':'parts/', 'callback':function(routeObj){
