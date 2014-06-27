@@ -36,68 +36,7 @@ var store_sac = function(_app) {
 				_app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				
 				
-				_app.router.appendHash({'type':'exact','route':'helmets/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'helmetsTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'parts/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'partsTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'apparel/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'apparelTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'brands/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'brandsTemplate'});
-					}});
 				
-				_app.router.appendHash({'type':'match','route':'helmets/{{id}}/*','callback':'filter'});
-				_app.ext.store_filter.vars.filterPages.push({id:'dirt-bike',path:'filters/helmets/dirt-bike.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'accessories',path:'filters/helmets/helmet-accessories.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'dual-sport',path:'filters/helmets/dual-sport.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'half-shell',path:'filters/helmets/half-shell.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'modular',path:'filters/helmets/modular.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'three-quarter',path:'filters/helmets/three-quarter.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'full-face',path:'filters/helmets/full-face.json'});
-				
-				_app.router.appendHash({'type':'match','route':'parts/{{id}}/*','callback':'filter'});
-				_app.ext.store_filter.vars.filterPages.push({id:'chain-and-sprocket-kits',path:'filters/parts/chain-kits.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'electrical',path:'filters/parts/electrical.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'exhaust',path:'filters/parts/exhaust.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'intake',path:'filters/parts/intake.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'suspension',path:'filters/parts/suspension.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'brakes',path:'filters/parts/brakes.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'chain',path:'filters/parts/chain.json'});
-				
-				_app.router.appendHash({'type':'match','route':'apparel/{{id}}/*','callback':'filter'});
-				_app.ext.store_filter.vars.filterPages.push({id:'gloves',path:'filters/apparel/gloves.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'grips',path:'filters/apparel/grips.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'luggage',path:'filters/apparel/luggage.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'tools',path:'filters/apparel/tools.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'security',path:'filters/apparel/security.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'tank-pads',path:'filters/apparel/tank-pads.json'});
-				
-				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter'});
-				_app.ext.store_filter.vars.filterPages.push({id:'airoh',path:'filters/brands/airoh.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'ancra',path:'filters/brands/ancra.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'answer',path:'filters/brands/answer.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'arai',path:'filters/brands/arai.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'bmc',path:'filters/brands/bmc.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'factory-racing',path:'filters/brands/factory-racing.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'giant-loop',path:'filters/brands/giant-loop.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'hjc',path:'filters/brands/hjc.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'k-and-n',path:'filters/brands/k-and-n.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'leovince',path:'filters/brands/leovince.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'msr',path:'filters/brands/msr.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'olympia',path:'filters/brands/olympia.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'onguard',path:'filters/brands/onguard.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'progressive',path:'filters/brands/progressive.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'racepro',path:'filters/brands/racepro.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'rk',path:'filters/brands/rk.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'shoei',path:'filters/brands/shoei.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'skid-lid',path:'filters/brands/skid-lid.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'speed-and-strength',path:'filters/brands/speed-and-strength.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'suomy',path:'filters/brands/suomy.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'thh',path:'filters/brands/thh.json'});
-				_app.ext.store_filter.vars.filterPages.push({id:'yuasa',path:'filters/brands/yuasa.json'});
 				
 				r = true;
 
@@ -133,13 +72,6 @@ var store_sac = function(_app) {
 							},1000);
 						}
 					});
-				
-				// _app.templates.categoryTemplateFilteredSearch.on('complete.sac',function(event, $context, infoObj){
-					// _app.ext.store_sac.u.initFilteredSearch($context, infoObj);
-					// });
-				// _app.templates.categoryTemplateFilteredSearch.on('depart.sac',function(event, $context, infoObj){
-					// _app.ext.store_sac.u.destroyFilteredSearch(infoObj);
-					// });
 					
 				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
@@ -149,6 +81,93 @@ var store_sac = function(_app) {
 					var $fc = $('#filterContainer');
 					$fc.removeClass('expand').removeClass('active');
 					});
+				
+				_app.router.appendHash({'type':'exact','route':'helmets/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'helmetsTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'parts/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'partsTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'apparel/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'apparelTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'brands/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'brandsTemplate'});
+					}});
+				
+				_app.router.appendHash({'type':'match','route':'helmets/{{id}}/*','callback':'filter'});
+				var helmetPages = [
+					{id:'dirt-bike',jsonPath:'filters/helmets/dirt-bike.json'},
+					{id:'accessories',jsonPath:'filters/helmets/helmet-accessories.json'},
+					{id:'dual-sport',jsonPath:'filters/helmets/dual-sport.json'},
+					{id:'half-shell',jsonPath:'filters/helmets/half-shell.json'},
+					{id:'modular',jsonPath:'filters/helmets/modular.json'},
+					{id:'three-quarter',jsonPath:'filters/helmets/three-quarter.json'},
+					{id:'full-face',jsonPath:'filters/helmets/full-face.json'}
+					];
+				for(var i in helmetPages){	
+					_app.ext.store_filter.vars.filterPages.push(helmetPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!helmets/"+helmetPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'parts/{{id}}/*','callback':'filter'});
+				var partsPages = [
+					{id:'chain-and-sprocket-kits',jsonPath:'filters/parts/chain-kits.json'},
+					{id:'electrical',jsonPath:'filters/parts/electrical.json'},
+					{id:'exhaust',jsonPath:'filters/parts/exhaust.json'},
+					{id:'intake',jsonPath:'filters/parts/intake.json'},
+					{id:'suspension',jsonPath:'filters/parts/suspension.json'},
+					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
+					{id:'chain',jsonPath:'filters/parts/chain.json'}
+					];
+				for(var i in partsPages){	
+					_app.ext.store_filter.vars.filterPages.push(partsPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!parts/"+partsPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'apparel/{{id}}/*','callback':'filter'});
+				var apparelPages = [
+					{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
+					{id:'grips',jsonPath:'filters/apparel/grips.json'},
+					{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
+					{id:'tools',jsonPath:'filters/apparel/tools.json'},
+					{id:'security',jsonPath:'filters/apparel/security.json'},
+					{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'}
+					];
+				for(var i in apparelPages){	
+					_app.ext.store_filter.vars.filterPages.push(apparelPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter'});
+				var brandsPages = [
+					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
+					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
+					{id:'answer',jsonPath:'filters/brands/answer.json'},
+					{id:'arai',jsonPath:'filters/brands/arai.json'},
+					{id:'bmc',jsonPath:'filters/brands/bmc.json'},
+					{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
+					{id:'giant-loop',jsonPath:'filters/brands/giant-loop.json'},
+					{id:'hjc',jsonPath:'filters/brands/hjc.json'},
+					{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
+					{id:'leovince',jsonPath:'filters/brands/leovince.json'},
+					{id:'msr',jsonPath:'filters/brands/msr.json'},
+					{id:'olympia',jsonPath:'filters/brands/olympia.json'},
+					{id:'onguard',jsonPath:'filters/brands/onguard.json'},
+					{id:'progressive',jsonPath:'filters/brands/progressive.json'},
+					{id:'racepro',jsonPath:'filters/brands/racepro.json'},
+					{id:'rk',jsonPath:'filters/brands/rk.json'},
+					{id:'shoei',jsonPath:'filters/brands/shoei.json'},
+					{id:'skid-lid',jsonPath:'filters/brands/skid-lid.json'},
+					{id:'speed-and-strength',jsonPath:'filters/brands/speed-and-strength.json'},
+					{id:'suomy',jsonPath:'filters/brands/suomy.json'},
+					{id:'thh',jsonPath:'filters/brands/thh.json'},
+					{id:'yuasa',jsonPath:'filters/brands/yuasa.json'}
+					];
+				for(var i in brandsPages){	
+					_app.ext.store_filter.vars.filterPages.push(brandsPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!brands/"+brandsPages[i].id+"/");
+					}
 				},
 			onError : function(){
 				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');

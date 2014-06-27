@@ -49,14 +49,14 @@ var store_filter = function(_app) {
 				function loadPage(id, successCallback, failCallback){
 					var pageObj = _app.ext.store_filter.vars.filterPageLoadQueue[id];
 					if(pageObj){
-						$.getJSON(pageObj.path+"?_v="+(new Date()).getTime(), function(json){
+						$.getJSON(pageObj.jsonPath+"?_v="+(new Date()).getTime(), function(json){
 							_app.ext.store_filter.filterData[pageObj.id] = json;
 							if(typeof successCallback == 'function'){
 								successCallback();
 								}
 							})
 							.fail(function(){
-								dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.path);
+								dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.jsonPath);
 								if(typeof failCallback == 'function'){
 									failCallback();
 									}
