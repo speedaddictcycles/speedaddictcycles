@@ -781,7 +781,10 @@ don't modify the 'data-templateid' unless you are changing template names and up
 </div>
 
 <div id="filteredSearchTemplate" data-tlc="store_sac#filterform;" data-filter="parent">
+	<span class="displayNone" data-tlc="bind $title '.title'; apply --attrib='data-seo-title';"></span>
+	<span class="displayNone" data-tlc="bind $desc '.description'; apply --attrib='data-seo-desc';"></span>
 	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
+	<div data-tlc="bind $desc '.description'; apply --append;"></div>
 	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
 </div>
 
@@ -1251,6 +1254,10 @@ this will likely become more flexible in the future. ###
 
 <div data-tlc="bind $var '.pid'; apply --attrib='data-pid';" id="productTemplate" class="productPage">
 	<span class="displayNone" data-tlc="bind $pid '.pid'; bind $seo '.%attribs.zoovy:prod_name'; bind $href ''; store_routing#productlink --pid=$pid --seo=$seo; apply --attrib='data-routing-hash';"></span>
+	
+	<span class="displayNone" data-tlc="bind $title '.%attribs.zoovy:prod_name'; apply --attrib='data-seo-title';"></span>
+	<span class="displayNone" data-tlc="bind $desc '.%attribs.zoovy:prod_desc'; apply --attrib='data-seo-desc';"></span>
+	
 	<div>
 		<ul data-tlc="bind $var '.session.recentCategories.0'; store_navcats#breadcrumb  --templateid='breadcrumbTemplate'  --legacy;" class="clearfix noPadOrMargin fluidList breadcrumb"></ul>
 	</div>

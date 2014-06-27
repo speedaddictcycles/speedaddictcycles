@@ -1,5 +1,6 @@
 {
 	"title" : "Dirt Bike Helmets",
+	"description" : "Sample Dirt Bike Description",
 	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"dirt"}}]},
 	"optionList" : [
 		"user:app_brand",
