@@ -116,6 +116,34 @@ $(document).ready(function(){
 	});
 </script>
 
+<script data-apptimize="minify" type="text/javascript">
+var _robots = {
+	hello : function(botStr){
+		_robots._robotGreeting = botStr || true;
+		console.log("Bot saying hello: "+botStr);
+		return "1.0";
+		},
+	next : function(){
+		//This implementation of _robots.next returns a function that simply blocks with a '100' until the app has been fully instantiated
+		_robots.status = function(){
+			if(typeof myApp !== 'undefined' && 
+				typeof myApp.ext !== 'undefined' && 
+				typeof myApp.ext.quickstart !== 'undefined' && 
+				typeof myApp.ext.quickstart.vars !== 'undefined' &&
+				myApp.ext.quickstart.vars.showContentFinished && myApp.ext.quickstart.vars.showContentCompleteFired){
+				return 204;
+				}
+			else{
+				return 100;
+				}
+			}
+		},
+	ready : function(){return false;},
+	goodbye : function(botStr){
+		console.log("Bot saying goodbye: "+botStr);
+		}
+	}
+</script>
 
 </head>
 
