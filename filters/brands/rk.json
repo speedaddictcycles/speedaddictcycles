@@ -1,0 +1,9 @@
+{
+	"title" : "RK Chains",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "rk"}},{"term" : {"part_type":"chain"}}]},
+	"optionList" : [
+		"user:chain_color",
+		"user:chain_pitch",
+		"user:chain_type"
+	]
+}

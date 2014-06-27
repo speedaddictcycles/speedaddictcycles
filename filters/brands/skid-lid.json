@@ -1,0 +1,7 @@
+{
+	"title" : "Skid Lid Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "skid_lid"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:finish"
+	]
+}

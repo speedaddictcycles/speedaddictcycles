@@ -1,0 +1,7 @@
+{
+	"title" : "Yuasa Batteries",
+	"baseFilter" : {"term" : {"app_brand" : "yuasa"}},
+	"optionList" : [
+		"user:part_sub_type"
+	]
+}

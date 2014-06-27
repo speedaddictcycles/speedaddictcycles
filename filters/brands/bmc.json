@@ -1,0 +1,8 @@
+{
+	"title" : "BMC Air Filters",
+	"baseFilter" : {"term" : {"app_brand" : "bmc"}},
+	"optionList" : [
+		"user:part_helper",
+		"user:make_key"
+	]
+}

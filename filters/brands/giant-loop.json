@@ -1,0 +1,7 @@
+{
+	"title" : "Giant Loop Luggage",
+	"baseFilter" : {"term" : {"app_brand" : "giant_loop"}},
+	"optionList" : [
+		"user:luggage_type"
+	]
+}

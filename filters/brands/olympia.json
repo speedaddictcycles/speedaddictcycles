@@ -1,0 +1,8 @@
+{
+	"title" : "Olympia Gloves",
+	"baseFilter" : {"term" : {"app_brand" : "olympia"}},
+	"optionList" : [
+		"user:glove_style",
+		"user:primary_color"
+	]
+}

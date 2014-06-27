@@ -1,0 +1,10 @@
+{
+	"title" : "Speed And Strength Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "speed_and_strength"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:riding_style",
+		"user:sas_model",
+		"user:finish",
+		"user:primary_color"
+	]
+}

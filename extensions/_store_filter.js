@@ -31,6 +31,7 @@ var store_filter = function(_app) {
 			"filteredSearchTemplate",
 			],
 		filterPages : [],
+		filterPageLoadQueue : [],
 		elasticFields : {} // will get populated with data from appResource call
 		},
 	
@@ -45,52 +46,75 @@ var store_filter = function(_app) {
 				_app.model.addDispatchToQ({"_cmd":"appResource","filename":"elastic_public.json","_tag":{"datapointer":"appResource|elastic_public", "callback":"handleElasticFields","extension":"store_filter"}},'mutable');
 				_app.model.dispatchThis('mutable');
 				
-				function loadPage(pageObj){
-					//dump('Loading Page');
-					//dump(pageObj);
-					//dump(pageObj.path+"?_v="+(new Date()).getTime());
-					$.getJSON(pageObj.path+"?_v="+(new Date()).getTime(), function(json){
-						_app.ext.store_filter.filterData[pageObj.id] = json;
-						})
-						// .fail(function(){
-							// dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.path);
-							// });
+				function loadPage(id, successCallback, failCallback){
+					var pageObj = _app.ext.store_filter.vars.filterPageLoadQueue[id];
+					if(pageObj){
+						$.getJSON(pageObj.path+"?_v="+(new Date()).getTime(), function(json){
+							_app.ext.store_filter.filterData[pageObj.id] = json;
+							if(typeof successCallback == 'function'){
+								successCallback();
+								}
+							})
+							.fail(function(){
+								dump("FILTER DATA FOR PAGE: "+pageObj.id+" UNAVAILABLE AT PATH: "+pageObj.path);
+								if(typeof failCallback == 'function'){
+									failCallback();
+									}
+								});
+						}
+					else {
+						if(typeof failCallback == 'function'){
+							failCallback();
+							}
+						}
 					};
-				dump(_app.ext.store_filter.vars.filterPages.length);
-				for(var i in _app.ext.store_filter.vars.filterPages){
-					loadPage(_app.ext.store_filter.vars.filterPages[i]);
-					}
-				_app.ext.store_filter.vars.filterPages = {push : loadPage}
+					
+				function queuePage(pageObj){
+					_app.ext.store_filter.vars.filterPageLoadQueue[pageObj.id] = pageObj;
+					};
 				
-				_app.router.addAlias('filter', function(routeObj){
-					if(_app.ext.store_filter.filterData[routeObj.params.id]){
-						routeObj.params.templateID = "filteredSearchTemplate";
-						routeObj.params.dataset = $.extend(true, {}, _app.ext.store_filter.filterData[routeObj.params.id]);
-						
-						var optStrs = routeObj.params.dataset.optionList;
-						routeObj.params.dataset.options = routeObj.params.dataset.options || {};
-						for(var i in optStrs){
-							var o = optStrs[i];
-							if(_app.ext.store_filter.vars.elasticFields[o]){
-								routeObj.params.dataset.options[o] = $.extend(true, {}, _app.ext.store_filter.vars.elasticFields[o]);
-								if(routeObj.hashParams[o]){
-									var values = routeObj.hashParams[o].split('|');
-									for(var i in routeObj.params.dataset.options[o].options){
-										var option = routeObj.params.dataset.options[o].options[i];
-										if($.inArray(option.v, values) >= 0){
-											option.checked = "checked";
-											}
+				for(var i in _app.ext.store_filter.vars.filterPages){
+					queuePage(_app.ext.store_filter.vars.filterPages[i]);
+					}
+				_app.ext.store_filter.vars.filterPages = {push : queuePage}
+				
+				function showPage(routeObj){
+					routeObj.params.templateID = "filteredSearchTemplate";
+					routeObj.params.dataset = $.extend(true, {}, _app.ext.store_filter.filterData[routeObj.params.id]);
+					
+					var optStrs = routeObj.params.dataset.optionList;
+					routeObj.params.dataset.options = routeObj.params.dataset.options || {};
+					for(var i in optStrs){
+						var o = optStrs[i];
+						if(_app.ext.store_filter.vars.elasticFields[o]){
+							routeObj.params.dataset.options[o] = $.extend(true, {}, _app.ext.store_filter.vars.elasticFields[o]);
+							if(routeObj.hashParams[o]){
+								var values = routeObj.hashParams[o].split('|');
+								for(var i in routeObj.params.dataset.options[o].options){
+									var option = routeObj.params.dataset.options[o].options[i];
+									if($.inArray(option.v, values) >= 0){
+										option.checked = "checked";
 										}
 									}
 								}
-							else {
-								dump("Unrecognized option "+o+" on filter page "+routeObj.params.id);
-								}
 							}
-						showContent('static',routeObj.params)
+						else {
+							dump("Unrecognized option "+o+" on filter page "+routeObj.params.id);
+							}
+						}
+					showContent('static',routeObj.params);
+					}
+					
+				_app.router.addAlias('filter', function(routeObj){
+					if(_app.ext.store_filter.filterData[routeObj.params.id]){
+						showPage(routeObj);
 						}
 					else {
-						showContent('404');
+						loadPage(
+							routeObj.params.id, 
+							function(){showPage(routeObj);}, 
+							function(){showContent('404');}
+							);
 						}
 					});
 				
