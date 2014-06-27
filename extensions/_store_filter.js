@@ -134,7 +134,7 @@ var store_filter = function(_app) {
 		attachEventHandlers : {
 			onSuccess : function(){
 				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
-					$('form[data-filter=filterList]', $context).trigger('submit');
+					//$('form[data-filter=filterList]', $context).trigger('submit');
 					});
 				},
 			onError : function(){
