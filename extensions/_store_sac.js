@@ -95,7 +95,9 @@ var store_sac = function(_app) {
 					showContent('static',{'templateID':'brandsTemplate'});
 					}});
 				
-				_app.router.appendHash({'type':'match','route':'helmets/{{id}}/*','callback':'filter'});
+				//Adds the listener for the url.  The route needs to match the page pushed into robots below
+				_app.router.appendHash({'type':'match','route':'motorcycle-helmets/{{id}}/*','callback':'filter'});
+				//This is the list of helmet pages.  The ID is part of the URL- change this for SEO reasons- the jsonPath is the file where it loads the options from.  The jsonPath doesn't matter as long as it loads the file
 				var helmetPages = [
 					{id:'dirt-bike',jsonPath:'filters/helmets/dirt-bike.json'},
 					{id:'accessories',jsonPath:'filters/helmets/helmet-accessories.json'},
@@ -107,7 +109,8 @@ var store_sac = function(_app) {
 					];
 				for(var i in helmetPages){	
 					_app.ext.store_filter.vars.filterPages.push(helmetPages[i]);
-					_app.ext.seo_robots.vars.pages.push("#!helmets/"+helmetPages[i].id+"/");
+					//this page needs to match the route above
+					_app.ext.seo_robots.vars.pages.push("#!motorcycle-helmets/"+helmetPages[i].id+"/");
 					}
 				
 				_app.router.appendHash({'type':'match','route':'parts/{{id}}/*','callback':'filter'});
@@ -118,6 +121,7 @@ var store_sac = function(_app) {
 					{id:'intake',jsonPath:'filters/parts/intake.json'},
 					{id:'suspension',jsonPath:'filters/parts/suspension.json'},
 					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
+					{id:'controls',jsonPath:'filters/parts/controls.json'},
 					{id:'chain',jsonPath:'filters/parts/chain.json'}
 					];
 				for(var i in partsPages){	
