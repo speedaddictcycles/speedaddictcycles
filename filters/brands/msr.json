@@ -1,0 +1,7 @@
+{
+	"title" : "MSR Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "msr"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:primary_color"
+	]
+}

@@ -41,7 +41,7 @@ var store_search = function(_app) {
 /*
 P is the params object. something like: 
 var P = {}
-P.mode = 'elastic-native';
+P.mode = 'elastic-search';
 P.size = 250;
 P.filter =  { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_SALE'}}  ] } }
 or instead of P.filter, you may have
@@ -50,6 +50,9 @@ P.query = { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_S
 		appPublicProductSearch : {
 			init : function(P,tagObj,Q)	{
 //				_app.u.dump("BEGIN _app.ext.store_search.calls.appPublicSearch");
+				if(_app.vars.debug == 'search')	{
+					dump(JSON.stringify(P));
+					}
 				this.dispatch(P,tagObj,Q)
 				return 1;
 				},
@@ -66,6 +69,10 @@ P.query = { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_S
 // to get a good handle on what datapointers should look like.
 		appPublicSearch : {
 			init : function(obj,tagObj,Q)	{
+//				_app.u.dump("BEGIN _app.ext.store_search.calls.appPublicSearch");
+				if(_app.vars.debug == 'search')	{
+					dump(JSON.stringify(obj));
+					}
 				this.dispatch(obj,tagObj,Q)
 				return 1;
 				},
@@ -113,7 +120,6 @@ P.query = { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_S
 // parentID, templateID (template used on each item in the results) and datapointer.
 		handleElasticResults : {
 			onSuccess : function(_rtag)	{
-				dump(" >>>> BEGIN handleElasticResults <<<<<<<<<<<<<");
 				var L = _app.data[_rtag.datapointer]['_count'];
 				
 				var $list = _rtag.list;
@@ -183,7 +189,7 @@ P.query = { 'and':{ 'filters':[ {'term':{'profile':'E31'}},{'term':{'tags':'IS_S
 
 //this gets run whether there are results or not. It is the events responsibility to make sure results were returned. 
 // That way, it can handle a no-results action.
-				$list.trigger('listcomplete');
+				$list.trigger('listcomplete',_rtag);
 				}
 			}
 		}, //callbacks
@@ -285,8 +291,8 @@ _app.u.dump(" -> pageInFocus: "+pageInFocus);
 //					_app.u.dump(" -> newPage: " + newPage);
 					if(EQ)	{
 						var query = EQ;
-						_app.u.dump("EQ:");
-						_app.u.dump(EQ);
+//						_app.u.dump("EQ:");
+//						_app.u.dump(EQ);
 						//query.size = EQ.size; //use original size, not what's returned in buildSimple...
 						query.from = (newPage - 1) * EQ.size; //page is passed in, which starts at 1. but elastic starts at 0.
 						_app.ext.store_search.u.updateDataOnListElement($list,query,newPage);
@@ -472,18 +478,18 @@ P.parentID - The parent ID is used as the pointer in the multipage controls obje
 				var es = $.extend(true, {}, elasticsearch);
 				
 				es.type = 'product';
-				es.mode = 'elastic-native';
+				es.mode = 'elastic-search';
 				es.size = 250;
-				
+//				es.sort = [{'prod_name.raw':'asc'}] //here for testing. prod_name is tokenized, so the .raw field must be used for sorting.
 				return es;
-			},
+				},
 			
 //Example of an obj would be: {'query':'some search string'} OR {'query':'some search string','fields':'prod_keywords'}
 			buildElasticSimpleQuery : function(obj)	{
 				var query = {}; //what is returned. false if error occurs.
 				if(obj && obj.query)	{
 					query.type = 'product';
-					query.mode = 'elastic-native';
+					query.mode = 'elastic-search';
 					query.size = 250;
 					query.query =  {"query_string" : obj};
 					}
@@ -494,7 +500,7 @@ P.parentID - The parent ID is used as the pointer in the multipage controls obje
 				return query;
 				},
 
-//not used by quickstart anymore. Still in use by analyzer and admin product editor.
+//This is used by quickstart for simple tag and keyword searches as well as by analyzer and admin interface (product editor and probably finder).
 			handleElasticSimpleQuery : function(keywords,_tag)	{
 				var qObj = this.buildElasticSimpleQuery({'query':keywords});
 				_tag = _tag || {};

@@ -1,0 +1,9 @@
+{
+	"title" : "Grips - Motorcycle Apparel & Accessories",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"grips"}}]},
+	"optionList" : [
+		"user:riding_style",
+		"user:primary_color",
+		"user:accent_color"
+	]
+}

@@ -143,30 +143,32 @@ used, but not pre-loaded.
 //that way, two render formats named the same (but in different extensions) don't overwrite each other.
 		renderFormats : {
 			projectidpretty : function($tag,data)	{
-				dump(" BEGIN projectidpretty");
+//				dump(" BEGIN projectidpretty");
 				var o = data.value; //what will be Output into $tag. Defaults to project id (which is what should be in data.value
-				if(_app.data.adminProjectList && _app.data.adminProjectList['@PROJECTS'])	{
-					dump(" projects ARE in memory");
-					var index = _app.ext.admin.u.getIndexInArrayByObjValue(_app.data.adminProjectList['@PROJECTS'],'UUID',data.value);
-					dump(" -> index: "+index);
-					if(index === 0 || index >= 1)	{
-						if(_app.data.adminProjectList['@PROJECTS'][index].TITLE)	{
-							o = _app.data.adminProjectList['@PROJECTS'][index].TITLE;
+				if(o)	{
+					if(_app.data.adminProjectList && _app.data.adminProjectList['@PROJECTS'])	{
+						dump(" projects ARE in memory");
+						var index = _app.ext.admin.u.getIndexInArrayByObjValue(_app.data.adminProjectList['@PROJECTS'],'UUID',data.value);
+	//					dump(" -> index: "+index);
+						if(index === 0 || index >= 1)	{
+							if(_app.data.adminProjectList['@PROJECTS'][index].TITLE)	{
+								o = _app.data.adminProjectList['@PROJECTS'][index].TITLE;
+								}
 							}
 						}
+					$tag.text(o);
 					}
-				$tag.text(o);
 				},
 			projectbuttons : function($tag,data)	{
 				var $menu = $("<menu \/>").addClass('projectMenu').hide();
 				$tag.css('position','relative');  //so menu appears where it should.
 				if(data.value.GITHUB_REPO)	{
 					$menu.append("<li><a href='#' data-app-click='admin|linkOffSite' data-url='"+data.value.GITHUB_REPO+"'>Visit GitHub Repository<\/a><\/li>");
-					$menu.append("<li><a href='#' data-app-click='admin_batchjob|adminBatchJobExec' data-whitelist='PROJECT' data-type='UTILITY/GITPULL'>Pull from GitHub</a></li>");
+					$menu.append("<li><a href='#' data-app-click='admin_batchjob|adminBatchJobExec' data-whitelist='project' data-type='UTILITY/GITPULL'>Pull from GitHub</a></li>");
 					}
 				if(data.value.LINK)	{
 					$menu.append("<li><a href='#' data-app-click='admin|linkOffSite' data-url='"+data.value.LINK+"'>Visit GitHub Repository<\/a><\/li>");
-					$menu.append("<li><a href='#' data-app-click='admin_batchjob|adminBatchJobExec' data-whitelist='PROJECT' data-type='UTILITY/GITPULL'>Pull from GitHub</a></li>");
+// -> Can't do a pull here  because the 'pull' goes to a dir that is host/domain specific. it isn't 'stored' till it's tied to a host/domain. A pull is specific to that host/domain.
 					}
 				$menu.append("<li><a href='#' data-app-click='admin_sites|projectRemove'>Remove this Project<\/a><\/li>");
 
@@ -240,18 +242,21 @@ used, but not pre-loaded.
 					'_tag':sfo._tag,
 					'@updates':[]
 					};
-				if(sfo.domaintype == 'DOMAIN-DELEGATE')	{
+				if(sfo.domaintype == 'DOMAIN-CREATE')	{
 					newSfo.DOMAINNAME = sfo.DOMAINNAME;
-					newSfo['@updates'].push("DOMAIN-DELEGATE");
+					newSfo['@updates'].push("DOMAIN-CREATE");
+					newSfo['@updates'].push("HOST-ADD?HOSTNAME=www&HOSTTYPE=APPTIMIZER");
 					}
 				else if(sfo.domaintype == 'DOMAIN-RESERVE')	{
-					newSfo['@updates'].push("DOMAIN-RESERVE")					
+					newSfo['@updates'].push("DOMAIN-RESERVE");
+					newSfo['@updates'].push("HOST-ADD?HOSTNAME=www&HOSTTYPE=APPTIMIZER");
 					}
 				else	{
 					newSfo = false;
 					}
 				return newSfo;
 				},
+			
 
 			//executed when save is pressed within the general panel of editing a domain.
 			adminDomainMacroGeneral : function(sfo,$form)	{
@@ -302,6 +307,61 @@ used, but not pre-loaded.
 //utilities are typically functions that are exected by an event or action.
 //any functions that are recycled should be here.
 		u : {
+
+			hostChooser : function(opts)	{
+				opts = opts || {};
+				var $D = _app.ext.admin.i.dialogCreate({
+					title : "Choose Host(s)",
+					anycontent : false, //the dialogCreate params are passed into anycontent
+					handleAppEvents : false //defaults to true
+					});
+				$D.dialog('open');
+				$D.showLoading({'message':'Fetching updated list of domains and hosts.'});
+				_app.model.addDispatchToQ({
+					'_cmd':'adminDomainList',
+					'hosts' : true,
+					'_tag':	{
+						'datapointer' : 'adminDomainList',
+						'callback':function(rd)	{
+							$D.hideLoading();
+							if(_app.model.responseHasErrors(rd)){
+								$D.anymessage({'message':rd});
+								}
+							else	{
+								var dataset, templateid;
+								if(opts.filter)	{
+									dataset = _app.ext.admin.u.getValueByKeyFromArray(_app.data[rd.datapointer]['@DOMAINS'],opts.filter.by,opts.filter.for);
+									templateid = 'hostChooserDomainTemplate';
+									}
+								else	{
+									dataset = _app.data[rd.datapointer];
+									templateid = 'hostChooserDomainListTemplate';
+									}
+								
+								$D.tlc({'templateid':templateid,'dataset':dataset});
+								if(typeof opts.beforeSelectable === 'function')	{
+									opts.before($D);
+									}
+								
+								$D.selectable({'filter' : 'li'});
+								
+								if(typeof opts.afterSelectable === 'function')	{
+									opts.before($D);
+									}
+								
+								if(typeof opts.saveAction === 'function')	{
+									$("<button>").text('Save Hosts').button().on('click',function(){
+										opts.saveAction($D);
+										}).appendTo($D);
+									}
+								}
+							}
+						}
+					},'mutable');
+					_app.model.dispatchThis('mutable');
+
+
+				},
 
 //mode is required and can be create or update.
 //form is pretty self-explanatory.
@@ -388,22 +448,20 @@ used, but not pre-loaded.
 					_app.model.addDispatchToQ(cmdObj,'immutable'); //this handles the update cmd.
 //This will update the hosts tbody.
 					if($domainEditor instanceof jQuery)	{
-						var $tbody = $("tbody[data-app-role='domainsHostsTbody']",$domainEditor);
-						if($tbody.length)	{
-							$tbody.empty();
-							_app.model.addDispatchToQ({
-								'_cmd':'adminDomainDetail',
-								'DOMAINNAME':sfo.DOMAINNAME,
-								'_tag':	{
-									'datapointer' : 'adminDomainDetail|'+sfo.DOMAINNAME,
-									'jqObj' : $tbody,
-									'callback' : 'tlc'
-									}
-								},'immutable');
+						$domainEditor.empty().showLoading({'message':'Updating '+sfo.HOSTNAME+'.'+sfo.DOMAINNAME+' and refreshing content...'});
+						if($domainEditor.data('isTLC'))	{
+							$domainEditor.tlc('destroy'); //ensures fresh data is used.
 							}
-						else	{
-							_app.u.dump("In admin_sites.u.domainAddUpdateHost, $domainEditor was specified [length: "+$domainEditor.length+"], but tbody[data-app-role='domainsHostsTbody'] has no length, so the view will not be updated.","warn");
-							}
+						_app.model.addDispatchToQ({
+							'_cmd':'adminDomainDetail',
+							'DOMAINNAME':sfo.DOMAINNAME,
+							'_tag':	{
+								'datapointer' : 'adminDomainDetail|'+sfo.DOMAINNAME,
+								'templateid' : 'domainUpdateTemplate',
+								'jqObj' : $domainEditor,
+								'callback' : 'tlc'
+								}
+							},'immutable');
 						}
 					
 					_app.model.dispatchThis('immutable');
@@ -467,6 +525,54 @@ used, but not pre-loaded.
 					}
 				},
 
+			adminDomainCreateExec : function($ele,p)	{
+				
+				var $form = $ele.closest('form');
+				if(_app.u.validateForm($form))	{
+					$form.showLoading({'message' : 'Adding Domain'});
+					var sfo = $form.serializeJSON();
+					sfo['@updates'] = new Array();
+					
+					if(sfo.domaintype == 'DOMAIN-CREATE')	{
+						sfo.DOMAINNAME = sfo.DOMAINNAME;
+						sfo['@updates'].push("DOMAIN-CREATE");
+						sfo['@updates'].push("HOST-ADD?HOSTNAME=www&HOSTTYPE=APPTIMIZER");
+						}
+					else if(sfo.domaintype == 'DOMAIN-RESERVE')	{
+						sfo['@updates'].push("DOMAIN-RESERVE");
+						sfo['@updates'].push("HOST-ADD?HOSTNAME=www&HOSTTYPE=APPTIMIZER");
+						}
+					else	{
+						
+						}
+					
+					if(sfo['@updates'].length)	{
+						sfo._cmd = 'adminDomainMacro';
+						sfo._tag = {
+							callback : function(rd)	{
+								$form.hideLoading();
+								if(_app.model.responseHasErrors(rd)){
+									$form.anymessage({'message':rd});
+									}
+								else	{
+									//sample action. success would go here.
+									$('#globalMessaging').anymessage(_app.u.successMsgObject('Your domain has been added.'));
+									navigateTo("#!ext/admin_sites/showDomainConfig");
+									$form.closest('.ui-dialog-content').dialog('close');
+									}
+								}
+							}
+						_app.model.addDispatchToQ(sfo,"immutable");
+						_app.model.dispatchThis("immutable");
+						}
+					else	{
+						$('#globalMessaging').anymessage({'message':'In adminDomainCreateExec, unrecognized domain type set in form.','gMessage':true});
+						}
+					}
+				else	{} //validateForm will handle error display.
+				
+				},
+
 			adminDomainCreateShow : function($ele,p)	{
 				var $D = _app.ext.admin.i.dialogCreate({
 					'title':'Add New Domain',
@@ -474,10 +580,51 @@ used, but not pre-loaded.
 					'showLoading':false //will get passed into anycontent and disable showLoading.
 					});
 				_app.u.handleButtons($D);
+				_app.u.addEventDelegation($D);
+				$D.dialog('option','width',($(document.body).width() > 500 ? 500 : '90%'));
 				$D.dialog('open');
 				$D.anyform();
 				}, //adminDomainCreateShow
 
+
+			adminDomainRemoveConfirm : function($ele,p)	{
+				p.preventDefault();
+				var domain = $ele.closest("[data-element='domain']").data('domainname');
+				if(domain)	{
+					var $D = _app.ext.admin.i.dialogConfirmRemove({
+						"message" : "Are you sure you wish to remove the domain "+domain+"? There is no undo for this action.",
+						"removeButtonText" : "Remove Domain", //will default if blank
+						"title" : "Remove Domain: "+domain, //will default if blank
+						"removeFunction" : function(p,$D){
+							$D.parent().showLoading({"message":"Removing domain "+domain+"..."});
+							_app.model.addDispatchToQ({
+								'_cmd':'adminDomainMacro',
+								'DOMAINNAME' : domain,
+								'@updates' : ["DOMAIN-REMOVE"],
+								'_tag':	{
+									'callback':function(rd){
+										$D.parent().hideLoading();
+										if(_app.model.responseHasErrors(rd)){
+											$D.anymessage({'message':rd});
+											}
+										else	{
+											$D.dialog('close');
+											$('#globalMessaging').anymessage(_app.u.successMsgObject('The domain '+domain+' has been removed'));
+											$ele.closest('tbody').hide().intervaledEmpty();
+											}
+										}
+									}
+								},'mutable');
+							_app.model.dispatchThis('mutable');
+							}
+						});
+					}
+				else	{
+					$("#globalMessaging").anymessage({"message":"In admin_sites.e.adminDomainRemoveConfirm, unable to ascertain domain.","gMessage":true});
+					}
+				
+				return false;
+				}, //adminDomainCreateShow
 
 //if(domain == _app.vars.domain)	{$ele.addClass('ui-state-highlight')}
 			domainPutInFocus : function($ele,p)	{
@@ -534,7 +681,7 @@ used, but not pre-loaded.
 				$("[data-app-role='domainDetailContainer']:visible",$ele.closest('table')).each(function(){$(this).slideUp('slow','',function(){
 					$(this).intervaledEmpty().tlc('destroy');
 					});}); //close any open rows. interface gets VERY crowded if more than one editor is open.
-				_app.u.dump(" -> wasVisible: "+wasVisible);
+
 				if(wasVisible)	{}//was open and has already been closed
 				else	{
 					$detail.show();
@@ -563,7 +710,7 @@ used, but not pre-loaded.
 						}
 					else	{}
 					}
-				}, //adminDomainDetailShow
+	 			}, //adminDomainDetailShow
 
 			domainView : function($ele,p)	{
 				var domainname = $ele.closest("[data-domainname]").data('domainname');
@@ -595,12 +742,9 @@ used, but not pre-loaded.
 					if($ele.data('mode') == 'update')	{
 // ### FUTURE -> this is gonna get more love soon.  When it does, for adding a template to a host, would be nice to remember which template was selected.
 						$.extend(data,_app.data['adminDomainDetail|'+domain]['@HOSTS'][$ele.closest('tr').data('obj_index')]);
-						_app.u.dump(" -> data: ");_app.u.dump(data);
 						title += ': '+(data.HOSTNAME.toString().toLowerCase())
 						}
-					
 					title += ' for '+domain
-					
 					var $D = _app.ext.admin.i.dialogCreate({
 						'title': title,
 						'data' : data, //passes in DOMAINNAME and anything else that might be necessary for anycontent translation.
@@ -608,7 +752,7 @@ used, but not pre-loaded.
 						'appendTo' : $ele.closest("[data-app-role='domainDetailContainer']"),
 						'showLoading':false //will get passed into anycontent and disable showLoading.
 						});
-
+					
 //get the list of projects and populate the select list.  If the host has a project set, select it in the list.
 					var _tag = {'datapointer' : 'adminProjectList','callback':function(rd){
 						if(_app.model.responseHasErrors(rd)){
@@ -616,9 +760,9 @@ used, but not pre-loaded.
 							}
 						else	{
 							//success content goes here.
-							$("[data-panel-id='domainNewHostTypeSITEPTR']",$D).tlc({'datapointer':rd.datapointer});
+							$("[data-panel-id='domainNewHostTypeSITEPTR']",$D).anycontent({'datapointer':rd.datapointer});
 							if($ele.data('mode') == 'update')	{
-								$("input[name='PROJECT']",$D).val(_app.data['adminDomainDetail|'+domain]['@HOSTS'][$ele.closest('tr').data('obj_index')].PROJECT)
+								$("select[name='PROJECT']",$D).val(_app.data['adminDomainDetail|'+domain]['@HOSTS'][$ele.closest('tr').data('obj_index')].PROJECT)
 								}
 							_app.u.handleButtons($D);
 							_app.u.handleCommonPlugins($D);
@@ -636,13 +780,13 @@ used, but not pre-loaded.
 					if(_app.model.fetchData('adminSiteTemplateList') == false)	{
 						_app.model.addDispatchToQ({'_cmd':'adminSiteTemplateList','_tag':{
 							'datapointer' : 'adminSiteTemplateList',
-							'callback' : 'tlc',
+							'callback' : 'anycontent',
 							'jqObj' : $("[data-app-role='hostTemplateListContainer']",$D)
 							}},'mutable'); //necessary for projects list in app based hosttypes.
 						_app.model.dispatchThis();
 						}
 					else	{
-						$("[data-app-role='hostTemplateListContainer']",$D).tlc({'datapointer' : 'adminSiteTemplateList'});
+						$("[data-app-role='hostTemplateListContainer']",$D).anycontent({'datapointer' : 'adminSiteTemplateList'});
 						}
 						
 					_app.model.addDispatchToQ({'_cmd':'adminProjectList','_tag':	_tag},'mutable'); //necessary for projects list in app based hosttypes.
@@ -680,7 +824,7 @@ used, but not pre-loaded.
 							"_cmd":"adminProjectDetail",
 							"UUID":projectUUID,
 							"_tag": {
-								'callback':'anytlc',
+								'callback':'tlc',
 								jqObj:$detailRow,
 								'datapointer' : 'adminProjectDetail|'+projectUUID
 								}
@@ -715,7 +859,8 @@ used, but not pre-loaded.
 				if(_app.u.validateForm($form))	{
 					$form.showLoading({'message':'Adding your new project. This may take a few moments as the repository is imported.'});
 					_app.model.destroy('adminProjectList');
-					sfo.UUID = _app.u.guidGenerator();
+//UUID is now set by merchant.
+//					sfo.UUID = _app.u.guidGenerator();
 					sfo._cmd = 'adminProjectCreate';
 					sfo._tag = {"callback":function(rd){
 						$form.hideLoading();

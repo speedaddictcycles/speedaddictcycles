@@ -1,0 +1,8 @@
+{
+	"title" : "Three Quarter Motorcycle Helmets",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"three_quarter"}}]},
+	"optionList" : [
+		"user:app_brand",
+		"user:primary_color"
+	]
+}

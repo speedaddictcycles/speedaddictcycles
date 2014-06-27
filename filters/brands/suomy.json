@@ -1,0 +1,10 @@
+{
+	"title" : "Suomy Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "suomy"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:riding_style",
+		"user:suomy_model",
+		"user:finish",
+		"user:primary_color"
+	]
+}

@@ -83,7 +83,7 @@ function model(_app) {
 	var r = {
 	
 		
-		version : "201402",
+		version : "201405",
 		
 		
 	// --------------------------- GENERAL USE FUNCTIONS --------------------------- \\
@@ -210,7 +210,7 @@ function model(_app) {
 				
 //				_app.u.dump(index+"). "+_app.q[QID][index]._cmd+" status: "+_app.q[QID][index]._tag.status);
 				
-				if(_app.q[QID][index]._tag.status == 'queued')	{
+				if(_app.q[QID][index]._tag && _app.q[QID][index]._tag.status == 'queued')	{
 					_app.q[QID][index]._tag.status = "requesting";
 //					_app.u.dump(" -> new status: "+_app.q[QID][index]._tag.status);
 					if(puuid){_app.q[QID][index]._tag.pipeUUID = puuid}
@@ -346,7 +346,10 @@ can't be added to a 'complete' because the complete callback gets executed after
 		});
 
 	_app.globalAjax.requests[QID][pipeUUID].error(function(j, textStatus, errorThrown)	{
+//		_app.u.dump(" ------------------------ ");
 		_app.u.dump("UH OH! got into ajaxRequest.error. either call was aborted or something went wrong.");
+//		_app.u.dump(j); _app.u.dump("textStatus: "+textStatus); _app.u.dump(errorThrown);
+//		_app.u.dump(" ------------------------ ");
 		if(textStatus == 'abort')	{
 			delete _app.globalAjax.requests[QID][pipeUUID];
 			for(var index in Q) {
@@ -354,13 +357,13 @@ can't be added to a 'complete' because the complete callback gets executed after
 				}
 			}
 		else	{
-//			_app.u.dump(j);
-			_app.u.dump(' -> REQUEST FAILURE! Request returned high-level errors or did not request: textStatus = '+textStatus+' errorThrown = '+errorThrown);
-//			_app.u.dump("pipeUUID: "+pipeUUID);
+			_app.u.dump(' -> REQUEST FAILURE! Request returned high-level errors or did not request: textStatus = '+textStatus+' errorThrown = '+errorThrown,'error');
 			delete _app.globalAjax.requests[QID][pipeUUID];
 			_app.model.handleCancellations(Q,QID);
 			if(typeof jQuery().hideLoading == 'function'){
-				$(".loading-indicator-overlay").parent().hideLoading(); //kill all 'loading' gfx. otherwise, UI could become unusable.
+//				$(".loading-indicator-overlay").parent().hideLoading(); 
+// ** 201403 -> rather than targeting a child and then going up the dom, we'll target the element that had showLoading applied to it directly.
+				$(".ui-showloading").hideLoading(); //kill all 'loading' gfx. otherwise, UI could become unusable.
 				}
 //			setTimeout("_app.model.dispatchThis('"+QID+"')",1000); //try again. a dispatch is only attempted three times before it errors out.
 			}
@@ -483,6 +486,12 @@ QID is the dispatchQ ID (either passive, mutable or immutable. required for the 
 //if an iseerr occurs, than even in a pipelined request, errid will be returned on 'parent' and no individual responses are returned.
 				if(responseData && (responseData['_rcmd'] == 'err' || responseData.errid))	{
 					_app.u.dump(' -> API Response for '+QID+' Q contained an error at the top level (on the pipe)','warn');
+					$('.ui-showloading').hideLoading(); //make sure all the showLoadings go away.
+					//brian says that an error 10 will always ONLY be for admin. 2014-03-20
+					if(responseData.errid == 10)	{
+						_app.u.dump(" -> errid of 10 corresponds to an expired token. ");
+						_app.ext.admin.callbacks.handleLogout.onSuccess({"msg":"You were logged out because the token you were using has expired. Please log in to continue."});
+						}
 					if(Q && Q.length)	{
 //						_app.u.dump(" -> Q.length: "+Q.length); _app.u.dump(Q);
 						for(var i = 0, L = Q.length; i < L; i += 1)	{
@@ -629,9 +638,10 @@ QID is the dispatchQ ID (either passive, mutable or immutable. required for the 
 		thisGetsSaved2Memory : function(cmd)	{
 			var r = true;
 			if(cmd == 'adminNavcatMacro')	{}
-			else if(this.cmdIsAnAdminUpdate(cmd))	{
-				r = false;
-				}
+// ** 201402 -> if they don't need to be saved to memory, don't put a datapointer on them. But allow them to be added if necessary.
+//			else if(this.cmdIsAnAdminUpdate(cmd))	{
+//				r = false;
+//				}
 			else	{
 				switch(cmd)	{
 					case 'appPageGet': //saved into category object earlier in process. redundant here.
@@ -678,7 +688,7 @@ QID is the dispatchQ ID (either passive, mutable or immutable. required for the 
 					break;
 					}
 				}
-			return r;
+			return false; //saving to session was causing a LOT of memory to be used in FF.
 			},
 
 	//gets called for each response in a pipelined request (or for the solo response in a non-pipelined request) in most cases. request-specific responses may opt to not run this, but most do.
@@ -866,7 +876,6 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 */	
 		responseHasErrors : function(responseData)	{
 //			_app.u.dump('BEGIN model.responseHasErrors');
-//			_app.u.dump(" -> responseData"); _app.u.dump(responseData);
 //at the time of this version, some requests don't have especially good warning/error in the response.
 //as response error handling is improved, this function may no longer be necessary.
 			var r = false; //defaults to no errors found.
@@ -880,11 +889,12 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 			else	{
 				switch(responseData['_rcmd'])	{
 					case 'appProductGet':
+					case 'adminProductDetail':
 	//the API doesn't recognize doing a query for a sku and it not existing as being an error. handle it that way tho.
 						if(!responseData['%attribs'] || !responseData['%attribs']['db:id']) {
 							r = true;
 							responseData['errid'] = "MVC-M-100";
-							responseData['errtype'] = "apperr"; 
+							responseData['errtype'] = "missing"; 
 							responseData['errmsg'] = "could not find product "+responseData.pid+". Product may no longer exist. ";
 							} //db:id will not be set if invalid sku was passed.
 						break;
@@ -904,6 +914,7 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 							responseData['errtype'] = "apperr"; 
 							responseData['errmsg'] = "profile came back either without %PROFILE or without %PROFILE.PROFILE.";
 							}
+						break;
 					case 'appNavcatDetail':
 						if(responseData.errid > 0 || responseData['exists'] == 0)	{
 							r = true
@@ -912,19 +923,19 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 							responseData['errmsg'] = "could not find category (may not exist)";
 							} //a response errid of zero 'may' mean no errors.
 						break;
-		
-					case 'addSerializedDataToCart': //no break is present here so that case addSerializedDataToCart and case addToCart execute the same code.
-		
-					case 'cartOrderCreate':
-		//				_app.u.dump(' -> case = createOrder');
-						if(!_app.u.isSet(responseData['orderid']))	{
-		//					_app.u.dump(' -> request has errors. orderid not set. orderid = '+responseData['orderid']);
-							r = true;
-							}  
-						break;
+	
 					default:
-						if(Number(responseData['errid']) > 0 && responseData.errtype != 'warn') {r = true;} //** 201338 -> warnings do not constitute errors.
-						else if(Number(responseData['_msgs']) > 0 && responseData['_msg_1_id'] > 0)	{r = true} //chances are, this is an error. may need tuning later.
+						if(Number(responseData['errid']) > 0 && responseData.errtype != 'warn') {r = true;} //warnings do not constitute errors.
+						else if(Number(responseData['_msgs']) > 0)	{
+							var errorTypes = new Array("youerr","fileerr","apperr","apierr","iseerr","cfgerr");
+							//the _msg format index starts at one, not zero.
+							for(var i = 1, L = Number(responseData['_msgs']); i <= L; i += 1)	{
+								if($.inArray(responseData['_msg_'+i+'_type'],errorTypes) >= 0)	{
+									r = true;
+									break; //once an error type is found, exit. one positive is enough.
+									}
+								}
+							}
 // *** 201336 -> mostly impacts admin UI. @MSGS is another mechanism for alerts that needs to be checked.
 						else if(responseData['@MSGS'] && responseData['@MSGS'].length)	{
 							var L = responseData['@MSGS'].length;
@@ -936,8 +947,7 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 								}
 							}
 						else if(responseData['@RESPONSES'] && responseData['@RESPONSES'].length)	{
-							var L = responseData['@RESPONSES'].length;
-							for(var i = 0; i < L; i += 1)	{
+							for(var i = 0, L = responseData['@RESPONSES'].length; i < L; i += 1)	{
 								if(responseData['@RESPONSES'][i]['msgtype'] == 'ERROR' || responseData['@RESPONSES'][i]['msgtype'] == 'apierr')	{
 									r = true;
 									break; //if we have an error, exit early.
@@ -949,6 +959,9 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 						break;
 					}
 				}
+//			if(r)	{
+//				_app.u.dump(" -> responseData"); _app.u.dump(responseData);
+//				}
 	//		_app.u.dump('//END responseHasErrors. has errors = '+r);
 			return r;
 			},
@@ -1090,7 +1103,7 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 				}
 			carts.unshift(cartID); //new carts get put on top. that way [0] is always the latest cart.
 			_app.vars.carts = carts;
-			this.dpsSet('app','carts',carts); //update localStorage.
+			return this.dpsSet('app','carts',carts); //update localStorage.
 			},
 
 //always use this to remove a cart from a session. That way all the storage containers are empty
@@ -1100,6 +1113,11 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 				carts.splice( $.inArray(cartID, carts), 1 );
 				_app.model.destroy('cartDetail|'+cartID);
 				this.dpsSet('app','carts',carts); //update localStorage.
+				//support for browsers w/ localStorage disabled.
+				if(!$.support.localStorage)	{
+					_app.model.deleteCookie('cartid');
+					}
+
 				}
 			else	{
 				$('#globalMessaging').anymessage({'message':'In model.removeCartFromSession, no cartid passed','gMessage':true});
@@ -1109,13 +1127,18 @@ or as a series of messages (_msg_X_id) where X is incremented depending on the n
 //gets the cart id.  carts are stored as an array.  the latest cart is always put on top of the array, which is what this returns.
 //Check to see if it's already set. If not, request a new session via ajax.
 		fetchCartID : function()	{
-//			_app.u.dump('BEGIN: model.fetchCartID');
 			var s = false;
-			var carts = _app.vars.carts || this.dpsGet('app','carts') || []; //will return an array.
-			if(carts.length)	{
-				s = carts[0]; //most recent carts are always added to the top of the stack.
+//			_app.u.dump('BEGIN: model.fetchCartID');
+			if(_app.vars._clientid == '1pc')	{
+				s = _app.vars.cartID;
 				}
-			else	{}
+			else	{
+				var carts = _app.vars.carts || this.dpsGet('app','carts') || []; //will return an array.
+				if(carts.length)	{
+					s = carts[0]; //most recent carts are always added to the top of the stack.
+					}
+				else	{}
+				}
 			return s;
 			}, //fetchCartID
 	
@@ -1228,7 +1251,11 @@ will return false if datapointer isn't in _app.data or local (or if it's too old
 //templateID is how the template will be referenced in _app.templates.
 		makeTemplate : function($templateSpec,templateID)	{
 			var r = true; //what is returned. if a template is created, true is returned.
-			if(templateID && typeof $templateSpec == 'object')	{
+			if(templateID && $templateSpec)	{
+				if($templateSpec instanceof jQuery)	{}
+				else{
+					$templateSpec = $($templateSpec);
+					}
 				_app.templates[templateID] = $templateSpec.attr('data-templateid',templateID).clone(true); //events needs to be copied from original
 				_app.templates[templateID].removeAttr('id'); //get rid of the ID to reduce likelyhood of duplicate ID's on the DOM.
 				$('#'+templateID).empty().remove(); //here for templates created from existing DOM elements. They're removed to ensure no duplicate ID's exist.
@@ -1603,7 +1630,7 @@ ADMIN/USER INTERFACE
 				}
 
 
-			cmdObj = {
+			var cmdObj = {
 				_cmd : 'adminUIExecuteCGI',
 				uri : path,
 				'_tag' : {
@@ -1630,28 +1657,21 @@ methods of getting data from non-server side sources, such as cookies, local or 
 */
 
 //location should be set to 'session' or 'local'.
+// WARNING! -> any changes to writeLocal should be tested in IE8 right away.
 		writeLocal : function (key,value,location)	{
 			location = location || 'local';
 			var r = false;
-
 			if($.support[location+'Storage'])	{
-				if(typeof window[location+'Storage'].setItem == 'function' )	{
-					r = true;
-					if (typeof value == "object") {value = JSON.stringify(value);}
-
+				r = true;
+				if (typeof value == "object") {value = JSON.stringify(value);}
 //a try is used here so that if storage is full, the error is handled gracefully.
-					try	{
-						window[location+'Storage'].setItem(key, value);
-						}
-					catch(e)	{
-						r = false;
-						_app.u.dump(' -> '+location+'Storage [key: '+key+'] defined but not available.');
-						_app.u.dump(e.message);
-						}
-					
+				try	{
+					window[location+'Storage'].setItem(key, value);
 					}
-				else	{
-					_app.u.dump(" -> window."+location+"Storage.setItem is not a function.");
+				catch(e)	{
+					r = false;
+					_app.u.dump(' -> '+location+'Storage [key: '+key+'] defined but not available.');
+					_app.u.dump(e.message);
 					}
 				}
 			else	{
@@ -1677,6 +1697,7 @@ methods of getting data from non-server side sources, such as cookies, local or 
 				}
 			},
 
+// WARNING! -> any changes to readLocal should be tested in IE8 right away.
 		readLocal : function(key,location)	{
 			location = location || 'local';
 			if(!$.support[location+'Storage'])	{
@@ -1703,8 +1724,10 @@ methods of getting data from non-server side sources, such as cookies, local or 
 			}, //readLocal
 /*
 A note about cookies:
-	They're not particularly mobile friendly. All modern browsers support localStorage, even ie7, supports local/session storage, which is the main mechanism used by the model for persistent data storage.
+	They're not particularly mobile friendly. All modern browsers support localStorage, even ie7 supports local/session storage, which is the main mechanism used by the model for persistent data storage.
 	So the cookie functions are here (for now), but should probably be avoided.
+	They are used to store the session ID if localStorage is disabled.
+	Quickstart uses them to store the cartid.
 */
 		readCookie : function(c_name){
 			var i,x,y,ARRcookies=document.cookie.split(";");
@@ -1713,6 +1736,7 @@ A note about cookies:
 				y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
 				x=x.replace(/^\s+|\s+$/g,"");
 				if (x==c_name)	{
+					dump(" -> "+c_name +" cookie value: "+y);
 					return unescape(y);
 					}
 				}
@@ -1720,16 +1744,15 @@ A note about cookies:
 			},
 
 		writeCookie : function(c_name,value)	{
-var myDate = new Date();
-myDate.setTime(myDate.getTime()+(1*24*60*60*1000));
-document.cookie = c_name +"=" + value + ";expires=" + myDate + ";domain=.zoovy.com;path=/";
-document.cookie = c_name +"=" + value + ";expires=" + myDate + ";domain=www.zoovy.com;path=/";
+			var myDate = new Date();
+			myDate.setTime(myDate.getTime()+(1*24*60*60*1000));
+			document.cookie = c_name +"=" + value + ";expires=" + myDate + ";domain="+document.domain+";path=/";
 			},
 //deleting a cookie seems to cause lots of issues w/ iOS and some other mobile devices (where admin login is concerned, particularly. 
 //test before earlier.
 		deleteCookie : function(c_name)	{
-document.cookie = c_name+ "=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/";
-_app.u.dump(" -> DELETED cookie "+c_name);
+			document.cookie = c_name+ "=; expires=Thu, 01-Jan-70 00:00:01 GMT; path=/";
+			_app.u.dump(" -> DELETED cookie "+c_name);
 			},
 
 
@@ -1744,7 +1767,7 @@ _app.u.dump(" -> DELETED cookie "+c_name);
 				var r = false, DPS = this.readLocal('dps','local') || {};
 //				_app.u.dump("DPS from local: "); _app.u.dump(DPS);
 				if($.isEmptyObject(DPS))	{
-//					_app.u.dump(" ^^ Entire 'DPS' object is empty.");
+					_app.u.dump(" ^^ Entire 'DPS' object is empty.");
 					// if nothing is local, no work to do. this allows an early exit.
 					} 
 				else	{
@@ -1764,6 +1787,7 @@ _app.u.dump(" -> DELETED cookie "+c_name);
 //for instance, in orders, what were the most recently selected filter criteria.
 //ext and namespace (ns) are required. reduces likelyhood of nuking entire preferences object.
 			dpsSet : function(ext,ns,varObj)	{
+				var r = false; //what is returned.
 				if(ext && ns && (varObj || varObj == 0))	{
 					var DPS = this.readLocal('dps','local') || {}; //readLocal returns false if no data local.
 					if(typeof DPS[ext] === 'object'){
@@ -1774,11 +1798,12 @@ _app.u.dump(" -> DELETED cookie "+c_name);
 						DPS[ext][ns] = varObj;
 						} //object  exists already. update it.
 //SANITY -> can't extend, must overwrite. otherwise, turning things 'off' gets obscene.					
-					this.writeLocal('dps',DPS,'local'); //update the localStorage session var.
+					r = this.writeLocal('dps',DPS,'local');
 					}
 				else	{
 					_app.u.throwGMessage("Either extension ["+ext+"] or ns["+ns+"] or varObj ["+(typeof varObj)+"] not passed into admin.u.dpsSet.");
 					}
+				return r;
 				},
 
 			getGrammar : function(url)	{
@@ -1789,20 +1814,27 @@ _app.u.dump(" -> DELETED cookie "+c_name);
 						$('#globalMessaging').anymessage({'errtype':'fail-fatal','message':'An error occured while attempting to load the grammar file. See console for details. The rendering engine will not run without that file.'});
 						},
 					'success' : function(file){
+						var success, errors;
+/*
+SANITY -> if the eval is giving trouble in IE, save the contents of the eval into a file and test against that. You'll get more detailed errors.
+ -> also, first step would be to check for any orphaned commas on object literals. They kill old IE.
+*/
+
 						try{
 							var pegParserSource = PEG.buildParser(file);
 							window.pegParser = eval(pegParserSource); //make sure pegParser is valid.
 							success = true;
 							}
 						catch(e)	{
-							_app.u.dump("Could not build pegParser.","warn");
-							_app.u.dump(buildErrorMessage(e),"error");
+							_app.u.dump("Could not build pegParser. errors follow: ","error");
+							errors = (e.line !== undefined && e.column !== undefined) ? "Line " + e.line + ", column " + e.column + ": " + e.message : e.message;
+							_app.u.dump(e);
 							}
 						if(success)	{
 							_app.u.dump(" -> successfully built pegParser");
 							}
 						else	{
-							$('#globalMessaging').anymessage({'errtype':'fail-fatal','message':'The grammar file did not pass evaluation. It may contain errors (check console). The rendering engine will not run without that file.'});
+							$('#globalMessaging').anymessage({'errtype':'fail-fatal','message':'The grammar file did not pass evaluation. It may contain errors (check console). The rendering engine will not run without that file. errors:<br>'+errors});
 							}
 						}
 					})

@@ -17,6 +17,14 @@ body,html	{font-size:85%;} /* increased for non mobile devices w/ a media query 
 section	{display:block;}
 
 /*
+*** 201338 -> here to fix a bug in jqueryUI. the dialogs, when attempting to move, would jump away from the cursor in FF. This fixed it.
+Put this high in the doc as a reminder to occassionally re-check if it can be removed
+*/
+.ui-dialog {
+    position: fixed;
+	}
+
+/*
 loading class. add class to your templates if you want a loading graphic to appear while data is requested. add only to the parent element. 
 loadingBG classname is removed once template is rendered.
 note - wait should only be used in cases where the entire template is being reloaded. the class is NOT automatically removed ever.
@@ -29,6 +37,8 @@ span.wait	{display:inline-block;}
 /* global styles - added for cross-browser uniformity or usability */
 
 img	{border:0; vertical-align: top; display:inline-block;} /* vertical-align: top; removes the whitespace sometimes added under an image.  */
+a:focus { outline: none; } /* disable the outline around links. it's unattactive */
+a.blockLink	{text-decoration:none; cursor:pointer;} /* used for #! anchors. IE needs the cursor defined or it shows as an arrow instead of a hand. */
 
 button {display:inline-block; margin: 0; padding: 0; cursor:pointer;}
 /* for small buttons */
@@ -50,6 +60,19 @@ td.valignMiddle	{vertical-align: middle;}
 /* feel free to delete these or override in your own .css file */
 h1, h2, h3, h4, h5, h6	{padding:0; margin:0;}
 
+/* some optional form styling
+<label><span class='prompt'>prompt</span><input class='alignInput'></label> w/ alignedForm class around it on form, fieldset, whatever 
+ */
+.alignedForm label	{display:block; clear:both; margin:0 0 .2em 0; padding:0; vertical-align:top;} /* remove padding/margin to ensure cross-browser consistency */
+.alignedForm label:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+	}
+.alignedForm .prompt	{text-align:right; float:left; width:35%; display:block; margin-right:2%;}
+.alignedForm .alignInput	{width:55%; float:right;} /* not enforcing width is common enough that it justifies using a class to enforce it. */
 
 /* chrome and safari add an outer border/glow to the input in focus. this removes it. */
 input:focus {
@@ -133,7 +156,7 @@ and offMenu is toggle off, hiding the change button.
 .stdMargin	{margin:1em;}
 .headerPadding	{padding: .2em .4em;} /* for use in headings or legends that use the ui-state classes and need a little padding within. */
 .stdPadding	{padding:1em;}
-
+.smallPadding	{padding:.5em;}
 .fullWidth	{width:100%;}
 
 
@@ -157,7 +180,7 @@ and offMenu is toggle off, hiding the change button.
 
 .mainColumn	{width:75%;}
 .sideline	{float:right; width:20%; margin:0 0 2em 0;}
-.sideline a	{padding:1em 0; text-decoration:none; display:block;} /* recommend at least 5px vert padding for mobile/pad */
+.sideline a	{padding:.3em 0; text-decoration:none; display:block;} /* recommend at least 5px vert padding for mobile/pad */
 
 
 
@@ -187,7 +210,7 @@ a.blockLink {border:none; display:block;}
 
 /* over rides - height and width ensure each row is the same height. percentages could be used for width */
 .productList > li	{width:150px; height:250px; position:relative;}
-.lineItemProdlist > li	{position:relative; display:block; padding:1em 0; width:100% !important; height:auto !important; border-bottom:1px dotted #efefef;} /* single column product list - used in cart, checkout, etc. productList class is also defined in these cases. */
+.lineItemProdlist > li	{position:relative; display:block; padding:1em 0; float:none; width:auto; height:auto !important; border-bottom:1px dotted #efefef;} /* single column product list - used in cart, checkout, etc. productList class is also defined in these cases. */
 
 .lineItemProdlist .prodThumb	{margin-right:1em;}
 
@@ -290,11 +313,7 @@ so the displayNone class is used, then a .grpType_PARENT class is added if the i
 .reviewLineItem blockquote	{margin:0 0 0 185px; padding:0;}
 
 
-/* WRITE REVIEW MODAL */
-#reviewFrm label	{display:block; text-align:right; float:left; width:150px;}
-#reviewsMessage		{width:250px; height:250px;}
-#reviewFrm input, #reviewFrm textarea, #reviewFrm select	{margin-bottom:.5em;}
-#reviewFrm .ui-button	{float:right;}
+
 
 /*
 
@@ -321,9 +340,9 @@ cartTemplate
 
 
 .cartContainer	{width:100%;}
-
 #mainContentArea_cart .continueShoppingButton	{display:none;} /* used in modal cart only */
 
+.cartSummaryTotalsContainer .ui-widget .cartRefreshButton	{margin: -4px 0 0 0; float:right;}
 /*
 
 CUSTOMER PAGES
@@ -356,6 +375,12 @@ CUSTOMER PAGES
 #buyerAddresses h2	{margin:1em 0; clear:both;}
 #buyerAddresses address	{margin:0 0px 1em 0; float:left; width:90%; display:block; padding:1em;}
 
+
+/* buyer lists */
+.smallButtonList .ui-button-icon-only {width:1.4em}
+.smallButtonList .ui-button-icon-only .ui-button-text	{height:1.4em; padding:0;}
+
+.buyerList .prodThumbContainer	{position:relative;}
 
 
 /*
@@ -418,30 +443,6 @@ CART
 
 
 
-
-
-
-
-/*
-
-CHECKOUT
-
-*/
-
-#paybySupplemental_CREDIT .ui-icon-help	{display:inline-block; margin-left:.5em;}
-
-
-.paybySupplemental {padding:1em; font-weight:normal; border-top-width:0;}
-.paybySupplemental select {margin-right:1em;}
-
-.addressList address	{float:left; margin:0 1em 1em 0;}
-
-.creditCardCVVIcon	{display:inline-block !important;}
-
-.checkoutFormContainer input, checkoutFormContainer select	{margin:.3em .5em .3em 0;}
-.checkoutFormContainer input[type='password']	{width:200px;} /* class affects both login password and create account passwords */
-
-.headerPadding label	{padding:.3em .5em;}
 
 /* Pure CSS3 Multi Level Drop Down Navigation Menu */
 /*             http://www.bloggermint.com/demos/darknavmenu/#            */

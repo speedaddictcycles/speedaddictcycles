@@ -1,0 +1,7 @@
+{
+	"title" : "OnGuard Locks",
+	"baseFilter" : {"term" : {"app_brand" : "on_guard"}},
+	"optionList" : [
+		"user:lock_type"
+	]
+}

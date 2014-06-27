@@ -33,7 +33,6 @@ var store_sac = function(_app) {
 				
 				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
 				_app.ext.store_sac.u.loadBanners();
-				_app.ext.store_sac.u.initDropDowns();
 				_app.rq.push(['script',0,'carouFredSel-6.2.1/jquery.carouFredSel-6.2.1-packed.js']);
 				
 				
@@ -73,13 +72,106 @@ var store_sac = function(_app) {
 							},1000);
 						}
 					});
+					
+				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
+					var $fc = $('#filterContainer');
+					$('form', $fc).trigger('submit');
+					});	
+				_app.templates.filteredSearchTemplate.on('depart.filter', function(event, $context, infoObj){
+					var $fc = $('#filterContainer');
+					$fc.removeClass('expand').removeClass('active');
+					});
 				
-				_app.templates.categoryTemplateFilteredSearch.on('complete',function(event, $context, infoObj){
-					_app.ext.store_sac.u.initFilteredSearch($context, infoObj);
-					});
-				_app.templates.categoryTemplateFilteredSearch.on('depart',function(event, $context, infoObj){
-					_app.ext.store_sac.u.destroyFilteredSearch(infoObj);
-					});
+				_app.router.appendHash({'type':'exact','route':'helmets/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'helmetsTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'parts/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'partsTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'apparel/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'apparelTemplate'});
+					}});
+				_app.router.appendHash({'type':'exact','route':'brands/', 'callback':function(routeObj){
+					showContent('static',{'templateID':'brandsTemplate'});
+					}});
+				
+				//Adds the listener for the url.  The route needs to match the page pushed into robots below
+				_app.router.appendHash({'type':'match','route':'motorcycle-helmets/{{id}}/*','callback':'filter'});
+				//This is the list of helmet pages.  The ID is part of the URL- change this for SEO reasons- the jsonPath is the file where it loads the options from.  The jsonPath doesn't matter as long as it loads the file
+				var helmetPages = [
+					{id:'dirt-bike',jsonPath:'filters/helmets/dirt-bike.json'},
+					{id:'accessories',jsonPath:'filters/helmets/helmet-accessories.json'},
+					{id:'dual-sport',jsonPath:'filters/helmets/dual-sport.json'},
+					{id:'half-shell',jsonPath:'filters/helmets/half-shell.json'},
+					{id:'modular',jsonPath:'filters/helmets/modular.json'},
+					{id:'three-quarter',jsonPath:'filters/helmets/three-quarter.json'},
+					{id:'full-face',jsonPath:'filters/helmets/full-face.json'}
+					];
+				for(var i in helmetPages){	
+					_app.ext.store_filter.vars.filterPages.push(helmetPages[i]);
+					//this page needs to match the route above
+					_app.ext.seo_robots.vars.pages.push("#!motorcycle-helmets/"+helmetPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'parts/{{id}}/*','callback':'filter'});
+				var partsPages = [
+					{id:'chain-and-sprocket-kits',jsonPath:'filters/parts/chain-kits.json'},
+					{id:'electrical',jsonPath:'filters/parts/electrical.json'},
+					{id:'exhaust',jsonPath:'filters/parts/exhaust.json'},
+					{id:'intake',jsonPath:'filters/parts/intake.json'},
+					{id:'suspension',jsonPath:'filters/parts/suspension.json'},
+					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
+					{id:'controls',jsonPath:'filters/parts/controls.json'},
+					{id:'chain',jsonPath:'filters/parts/chain.json'}
+					];
+				for(var i in partsPages){	
+					_app.ext.store_filter.vars.filterPages.push(partsPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!parts/"+partsPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'apparel/{{id}}/*','callback':'filter'});
+				var apparelPages = [
+					{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
+					{id:'grips',jsonPath:'filters/apparel/grips.json'},
+					{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
+					{id:'tools',jsonPath:'filters/apparel/tools.json'},
+					{id:'security',jsonPath:'filters/apparel/security.json'},
+					{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'}
+					];
+				for(var i in apparelPages){	
+					_app.ext.store_filter.vars.filterPages.push(apparelPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
+					}
+				
+				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter'});
+				var brandsPages = [
+					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
+					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
+					{id:'answer',jsonPath:'filters/brands/answer.json'},
+					{id:'arai',jsonPath:'filters/brands/arai.json'},
+					{id:'bmc',jsonPath:'filters/brands/bmc.json'},
+					{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
+					{id:'giant-loop',jsonPath:'filters/brands/giant-loop.json'},
+					{id:'hjc',jsonPath:'filters/brands/hjc.json'},
+					{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
+					{id:'leovince',jsonPath:'filters/brands/leovince.json'},
+					{id:'msr',jsonPath:'filters/brands/msr.json'},
+					{id:'olympia',jsonPath:'filters/brands/olympia.json'},
+					{id:'onguard',jsonPath:'filters/brands/onguard.json'},
+					{id:'progressive',jsonPath:'filters/brands/progressive.json'},
+					{id:'racepro',jsonPath:'filters/brands/racepro.json'},
+					{id:'rk',jsonPath:'filters/brands/rk.json'},
+					{id:'shoei',jsonPath:'filters/brands/shoei.json'},
+					{id:'skid-lid',jsonPath:'filters/brands/skid-lid.json'},
+					{id:'speed-and-strength',jsonPath:'filters/brands/speed-and-strength.json'},
+					{id:'suomy',jsonPath:'filters/brands/suomy.json'},
+					{id:'thh',jsonPath:'filters/brands/thh.json'},
+					{id:'yuasa',jsonPath:'filters/brands/yuasa.json'}
+					];
+				for(var i in brandsPages){	
+					_app.ext.store_filter.vars.filterPages.push(brandsPages[i]);
+					_app.ext.seo_robots.vars.pages.push("#!brands/"+brandsPages[i].id+"/");
+					}
 				},
 			onError : function(){
 				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');
@@ -118,6 +210,21 @@ var store_sac = function(_app) {
 				var args = thisTLC.args2obj(data.command.args, data.globals);
 				data.globals.binds[data.globals.focusBind] = _app.u.makeImage(args);
 				return true;
+				},
+			filterform : function(data, thisTLC){
+				var $context = data.globals.tags[data.globals.focusTag];
+				
+				var $fc = $('#filterContainer');
+				var $fl = $('#filterList', $fc);
+				$fl.removeData().empty();
+				
+				
+				$fl.tlc({'dataset':data.value, 'templateid':'filterListTemplate'});
+				$('button', $fl).button();
+				$fc.addClass('active');
+				
+				$('form',$fl).data('jqContext',$context);
+				$('form', $fl).trigger('submit');
 				}
 			},
 		
@@ -202,14 +309,6 @@ var store_sac = function(_app) {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
-			initDropDowns : function(){
-				$('[data-sac="dropdown"]').on('mouseenter.dropdown', function(){
-					$('[data-sac="dropdownContent"]', $(this)).addClass('showDropDown');
-				});
-				$('[data-sac="dropdown"]').on('mouseleave.dropdown', function(){
-					$('[data-sac="dropdownContent"]', $(this)).removeClass('showDropDown');
-				});
-			},
 			startHomepageSlideshow : function(attempts){
 				attempts = attempts || 0;
 				if(_app.ext.store_sac.vars.bannerJSON){
@@ -415,47 +514,6 @@ var store_sac = function(_app) {
 				"base" : {"term" : {"prod_is_general" : "accessory_clothing"}},
 				"options" : {}
 				},
-			".motorcycle-apparel.gloves" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"gloves"}}]},
-				"options" : {
-					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"},{"p":"Liners","v":"liners"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-apparel.grips" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"grips"}}]},
-				"options" : {
-					"riding_style" : [{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},{"p":"Street","v":"street"}],
-					"primary_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}],
-					"accent_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-apparel.luggage" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"luggage"}}]},
-				"options" : {
-					"app_brand" : [{"p":"Giant Loop","v":"giant_loop"},{"p":"Factory Racing","v":"factory_racing"},{"p":"Dowco","v":"dowco"},{"p":"Willie and Max","v":"willie_and_max"}],
-					"riding_style" : [{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},{"p":"Street","v":"street"}],
-					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Tail Trunks","v":"tail_trunks"},{"p":"Pouches","v":"pouches"},{"p":"Helmet Bags","v":"helmet_bags"},{"p":"MX Gear Bags","v":"gearbag"},{"p":"Accessories","v":"accessories"}]
-					}
-				},
-			".motorcycle-apparel.security" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"security"}}]},
-				"options" : {
-					"lock_type" : [{"p":"Chain Locks","v":"chain"},{"p":"Armored Locks","v":"armored"},{"p":"Cable Locks","v":"cable"},{"p":"Disc Locks","v":"disc"},{"p":"U-Locks","v":"ulock"}],
-					}
-				},
-			".motorcycle-apparel.tank-pads" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"tank_pads"}}]},
-				"options" : {
-					"app_brand" : [{"p":"Pro Grip","v":"pro_grip"},{"p":"TechSpec","v":"techspec"}],
-					"primary_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}],
-					"accent_color" : [{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-apparel.tools" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"tools"}}]},
-				"options" : {}
-				},
 			".motorcycle-helmets" : {
 				"base" : {"term" : {"prod_is_general" : "helmet"}},
 				"options" : {
@@ -464,61 +522,8 @@ var store_sac = function(_app) {
 					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
 					}
 				},
-			".motorcycle-helmets.accessories" : {
-				"base" : {"term" : {"helmet_type" : "helmet_accessories"}},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"helmet_parts":[{"p":"Shields","v":"shields"},{"p":"Cheek Pads","v":"cheek_pads"},{"p":"Head Liners","v":"head_liners"},{"p":"Other Parts","v":"other_parts"},{"p":"MX Visors","v":"mx_visors"},{"p":"Helmet Bags","v":"helmet_bags"}]
-					}
-				},
-			".motorcycle-helmets.dirt-bike" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"dirt"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-helmets.dual-sport" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"dual_sport"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-helmets.full-face" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"full_face"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-helmets.half-shell" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"half_shell"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-helmets.modular" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"modular"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".motorcycle-helmets.three-quarter" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "helmet"}},{"term" : {"helmet_type":"three_quarter"}}]},
-				"options" : {
-					"app_brand":[{"p":"Airoh","v":"airoh"},{"p":"Answer","v":"answer"},{"p":"Arai","v":"arai"},{"p":"HJC","v":"hjc"},{"p":"Kali","v":"kali"},{"p":"MSR","v":"msr"},{"p":"Shoei","v":"shoei"},{"p":"Skid Lid","v":"skid_lid"},{"p":"Speed and Strength","v":"speed_and_strength"},{"p":"Suomy","v":"suomy"},{"p":"THH","v":"thh"},{"p":"Zox","v":"zox"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
 			".motorcycle-parts" : {
 				"base" : {"term" : {"prod_is_general" : "part"}},
-				"options" : {}
-				},
-			".motorcycle-parts.brakes" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"brakes"}}]},
 				"options" : {}
 				},
 			".motorcycle-parts.body" : {
@@ -529,210 +534,11 @@ var store_sac = function(_app) {
 					"finish":[{"p":"Aluminium","v":"aluminium"},{"p":"Black","v":"black"},{"p":"Carbon","v":"carbon"},{"p":"Chrome","v":"chrome"},{"p":"White","v":"white"},{"p":"Green","v":"green"}]
 					}
 				},
-			".motorcycle-parts.chain" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"chain"}}]},
-				"options" : {
-					"chain_color":[{"p":"Black","v":"black"},{"p":"Gold","v":"gold"}],
-					"chain_pitch":[{"p":"420","v":"420"},{"p":"428","v":"428"},{"p":"520","v":"520"},{"p":"525","v":"525"},{"p":"530","v":"530"},{"p":"532","v":"532"},{"p":"630","v":"630"}],
-					"chain_type":[{"p":"Standard","v":"standard"},{"p":"Heavy Duty","v":"heavy_duty"},{"p":"O-Ring","v":"o_ring"},{"p":"RX-Ring","v":"rx_ring"},{"p":"UW-Ring","v":"uw_ring"},{"p":"XW-Ring","v":"xw_ring"}]
-					}
-				},
-			".motorcycle-parts.chain-and-sprocket-kits" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"chain_kits"}}]},
-				"options" : {
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}],
-					"chain_kit_gearing":[{"p":"Quick Acceleration","v":"quick_acceleration"},{"p":"Stock","v":"stock"}],
-					"chain_kit_rearsprocket":[{"p":"Steel Silver","v":"steelsilver"},{"p":"Aluminium Silver","v":"alumsilver"},{"p":"Aluminium Black","v":"alumblack"}],
-					"chain_color":[{"p":"Black","v":"black"},{"p":"Gold","v":"gold"}]
-					}
-				},
 			".motorcycle-parts.controls" : {
 				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"controls"}}]},
 				"options" : {
 					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}]
 					}
-				},
-			".motorcycle-parts.electrical" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"electrical"}}]},
-				"options" : {
-					"part_sub_type":[{"p":"Batteries","v":"batteries"},{"p":"Battery Chargers","v":"battery_chargers"}]
-					}
-				},
-			".motorcycle-parts.exhaust" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"exhaust"}}]},
-				"options" : {
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}],
-					"app_brand":[{"p":"Jardine","v":"jardine"},{"p":"Leo Vince","v":"leo_vince"}],
-					"exhaust_type":[{"p":"Full System","v":"full_system"},{"p":"Slip On","v":"slip_on"},{"p":"Accessory","v":"accessory"}],
-					"finish":[{"p":"Aluminium","v":"aluminium"},{"p":"Black","v":"black"},{"p":"Carbon","v":"carbon"},{"p":"Stainless","v":"stainless"},{"p":"Titanium","v":"titanium"}]
-					}
-				},
-			".motorcycle-parts.intake" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"intake"}}]},
-				"options" : {
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}]
-					}
-				},
-			".motorcycle-parts.suspension" : {
-				"base" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"suspension"}}]},
-				"options" : {
-					"progressive_model":[{"p":"12 13 14 16 Series","v":"12_13_14_16_series"},{"p":"412 Series","v":"412_series"},{"p":"413 Series","v":"413_series"},{"p":"416 Series","v":"416_series"},{"p":"425 Series","v":"425_series"},{"p":"430 Series","v":"430_series"},{"p":"435 Series","v":"435_series"},{"p":"444 Series","v":"444_series"},{"p":"465 Series","v":"465_series"},{"p":"512 Series","v":"512_series"},{"p":"944 Series","v":"944_series"},{"p":"970 Series","v":"970_series"},{"p":"Fork Lowering Kits","v":"fork_lowering_kits"},{"p":"Fork Springs","v":"fork_springs"},{"p":"Rear Springs","v":"rear_springs"},{"p":"Monotube Fork Kits","v":"monotube_fork_kits"},{"p":"Touring Links","v":"touring_links"},{"p":"Accessories","v":"accessories"}],
-					"burly_model":[{"p":"Lowered Fork Springs","v":"lowered_fork_springs"},{"p":"Lowered Shocks","v":"lowered_shocks"},{"p":"Lowering Block Kits","v":"lowering_block_kits"},{"p":"Lowering Bolt Kits","v":"lowering_bolt_kits"},{"p":"Slammer Kits","v":"slammer_kits"},{"p":"Stiletto Shocks","v":"stiletto_shocks"}],
-					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
-					}
-				},
-			".brands.airoh.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "airoh"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.ancra.tie-downs" : {
-				"base" : {"term" : {"app_brand" : "ancra"}},
-				"options" : {}
-				},
-			".brands.answer.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "answer"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.arai.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "arai"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"},],
-					"arai_model":[{"p":"Corsair V","v":"corsair_v"},{"p":"RX Q","v":"rx_q"},{"p":"Signet Q","v":"signet_q"},{"p":"Defiant","v":"defiant"},{"p":"Vector 2","v":"vector_2"},{"p":"CT Z","v":"ct_z"},{"p":"XC","v":"xc"},{"p":"VX Pro3","v":"vx_pro3"},{"p":"XD4","v":"xd4"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.msr.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "msr"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.skid-lid.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "skid_lid"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}]
-					}
-				},
-			".brands.thh.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "thh"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"},],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.hjc.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "hjc"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"}],
-					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.suomy.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "suomy"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Dirt","v":"dirt"}],
-					"suomy_model":[{"p":"SR Sport","v":"sr_sport"},{"p":"Apex","v":"apex"},{"p":"Vandal","v":"vandal"},{"p":"D20","v":"d20"},{"p":"3logy","v":"3logy"},{"p":"Mr Jump","v":"mr_jump"},{"p":"MX Tour","v":"mx_tour"}],
-					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}	
-				},
-			".brands.speed-and-strength.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "speed_and_strength"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"}],
-					"sas_model":[{"p":"SS1100","v":"ss1100"},{"p":"SS1300","v":"ss1300"},{"p":"SS1500","v":"ss1500"},{"p":"SS1700","v":"ss1700"},{"p":"SS2000","v":"ss2000"},{"p":"SS2200","v":"ss2200"},{"p":"SS2500","v":"ss2500"},{"p":"SS300","v":"ss300"},{"p":"SS400","v":"ss400"},{"p":"SS600","v":"ss600"},{"p":"SS700","v":"ss700"}],
-					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.shoei.helmets" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "shoei"}},{"term" : {"prod_is_general":"helmet"}}]},
-				"options" : {
-					"riding_style":[{"p":"Street","v":"street"},{"p":"Adventure","v":"adventure"},{"p":"Cruiser","v":"cruiser"},{"p":"Dirt","v":"dirt"}],
-					"shoei_model":[{"p":"X Twelve","v":"x_twelve"},{"p":"RF 1200","v":"rf_1200"},{"p":"RF 1100","v":"rf_1100"},{"p":"Qwest","v":"qwest"},{"p":"GT Air","v":"gt_air"},{"p":"Neotec","v":"neotec"},{"p":"Hornet DS","v":"hornet_ds"},{"p":"VFX W","v":"vfx_w"},{"p":"J Cruise","v":"j_cruise"},{"p":"RJ Platinum R","v":"rj_platinum_r"}],
-					"finish":[{"p":"Gloss","v":"gloss"},{"p":"Matte","v":"matte"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.leovince.exhaust" : {
-				"base" : {"term" : {"app_brand" : "leo_vince"}},
-				"options" : {
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Other","v":"other"},{"p":"Scooters","v":"scooters"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"}],
-					"exhaust_type":[{"p":"Full System","v":"full_system"},{"p":"Slip On","v":"slip_on"},{"p":"Accessory","v":"accessory"}],
-					"finish":[{"p":"Aluminium","v":"aluminium"},{"p":"Black","v":"black"},{"p":"Carbon","v":"carbon"},{"p":"Stainless","v":"stainless"},{"p":"Titanium","v":"titanium"}]
-					}
-				},
-			".brands.rk.chain" : {
-				"base" : {"and" : [{"term" : {"app_brand" : "rk"}},{"term" : {"part_type":"chain"}}]},
-				"options" : {
-					"chain_color":[{"p":"Black","v":"black"},{"p":"Gold","v":"gold"}],
-					"chain_pitch":[{"p":"420","v":"420"},{"p":"428","v":"428"},{"p":"520","v":"520"},{"p":"525","v":"525"},{"p":"530","v":"530"},{"p":"532","v":"532"},{"p":"630","v":"630"}],
-					"chain_type":[{"p":"Standard","v":"standard"},{"p":"Heavy Duty","v":"heavy_duty"},{"p":"O-Ring","v":"o_ring"},{"p":"RX-Ring","v":"rx_ring"},{"p":"UW-Ring","v":"uw_ring"},{"p":"XW-Ring","v":"xw_ring"}]
-					}
-				},
-			".brands.bmc.air-filters" : {
-				"base" : {"term" : {"app_brand" : "bmc"}},
-				"options" : {
-					"part_helper":[{"p":"Standard","v":"standard"},{"p":"Race","v":"race"},{"p":"Track","v":"track"}],
-					"make_key":[{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"Buell","v":"buell"},{"p":"Can-Am","v":"can_am"},{"p":"Ducati","v":"ducati"},{"p":"Gilera","v":"gilera"},{"p":"Harley","v":"harley"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"KYMCO","v":"kymco"},{"p":"Kawasaki","v":"kawasaki"},{"p":"MV Agusta","v":"mv_agusta"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Scooters","v":"scooters"},{"p":"Suzuki","v":"suzuki"},{"p":"Triumph","v":"triumph"},{"p":"Vespa","v":"vespa"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"},{"p":"Universal","v":"universal"}]
-					}
-				},
-			".brands.olympia.gloves" : {
-				"base" : {"term" : {"app_brand" : "olympia"}},
-				"options" : {
-					"glove_style":[{"p":"Classic","v":"classic"},{"p":"Sport","v":"sport"},{"p":"Touring","v":"touring"},{"p":"Winter","v":"winter"},{"p":"Women's","v":"womens"},{"p":"Liners","v":"liners"}],
-					"primary_color":[{"p":"Black","v":"black"},{"p":"Blue","v":"blue"},{"p":"Brown","v":"brown"},{"p":"Green","v":"green"},{"p":"Grey","v":"grey"},{"p":"Orange","v":"orange"},{"p":"Pink","v":"pink"},{"p":"Purple","v":"purple"},{"p":"Red","v":"red"},{"p":"White","v":"white"},{"p":"Yellow","v":"yellow"},{"p":"Multi","v":"multi"}]
-					}
-				},
-			".brands.yuasa.batteries" : {
-				"base" : {"term" : {"app_brand" : "yuasa"}},
-				"options" : {
-					"part_sub_type":[{"p":"Batteries","v":"batteries"},{"p":"Battery Chargers","v":"battery_chargers"}],
-					}
-				},
-			".brands.progressive.suspension" : {
-				"base" : {"term" : {"app_brand" : "progressive"}},
-				"options" : {
-					"progressive_model":[{"p":"12 13 14 16 Series","v":"12_13_14_16_series"},{"p":"412 Series","v":"412_series"},{"p":"413 Series","v":"413_series"},{"p":"416 Series","v":"416_series"},{"p":"425 Series","v":"425_series"},{"p":"430 Series","v":"430_series"},{"p":"435 Series","v":"435_series"},{"p":"444 Series","v":"444_series"},{"p":"465 Series","v":"465_series"},{"p":"512 Series","v":"512_series"},{"p":"944 Series","v":"944_series"},{"p":"970 Series","v":"970_series"},{"p":"Fork Lowering Kits","v":"fork_lowering_kits"},{"p":"Fork Springs","v":"fork_springs"},{"p":"Rear Springs","v":"rear_springs"},{"p":"Monotube Fork Kits","v":"monotube_fork_kits"},{"p":"Touring Links","v":"touring_links"},{"p":"Accessories","v":"accessories"}],
-					"make_key":[{"p":"American Eagle","v":"ae"},{"p":"AJS","v":"ajs"},{"p":"Aprilia","v":"aprilia"},{"p":"BMW","v":"bmw"},{"p":"BSA","v":"bsa"},{"p":"Buell","v":"buell"},{"p":"Bultaco","v":"bultaco"},{"p":"Can-Am","v":"can_am"},{"p":"Carabela","v":"carabela"},{"p":"Cooper Islo","v":"cooper_islo"},{"p":"CZ","v":"cz"},{"p":"DKW","v":"dkw"},{"p":"Ducati","v":"ducati"},{"p":"Harley","v":"harley"},{"p":"Hodaka","v":"hodaka"},{"p":"Honda","v":"honda"},{"p":"Husqvarna","v":"husqvarna"},{"p":"KTM","v":"ktm"},{"p":"Kawasaki","v":"kawasaki"},{"p":"Laverda","v":"laverda"},{"p":"Maico","v":"maico"},{"p":"Monarch","v":"monarch"},{"p":"Montesa","v":"montesa"},{"p":"Moto Guzzi","v":"moto_guzzi"},{"p":"Norton","v":"norton"},{"p":"Ossa","v":"ossa"},{"p":"Polaris","v":"polaris"},{"p":"Puch","v":"Puch"},{"p":"Suzuki","v":"suzuki"},{"p":"Rickman","v":"rickman"},{"p":"Rokon","v":"rokon"},{"p":"Triumph","v":"triumph"},{"p":"Victory","v":"victory"},{"p":"Yamaha","v":"yamaha"},{"p":"Other","v":"other"},{"p":"Universal","v":"universal"}],
-					"measures":[{"p":"11","v":"11"},{"p":"11.5","v":"11.5"},{"p":"12","v":"12"},{"p":"12.5","v":"12.5"},{"p":"12.6","v":"12.6"},{"p":"13","v":"13"},{"p":"13.2","v":"13.2"},{"p":"13.5","v":"13.5"},{"p":"13.6","v":"13.6"},{"p":"14","v":"14"},{"p":"14.2","v":"14.2"},{"p":"14.25","v":"14.25"},{"p":"14.3","v":"14.3"},{"p":"14.5","v":"14.5"},{"p":"15","v":"15"},{"p":"15.5","v":"15.5"},{"p":"15.7","v":"15.7"},{"p":"15.75","v":"15.75"},{"p":"16","v":"16"},{"p":"16.25","v":"16.25"},{"p":"16.5","v":"16.5"},{"p":"17","v":"17"},{"p":"17.5","v":"17.5"},{"p":"17.7","v":"17.7"},{"p":"18.5","v":"18.5"},{"p":"Adjustable","v":"adjustable"},{"p":"Other","v":"other"}],
-					"finish":[{"p":"Black","v":"black"},{"p":"Chrome","v":"chrome"}]
-					}
-				},
-			".brands.factory-racing.products" : {
-				"base" : {"term" : {"app_brand" : "factory_racing"}},
-				"options" : {}
-				},
-			".brands.racepro" : {
-				"base" : {"term" : {"app_brand" : "racepro"}},
-				"options" : {}
-				},
-			".brands.giant-loop.luggage" : {
-				"base" : {"term" : {"app_brand" : "giant_loop"}},
-				"options" : {
-					"luggage_type" : [{"p":"Tank Bags","v":"tank_bags"},{"p":"Saddlebags","v":"saddlebags"},{"p":"Pouches","v":"pouches"},{"p":"Accessories","v":"accessories"}],
-					}
-				},
-			".brands.onguard.locks" : {
-				"base" : {"term" : {"app_brand" : "on_guard"}},
-				"options" : {
-					"lock_type" : [{"p":"Chain Locks","v":"chain"},{"p":"Armored Locks","v":"armored"},{"p":"Cable Locks","v":"cable"},{"p":"Disc Locks","v":"disc"},{"p":"U-Locks","v":"ulock"}],
-					}
-				},
-			".brands.k-and-n.products" : {
-				"base" : {"term" : {"app_brand" : "k+n"}},
-				"options" : {}
-				},
-			".test2" : {
-				"base" : {"term" : {"make_key" : "test"}},
-				"options" : {
-					"app_brand" : [{"p":"HJC","v":"hjc"},{"p":"Cortech","v":"cortech"},{"p":"Tourmaster","v":"tourmaster"},{"p":"Fieldsheer","v":"fieldsheer"},{"p":"Mobile Warming","v":"mobile_warming"},{"p":"Shoei","v":"shoei"},{"p":"Pokerun","v":"pokerun"}],
-				}
 				},
 			}
 		} //r object.

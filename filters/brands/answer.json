@@ -1,0 +1,7 @@
+{
+	"title" : "Answer Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "answer"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:primary_color"
+	]
+}

@@ -1,0 +1,8 @@
+{
+	"title" : "Motorcycle Helmet Accessories",
+	"baseFilter" : {"term" : {"helmet_type" : "helmet_accessories"}},
+	"optionList" : [
+		"user:app_brand",
+		"user:helmet_parts"
+	]
+}
