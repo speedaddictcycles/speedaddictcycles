@@ -501,7 +501,7 @@ var store_sac = function(_app) {
 			searchFormSubmit : function($form, p){
 				p.preventDefault();
 				var json = $form.serializeJSON();
-				window.location.hash = "#!/search/"+json.search+"/";
+				window.location.hash = "#!search/keywords/"+json.search+"/";
 			}
 			}, //e [app Events]
 			
