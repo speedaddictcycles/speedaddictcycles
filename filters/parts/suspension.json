@@ -1,0 +1,9 @@
+{
+	"title" : "Suspension - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"suspension"}}]},
+	"optionList" : [
+		"user:progressive_model",
+		"user:burly_model",
+		"user:finish"
+	]
+}

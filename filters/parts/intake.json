@@ -1,0 +1,7 @@
+{
+	"title" : "Intake - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"intake"}}]},
+	"optionList" : [
+		"user:make_key"
+	]
+}

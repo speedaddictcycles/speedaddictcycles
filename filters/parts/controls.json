@@ -1,0 +1,7 @@
+{
+	"title" : "Controls - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"controls"}}]},
+	"optionList" : [
+		"user:primary_color"
+	]
+}

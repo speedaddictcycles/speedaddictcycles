@@ -1,0 +1,9 @@
+{
+	"title" : "Chains - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"chain"}}]},
+	"optionList" : [
+		"user:chain_color",
+		"user:chain_pitch",
+		"user:chain_type"
+	]
+}
