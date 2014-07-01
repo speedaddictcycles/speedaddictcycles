@@ -28,17 +28,7 @@ var seo_robots = function(_app) {
 		pagesLoaded : false,
 		counter : 0,
 		counterReset : 50,
-		blacklistNavcats : ['.beach-chairs.best-sellers','.beach-chairs.hot-deals','.beach-chairs.packages','.beach-chair.lafuma-recliner',
-			'.beach-chair.lafuma-recliner.director-chairs','.beach-chairs.beach-gear.gift_baskets','.beach-chairs.beach-gear.picnic-basket-beyond',
-			'.beach-chairs.beach-gear.women-swimwear-bikinis','.beach-sports.inflatables','.beach-sports.water-towables',
-			'.beachwear.beach-hat.beach-hats','.beachwear.beach-swimwear.board-shorts.womens','.beachwear.beach-swimwear.rashguard.rash-guards',
-			'.beachwear.sun-dresses-women.beach-dresses','.beachwear.sun-dresses-women.body-slimming','.beachwear.sun-dresses-women.evening',
-			'.beachwear.swimwear-women','.beachwear.swimwear-women.bathing-suits','.beachwear.swimwear-women.bikini-two-piece','.beachwear.swimwear-women.cover-ups',
-			'.beachwear.swimwear-women.monokinis-tankinis','.beachwear.swimwear-women.one-piece-swimsuits','.beachwear.swimwear-women.plus-size-swimsuits',
-			'.directory','.affiliates','.beach-umbrellas-shelter.patio-umbrella.6-foot-patio-umbrellas',
-			'.beach-umbrellas-shelter.patio-umbrella.7-foot-patio-umbrellas','.beach-umbrellas-shelter.patio-umbrella.market-umbrellas',
-			'.beach-umbrellas-shelter.patio-umbrella.offset-umbrellas','.beachwear.sun-dresses-women'],
-		compiledBlacklist : []
+		robotPresent : false
 		},
 
 ////////////////////////////////////   CALLBACKS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -55,9 +45,8 @@ var seo_robots = function(_app) {
 				if(_robots._robotGreeting){
 					_app.ext.seo_robots.u.welcomeRobot(_robots._robotGreeting);
 					}
-				else {
-					_robots.hello = _app.ext.seo_robots.u.welcomeRobot;
-					}
+				_robots.hello = _app.ext.seo_robots.u.welcomeRobot;
+				_robots.goodbye = _app.ext.seo_robots.u.goodbyeRobot;
 				//Replace the _robots.next default functionality with some real stuff
 				
 				
@@ -92,20 +81,34 @@ var seo_robots = function(_app) {
 								}
 							}
 						var status = 100;
+						var isFilter = false;
 						if(typeof page == 'string' && page.indexOf('#!') == 0){
 							_app.ext.quickstart.vars.showContentFinished = false;
 							_app.ext.quickstart.vars.showContentCompleteFired = false;
+							
+							if((page.indexOf('#!motorcycle-helmets') >= 0 && page != "#!motorcycle-helmets") ||
+								(page.indexOf('#!parts') >= 0  && page != "#!parts")||
+								(page.indexOf('#!apparel') >= 0 && page != "#!apparel")||
+								(page.indexOf('#!brands') >= 0 && page != "#!brands")){
+								isFilter = true;
+								}
+								
 							window.location.hash = page;
 							}
 						else if(typeof page == 'object'){ 
 							$('#globalMessaging').intervaledEmpty();
 							showContent('',page);
+							
+							if(page.pageType == "static" && _app.ext.store_filter.vars.filterPageLoadQueue[page.id]){
+								isFilter = true;
+								}
 							}
 						else{
 							status = 404;
 							}
 						_robots.status = function(){
-							if(status == 100 && _app.ext.quickstart.vars.showContentFinished && _app.ext.quickstart.vars.showContentCompleteFired){
+							
+							if(status == 100 && _app.ext.quickstart.vars.showContentFinished && _app.ext.quickstart.vars.showContentCompleteFired && (!isFilter || _app.ext.store_filter.vars.filterLoadingComplete)){
 								status = 200;
 								}
 							return status;
@@ -201,20 +204,11 @@ var seo_robots = function(_app) {
 								}
 									break;
 								case "navcat" : 
-									if(_app.ext.seo_robots.u.isBlacklistedCat(p.id)) {
-//										dump('NAVCAT was found in blacklist: '+p.id);
-							//			_app.ext.seo_robots.vars.compiledBlacklist.push(p.id);
-							//			dump(_app.ext.seo_robots.vars.compiledBlacklist);
-										break; //this category is blacklisted, don't index it.
-									}
-									else {
-//										dump('NOT a blacklisted navcat:'+p.id);
-										_app.ext.seo_robots.vars.pages.push({
+									_app.ext.seo_robots.vars.pages.push({
 										pageType : "category",
 										navcat : p.id
 										});
-										break;
-									}
+									break;
 								case "list" : 
 									dump("LIST "+p.id+" SKIPPED IN PAGE BUILDING");
 									break;
@@ -225,6 +219,7 @@ var seo_robots = function(_app) {
 								}
 							}
 						_app.ext.seo_robots.vars.pagesLoaded = true;
+						_app.ext.seo_robots.vars.robotPresent = true;
 						}
 					};
 				_app.model.addDispatchToQ(request, 'immutable');
@@ -232,26 +227,13 @@ var seo_robots = function(_app) {
 				
 				return "1.0";
 				},
-				
-				isBlacklistedCat : function(compare) {
-					var i = 0;
-					var r = false; //what is returned, false if no match is found
-//					dump('BLACKLIST LENGTH:'); dump(_app.ext.seo_robots.vars.blacklistNavcats.length);
-					while (i < _app.ext.seo_robots.vars.blacklistNavcats.length) {
-//						dump(_app.ext.seo_robots.vars.blacklistNavcats[i]); dump(compare);
-						if(_app.ext.seo_robots.vars.blacklistNavcats[i] == compare) { 
-//							dump('MATCH FOUND'); 
-							r = true;
-							return r;
-						}
-						else { 
-//							dump('NO MATCH'); //deosn't match this array item, move along
-						}
-						i++;
-					}
-					return r;
+			goodbyeRobot : function(botStr){
+				dump("Bot saying goodbye: "+botStr);
+				_app.ext.seo_robots.vars.robotPresent = false;
 				},
-		
+			isRobotPresent : function(){
+				return _app.ext.seo_robots.vars.robotPresent;
+				}
 			}, //u [utilities]
 
 //app-events are added to an element through data-app-event="extensionName|functionName"

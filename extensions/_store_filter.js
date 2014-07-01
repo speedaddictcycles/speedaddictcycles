@@ -30,6 +30,7 @@ var store_filter = function(_app) {
 		templates : [
 			"filteredSearchTemplate",
 			],
+		filterLoadingComplete : false,
 		filterPages : [],
 		filterPageLoadQueue : [],
 		elasticFields : {} // will get populated with data from appResource call
@@ -102,6 +103,7 @@ var store_filter = function(_app) {
 							dump("Unrecognized option "+o+" on filter page "+routeObj.params.id);
 							}
 						}
+					routeObj.params.loadFullList = _app.ext.seo_robots.u.isRobotPresent();
 					showContent('static',routeObj.params);
 					}
 					
@@ -248,6 +250,14 @@ var store_filter = function(_app) {
 //when adding an event, be sure to do off('click.appEventName') and then on('click.appEventName') to ensure the same event is not double-added if app events were to get run again over the same template.
 		e : {
 			execFilteredSearch : function($form, p){
+				var loadFullList = $form.data('loadFullList');
+				// dump("Executing Filtered Search");
+				if(loadFullList){
+					_app.ext.store_filter.vars.filterLoadingComplete = false;
+					}
+				else {
+					_app.ext.store_filter.vars.filterLoadingComplete = true;
+					}
 				var $page = $form.data('jqContext');
 				p.preventDefault();
 				var $resultsContainer = $page.closest('[data-filter=parent]').find('[data-filter=resultsList]');
@@ -320,7 +330,13 @@ var store_filter = function(_app) {
 					}
 				
 				//var es = _app.ext.store_search.u.buildElasticRaw(elasticsearch);
-				es.size = 30;
+				if(loadFullList){
+					es.size = 200;
+					es.timeout = 60;
+					}
+				else {
+					es.size = 30;
+					}
 				$resultsContainer.empty();
 				
 				_app.ext.store_search.u.updateDataOnListElement($resultsContainer,_app.u.getBlacklistedObject(es, ["facets"]),1);
@@ -367,7 +383,7 @@ var store_filter = function(_app) {
 								});
 							}
 						}
-					}, 'datapointer':'appFilteredSearch','templateID':'productListTemplateResults','list':$resultsContainer, 'filterList' : $form});
+					}, 'datapointer':'appFilteredSearch','templateID':'productListTemplateResults','list':$resultsContainer, 'filterList' : $form, 'loadFullList' : loadFullList});
 				_app.model.dispatchThis();
 				
 				}

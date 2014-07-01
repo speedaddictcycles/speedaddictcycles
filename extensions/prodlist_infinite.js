@@ -77,6 +77,7 @@ var prodlist_infinite = function(_app) {
 					$list.removeClass('loadingBG');
 					if(L == 0)	{
 						$list.append("Your query returned zero results.");
+						_app.ext.store_filter.vars.filterLoadingComplete = true;
 						}
 					else	{
 						$list.append(_app.ext.store_search.u.getElasticResultsAsJQObject(_rtag)); //prioritize w/ getting product in front of buyer
@@ -187,7 +188,7 @@ It is run once, executed by the renderFormat.
 
 				function handleProd(pid,$templateCopy)	{
 					$templateCopy.attr('data-pid',pid);
-					return _app.calls.appProductGet.init({"pid":pid,"withVariations":plObj.withVariations,"withInventory":plObj.withInventory},{'callback':'translateTemplate','extension':'store_prodlist',jqObj:$templateCopy,'verb':'translate'},'mutable');
+					return _app.calls.appProductGet.init({"pid":pid,"withVariations":plObj.withVariations,"withInventory":plObj.withInventory},{'callback':'tlc',jqObj:$templateCopy,'verb':'translate'},'mutable');
 					}
 //Go get ALL the data and render it at the end. Less optimal from a 'we have it in memory already' point of view, but solves a plethora of other problems.
 				for(var i = 0; i < L; i += 1)	{
@@ -269,24 +270,36 @@ else	{
 				var EQ = $tag.data('elastic-query');
 				var currPage = $tag.data('page-in-focus');
 				var totalPages = $tag.data('total-page-count');
-				if(_app.data[_rtag.datapointer].hits.total <= EQ.size)	{$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();} //do nothing. fewer than 1 page worth of items.
+				
+				var onScroll = function(override){
+					//will load data when two rows from bottom.
+					if(override || $(window).scrollTop() >= ( $(document).height() - $(window).height() - ($tag.children().first().height() * 2) ) )	{
+						$(window).off('scroll.infiniteScroll');
+						if($tag.data('isDispatching') == true)	{}
+						else	{
+							var _tag = _app.u.getWhitelistedObject(_rtag, ['datapointer','callback','extension','list','templateID','loadFullList']);
+							_app.ext.store_search.u.changePage($tag, currPage+1, _tag);
+							}
+						}
+					}
+			
+				if(_app.data[_rtag.datapointer].hits.total <= EQ.size)	{
+					$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
+					_app.ext.store_filter.vars.filterLoadingComplete = true;
+					} //do nothing. fewer than 1 page worth of items.
 				else if(currPage >= totalPages)	{
 				//reached the last 'page'. disable infinitescroll.
 					$(window).off('scroll.infiniteScroll');
 					$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
+					_app.ext.store_filter.vars.filterLoadingComplete = true;
 					}
 				else	{
-					$(window).off('scroll.infiniteScroll').on('scroll.infiniteScroll',function(){
-						//will load data when two rows from bottom.
-						if( $(window).scrollTop() >= ( $(document).height() - $(window).height() - ($tag.children().first().height() * 2) ) )	{
-							$(window).off('scroll.infiniteScroll');
-							if($tag.data('isDispatching') == true)	{}
-							else	{
-								var _tag = _app.u.getWhitelistedObject(_rtag, ['datapointer','callback','extension','list','templateID']);
-								_app.ext.store_search.u.changePage($tag, currPage+1, _tag);
-								}
-							}
-						});
+					if(_rtag.loadFullList){
+						onScroll(true);
+						}
+					else {
+						$(window).off('scroll.infiniteScroll').on('scroll.infiniteScroll', onScroll);
+						}
 					}
 				}
 

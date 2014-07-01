@@ -75,6 +75,7 @@ var store_sac = function(_app) {
 					
 				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
+					$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
 					$fc.addClass('active');
 					});	
 				_app.templates.filteredSearchTemplate.on('depart.filter', function(event, $context, infoObj){
@@ -223,7 +224,7 @@ var store_sac = function(_app) {
 				$('button', $fl).button();
 				
 				$('form',$fl).data('jqContext',$context);
-				$('form', $fl).trigger('submit');
+				//$('form', $fl).trigger('submit');
 				}
 			},
 		
