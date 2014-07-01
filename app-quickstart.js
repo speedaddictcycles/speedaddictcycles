@@ -459,7 +459,16 @@ document.write = function(v){
 				if(_app.data[tagObj.datapointer].schedule){
 					_app.vars.schedule = _app.data[tagObj.datapointer].schedule;
 					}
-				$('#appView [data-templateid=productTemplate]').intervaledEmpty().remove();
+				$('#appView #mainContentArea > *').each(function(){
+					var template = $(this).attr('data-templateid');
+					dump(template);
+					if(template != 'customerTemplate'){
+						$(this).intervaledEmpty().remove();
+						}
+					})
+				if(!$('#appView #mainContentArea :visible').length){
+					document.location.hash = "#!customer/myaccount";
+					}
 				for(var i in _app.data){
 					if(i.indexOf('appProductGet') >= 0){
 						_app.model.destroy(i);
@@ -2506,8 +2515,14 @@ either templateID needs to be set OR showloading must be true. TemplateID will t
 								$(document.body).removeClass('buyerLoggedIn');
 								$('.username').empty();
 								_app.u.logBuyerOut();
-								$('#appView [data-templateid=productTemplate]').intervaledEmpty().remove();
-								document.location.hash = '';
+								$('#appView #mainContentArea *').each(function(){
+									var template = $(this).attr('data-templateid');
+									dump(template);
+									if(template != 'customerTemplate'){
+										$(this).intervaledEmpty().remove();
+										}
+									});
+								document.location.hash = '#!';
 								break;
 							default:
 								dump("WARNING - unknown article/show ["+infoObj.show+" in showCustomer. ");
