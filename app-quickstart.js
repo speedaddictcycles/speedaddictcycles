@@ -455,6 +455,16 @@ document.write = function(v){
 		authenticateBuyer : {
 			onSuccess : function(tagObj)	{
 				_app.vars.cid = _app.data[tagObj.datapointer].cid; //save to a quickly referencable location.
+				delete _app.vars.schedule;
+				if(_app.data[tagObj.datapointer].schedule){
+					_app.vars.schedule = _app.data[tagObj.datapointer].schedule;
+					}
+				$('#appView [data-templateid=productTemplate]').intervaledEmpty().remove();
+				for(var i in _app.data){
+					if(i.indexOf('appProductGet') >= 0){
+						_app.model.destroy(i);
+						}
+					}
 				$('#loginSuccessContainer').show(); //contains 'continue' button.
 				$('#loginMessaging').empty().show().append("Thank you, you are now logged in."); //used for success and fail messaging.
 				$('#loginFormContainer').hide(); //contains actual form.
@@ -2496,6 +2506,7 @@ either templateID needs to be set OR showloading must be true. TemplateID will t
 								$(document.body).removeClass('buyerLoggedIn');
 								$('.username').empty();
 								_app.u.logBuyerOut();
+								$('#appView [data-templateid=productTemplate]').intervaledEmpty().remove();
 								document.location.hash = '';
 								break;
 							default:
