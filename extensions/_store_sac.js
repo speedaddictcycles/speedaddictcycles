@@ -173,6 +173,7 @@ var store_sac = function(_app) {
 					_app.ext.store_filter.vars.filterPages.push(brandsPages[i]);
 					_app.ext.seo_robots.vars.pages.push("#!brands/"+brandsPages[i].id+"/");
 					}
+				_app.ext.store_search.vars.universalFilters.push({"term":{"showtime":"1"}});
 				},
 			onError : function(){
 				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');
