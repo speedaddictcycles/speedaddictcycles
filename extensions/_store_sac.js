@@ -76,11 +76,20 @@ var store_sac = function(_app) {
 				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
 					$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
-					$fc.addClass('active');
+					$fc.addClass('active expand');
+					var timer = setTimeout(function(){
+						$fc.removeClass('expand');
+						}, 4000);
+					$fc.data('hidetimer', timer);
+					$fc.on('mouseenter.sac', function(){
+						clearTimeout($fc.data('hidetimer'));
+						$fc.off('mouseenter.sac');
+						});
 					});	
 				_app.templates.filteredSearchTemplate.on('depart.filter', function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
 					$fc.removeClass('expand').removeClass('active');
+					$fc.off('mouseenter.sac');
 					});
 				
 				_app.router.appendHash({'type':'exact','route':'motorcycle-helmets/', 'callback':function(routeObj){
@@ -208,6 +217,26 @@ var store_sac = function(_app) {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		
 		tlcFormats : {
+			countrylist : function(data, thisTLC){
+				var _tag = {
+					callback : function(rd){
+						var data = _app.data[rd.datapointer];
+						var destinations = data['@destinations'];
+						var L = destinations.length
+						var cartid = _app.model.fetchCartID();
+						var cartData = _app.data['cartDetail|'+cartid];
+						for(var i = 0; i < L; i += 1)	{
+							r += "<option value='"+destinations[i].ISO+"'>"+destinations[i].Z+"</option>";
+							}
+						
+						rd.jqObj.append(r);
+						rd.jqObj.val(_app.u.thisNestedExists("data.cartDetail|"+cartid+".ship.countrycode",_app) ? cartData['ship'].countrycode : 'US');
+						},
+					jqObj : data.globals.tags[data.globals.focusTag]
+					}
+				_app.ext.cco.calls.appCheckoutDestinations.init(_app.model.fetchCartID(),_tag,'mutable');
+				_app.model.dispatchThis('mutable');
+				},
 			imageurl : function(data,thisTLC){
 				var args = thisTLC.args2obj(data.command.args, data.globals);
 				data.globals.binds[data.globals.focusBind] = _app.u.makeImage(args);
@@ -274,7 +303,15 @@ var store_sac = function(_app) {
 				}
 				},
 			imajize : function($tag, data){
-				var src = "http://embed.imajize.com/"+data.value;
+				var src = '';
+				if(document.location.protocol == "https:"){
+					src += "https://s3.amazonaws.com/embed.imajize.com/";
+					}
+				else {
+					src += "http://embed.imajize.com/";
+					}
+				src += data.value;
+				dump(src);
 				$tag.attr('src',src);
 				},
 			imagesrcset : function($tag, data){
@@ -472,6 +509,15 @@ var store_sac = function(_app) {
 			}, //u [utilities]
 
 		e : {
+			cartCountryChange : function($ele, p){
+				p.preventDefault();
+				var country = $ele.val();
+				
+				_app.ext.cco.calls.cartSet.init({'ship/postal':'', 'ship/region':'', 'ship/countrycode':country,'_cartid': $ele.closest("[data-template-role='cart']").data('cartid')},{},'immutable');
+				$ele.closest("[data-template-role='cart']").trigger('fetch',{'Q':'immutable'});
+				$ele.closest("[data-app-role='cartTemplateShippingContainer']").find("input[name='ship/postal']").val('');
+				_app.model.dispatchThis('immutable');
+				},
 			productAdd2Cart : function($form, p){
 				p.preventDefault();
 				var $childSelect = $('.prodChildren.active select', $form);

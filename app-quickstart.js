@@ -1113,6 +1113,7 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 						break;
 	
 					case 'cart':
+						//_app.ext.cco.calls.appCheckoutDestinations.init(_app.model.fetchCartID(),{},'mutable'); //needed for cart shipping
 						$new = _app.ext.quickstart.u.showCart(infoObj);
 						break;
 
@@ -1137,17 +1138,21 @@ for legacy browsers. That means old browsers will use the anchor to retain 'back
 				infoObj.performJumpToTop = (infoObj.performJumpToTop === false) ? false : true; //specific instances jump to top. these are passed in (usually related to modals).
 		
 //transition appPreView out on init.
-				if($('#appPreView').is(':visible'))	{
-//appPreViewBG is an optional element used to create a layer between the preView and the view when the preView is loaded 'over' the view.
-					var $bg = $('#appPreViewBG');
-					if($bg.length)	{
-						$bg.animate({left:$(window).width(),top:$(window).height()},function(){$bg.hide();});
-						}
+				// if($('#appPreView').is(':visible'))	{
+// //appPreViewBG is an optional element used to create a layer between the preView and the view when the preView is loaded 'over' the view.
+					// var $bg = $('#appPreViewBG');
+					// if($bg.length)	{
+						// $bg.animate({left:$(window).width(),top:$(window).height()},function(){$bg.hide();});
+						// }
 
-					$('#appPreView').slideUp(1000,function(){
-						$new.show(); //have to show content area here because the slideDown will only make the parent visible
-						$('#appView').slideDown(3000);
-						});
+					// $('#appPreView').slideUp(1000,function(){
+						// $new.show(); //have to show content area here because the slideDown will only make the parent visible
+						// $('#appView').slideDown(3000);
+						// });
+					// }
+				if($('#loader').is(':visible')){
+					$('#loader').hide();
+					$new.show();
 					}
 				else if(infoObj.performTransition == false)	{
 					_app.ext.quickstart.vars.showContentFinished = true;
@@ -2286,7 +2291,7 @@ elasticsearch.size = 50;
 				
 				_app.ext.store_search.u.updateDataOnListElement($('#resultsProductListContainer'),elasticsearch,1);
 //				_app.ext.store_search.calls.appPublicSearch.init(elasticsearch,infoObj);
-				_app.ext.store_search.calls.appPublicSearch.init(elasticsearch,$.extend(true,{},infoObj,{'callback':'handleInfiniteElasticResults','datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'prodlist_infinite','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')}));
+				_app.ext.store_search.calls.appPublicSearch.init(elasticsearch,$.extend(true,{},infoObj,{'callback':'handleInfiniteElasticResults', 'emptyList':true,'datapointer':"appPublicSearch|"+JSON.stringify(elasticsearch),'extension':'prodlist_infinite','templateID':'productListTemplateResults','list':$('#resultsProductListContainer')}));
 				_app.model.dispatchThis();
 				infoObj.state = 'complete'; //needed for handleTemplateEvents.
 				_app.renderFunctions.handleTemplateEvents($page,infoObj);

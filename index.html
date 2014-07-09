@@ -151,7 +151,7 @@ var _robots = {
 
 <!-- what is displayed onLoad until the view is loaded -->
 <div id='appPreView'>
-<table>
+<!-- <table>
 <tr>
 	<td>
 	
@@ -174,12 +174,12 @@ var _robots = {
 	<div class='appMessaging'></div>
 	</td>
 </tr>
-</table>
+</table> -->
 </div>
 
 
 
-<div id='appView' class='displayNone'>
+<div id='appView' class=''>
 	
 	<div id="freeship" class="alignCenter">
 		<a href="#!company/shipping/" class="freeBanner"></a>
@@ -286,7 +286,11 @@ var _robots = {
 		</div>
 		-->
 
-		<div id='mainContentArea'></div><!-- DO NOT REMOVE - this is where the specific page (ex: homepage, product, category) content is going to go -->
+		<div id='mainContentArea'>
+			<div id="loader" class="alignCenter">
+				<img src="loading.gif"/>
+			</div>
+		</div><!-- DO NOT REMOVE - this is where the specific page (ex: homepage, product, category) content is going to go -->
 	
 		<div class="clear"></div>
 	</div>	
@@ -673,28 +677,28 @@ the homepageTemplate template is loaded into mainContentArea by default when the
 			<div class="imajizeContainer floatLeft alignCenter">
 			    <a href="#!brands/suomy/"  style="text-decoration:none;" class="block clear">
 					<h3 class="title sourceSans">Suomy SR Sport</h3>
-					<iframe src="http://embed.imajize.com/bLuiJBAynv4"></iframe>
+					<iframe data-tlc="set $var 'bLuiJBAynv4'; store_sac#imajize --legacy;"></iframe>
 					<h3 class="price sourceSans">Suomy's New Topline</h3>
 			    </a>
 			</div>
 			<div class="imajizeContainer floatLeft alignCenter">
 			    <a href="#!brands/thh/"  style="text-decoration:none;" class="block clear">
 					<h3 class="title sourceSans">THH TX-12 ECE Rated</h3>
-					<iframe src="http://embed.imajize.com/aHP8LLwrJ-8"></iframe>
+					<iframe data-tlc="set $var 'aHP8LLwrJ-8'; store_sac#imajize --legacy;"></iframe>
 					<h3 class="price sourceSans">Only $64 delivered!</h3>
 				</a>
 			</div>
 			<div class="imajizeContainer floatLeft alignCenter displayNone_320">
 			    <a href="#!brands/suomy/"  style="text-decoration:none;" class="block clear">
 					<h3 class="title sourceSans">Suomy MX Jump</h3>
-					<iframe src="http://embed.imajize.com/18ed18c6-d7f6-476d-ae12-af62f968e8ac"></iframe>
+					<iframe data-tlc="set $var '18ed18c6-d7f6-476d-ae12-af62f968e8ac'; store_sac#imajize --legacy;"></iframe>
 					<h3 class="price sourceSans">2.5Lbs...Game Over.</h3>
 				</a>	
 			</div>
 			<div class="imajizeContainer floatLeft alignCenter displayNone_320 displayNone_480">
 			    <a href="#!brands/shoei/"  style="text-decoration:none;" class="block clear">
 					<h3 class="title sourceSans">Shoei Neotec</h3>
-					<iframe src="http://embed.imajize.com/d22255c8-b0a6-44d6-89cd-6f89373b1081"></iframe>
+					<iframe data-tlc="set $var 'd22255c8-b0a6-44d6-89cd-6f89373b1081'; store_sac#imajize --legacy;"></iframe>
 					<h3 class="price sourceSans">Worlds Best Modular.</h3>
 				</a>
 			</div>
@@ -1189,6 +1193,8 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 -->
 <!-- Schad Turned off 360 results, to turn on fix 360 add I to id for viewer id check -->
 <li id="productListTemplateResults" class="loadingBG searchResultsProduct ">
+	
+		<div data-tlc="bind $var '.special_offer'; if(is $var --notblank;){{apply --show --tag;}};" class="displayNone">Special Offer</div>
 	<div data-tlc="bind $var '.pid'; apply --attrib='data-pid'; ">
 		<a href="#" class="hideInMinimalMode pointer moreDetails" data-tlc="bind $var '.'; store_routing#seoanchor --type='product' --seo; apply --attrib='href';">
 			<div data-tlc="bind $var '.prod_360_viewer_d'; if(is $var --notblank;) {{ apply --hide; }}; if (is $var --notblank;) {{apply --append;}};" class="prodThumbContainer">
@@ -1198,9 +1204,9 @@ SANITY -> if you change the height and width of this image, change the .minimalM
 				<img data-tlc="bind $var '.images[0]'; if (is $var --notblank;) {{ store_sac#imageurl --name=$var --w=232 --h=232 --b='ffffff'; apply --attrib='src';}};" src="blank.gif" class="prodThumb">
 			
 			</div>
-			<div data-tlc="bind $var '.prod_360_viewer_d'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
+			<!-- <div data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{ apply --show; }}; " class="displayNone">
 				<iframe data-tlc="bind $var '.prod_360_viewer_id'; if(is $var --notblank;) {{store_sac#imajize  --legacy;}};" class="prodThumb"></iframe>
-			</div>
+			</div> -->
 			<h5 data-tlc="bind $var '.prod_name'; if (is $var --notblank;) {{format --truncate='80'; apply --append;}};" class="name"></h5>
 
 			<h4 data-tlc="bind $var '.base_price'; if (is $var --notblank;) {{math --div='100'; format --currency='USD'; apply --append;}};" class="price"></h4>
@@ -1263,8 +1269,8 @@ this will likely become more flexible in the future. ###
 	</div>
 	<div class="floatRight prodSideBar displayOnly_960 alignCenter">
 	<!-- Schad turned off, need to configure banners
-		<div>Free Shipping</div>
-		<div>Special Offer</div>
+		<div data-tlc="bind $var '.%attribs.is:shipfree'; if(is $var --eq='1';){{apply --show --tag;}};" class="displayNone">Free Shipping</div>
+		<div data-tlc="bind $var '.%attribs.user:special_offer'; if(is $var --notblank;){{apply --show --tag;}};" class="displayNone">Special Offer</div>
 		<div>Recently Viewed Items</div>
 		-->
 	</div>
@@ -2208,6 +2214,7 @@ This is the template used both within a dialog and inline, unless implicitly ove
 
 <section data-app-role="cartTemplateShippingContainer" class="marginBottom cartTemplateShippingContainer">
 	<h3>Shipping:</h3>
+	<div class="billCountry" data-app-role="billCountry"><select data-tlc="store_sac#countrylist" data-app-change='store_sac|cartCountryChange'><option value=''>Please choose</option></select></div>
 
 	<div class="cartZipCodeContainer marginBottom">
 		<label>Zip/Postal Code:

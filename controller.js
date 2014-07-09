@@ -2295,7 +2295,10 @@ _app.u.makeImage({"name":"","w":150,"h":150,"b":"FFFFFF","class":"prodThumb","ta
 					url = url.slice(0,url.length-1); //strip trailing - because it isn't stricly 'compliant' with media lib specs.
 					}
 				}
-			url += '\/'+a.name;
+			if(a.name.charAt(0) != '/'){
+				url += '/';
+				}
+			url += a.name;
 			
 			if(a.tag == true)	{
 				a['class'] = typeof a['class'] == 'string' ? a['class'] : ''; //default class to blank
