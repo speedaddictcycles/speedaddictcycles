@@ -792,6 +792,55 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
 </div>
 
+<div id="filteredSearchTemplateBrand" data-tlc="store_sac#filterform;" data-filter="parent"class="brandFilterPage" >
+	<span class="displayNone" data-tlc="bind $title '.title'; apply --attrib='data-seo-title';"></span>
+	<span class="displayNone" data-tlc="bind $desc '.description'; apply --attrib='data-seo-desc';"></span>
+	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
+	<div data-tlc="bind $desc '.description'; apply --append;"></div>
+	<div class="defaultContent">
+		<ul data-tlc="bind $models '.models'; if(is $models --notblank;){{controller#loop --templateid='brandModelTemplate'; apply --append;}};" class="listStyleNone noPadOrMargin"></ul>
+	</div>
+	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList displayNone"></ul>
+</div>
+
+<ul>
+	<li id="brandModelTemplate" class="clear brandModelTemplate">
+		<h2 data-tlc="bind $var '.title'; apply --append;"></h2>
+		<div>
+			<img src="blank.gif" data-tlc="bind $src '.img'; store_sac#imageurl --name=$src --w='200' --h='200'; apply --attrib='src';" class="floatLeft"/>
+			<div>
+				<p data-tlc="bind $var '.description'; apply --append"></p>
+				<div class="modelStats">
+					<span class="title alignRight">Weight:</span>
+					<span data-tlc="bind $var '.weightScore'; apply --append"></span>
+				</div>
+				<div class="modelStats">
+					<span class="title alignRight">Ventilation:</span>
+					<span data-tlc="bind $var '.ventilationScore'; apply --append"></span>
+				</div>
+				<div class="modelStats">
+					<span class="title alignRight">Build Quality:</span>
+					<span data-tlc="bind $var '.buildScore'; apply --append"></span>
+				</div>
+				<div class="modelStats">
+					<span class="title alignRight">Fit:</span>
+					<span data-tlc="bind $var '.fitText'; apply --append"></span>
+				</div>
+				<div class="modelStats">
+					<span class="title alignRight">Ratings:</span>
+					<span data-tlc="bind $var '.ratingsText'; apply --append"></span>
+				</div>
+				<div class="modelStats">
+					<span class="title alignRight">Price Range:</span>
+					<span data-tlc="bind $var '.pricerangeText'; apply --append"></span>
+				</div>
+				
+			</div>
+		</div>
+		
+	</li>
+</ul>
+
 <form id="filterListTemplate" onSubmit="return false;" data-app-submit="store_filter|execFilteredSearch" data-tlc="bind $bf '.baseFilter'; stringify; apply --attrib='data-filter-base';">
 	<input data-tlc="bind $var '.base'; store_sac#assigndata  --attribute='filter-base' --legacy;" data-sac="filterBase" type="hidden">
 	
@@ -1268,9 +1317,13 @@ this will likely become more flexible in the future. ###
 		<ul data-tlc="bind $var '.session.recentCategories.0'; store_navcats#breadcrumb  --templateid='breadcrumbTemplate'  --legacy;" class="clearfix noPadOrMargin fluidList breadcrumb"></ul>
 	</div>
 	<div class="floatRight prodSideBar displayOnly_960 alignCenter">
+		<div data-tlc="bind $var '.%attribs.is:shipfree'; if(is $var --eq='1';){{apply --show --tag;}};" class="displayNone">
+			<img src="images/shipfree_banner_235x78.png"/>
+		</div>
+		<div data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{apply --show --tag;}};" class="displayNone">
+			<img src="blank.gif" data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{store_sac#imageurl --name=$var --w='235' --b='ffffff'; apply --attrib='src';}};"/>
+		</div>
 	<!-- Schad turned off, need to configure banners
-		<div data-tlc="bind $var '.%attribs.is:shipfree'; if(is $var --eq='1';){{apply --show --tag;}};" class="displayNone">Free Shipping</div>
-		<div data-tlc="bind $var '.%attribs.user:special_offer'; if(is $var --notblank;){{apply --show --tag;}};" class="displayNone">Special Offer</div>
 		<div>Recently Viewed Items</div>
 		-->
 	</div>
@@ -1437,9 +1490,13 @@ this will likely become more flexible in the future. ###
 	or the tab clicked won't open the right content.
 	It's done this way because ID's hard coded into template are bad mojo (templates are recycled) and because using data-binds to add id's caused some serious issues
 	-->
-		<div class="prodBanners clearLeft displayNone_960">
-			<div class="floatLeft">Free Shipping</div>
-			<div class="floatLeft">Special Offer</div>
+		<div class="prodBanners clearLeft displayNone_960 alignCenter">
+			<span data-tlc="bind $var '.%attribs.is:shipfree'; if(is $var --eq='1';){{apply --show --tag;}};" class="displayNone">
+				<img src="images/shipfree_banner_235x78.png"/>
+			</span>
+			<span data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{apply --show --tag;}};" class="displayNone">
+				<img src="blank.gif" data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{store_sac#imageurl --name=$var --h='78' --b='ffffff'; apply --attrib='src';}};"/>
+			</span>
 		</div>
 		<div data-tlc="bind $var '.pid'; apply --attrib='data-pid';" class="prodTabs tabbedProductContent clear applyAnytabs">
 			<ul class="tabs">

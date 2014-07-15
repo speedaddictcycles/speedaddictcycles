@@ -6,5 +6,29 @@
 		"user:suomy_model",
 		"user:finish",
 		"user:primary_color"
-	]
+	],
+	"models" : [
+		{
+			"title" : "Brand Model 1 - Click to Shop Model 1",
+			"img" : "suomy/01_402_l",
+			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
+			"weightScore" : "5",
+			"ventilationScore" : "5",
+			"buildScore" : "5",
+			"fitText" : "Runs small, intermediate oval",
+			"ratingsText" : "DOT and ECE 22.05",
+			"pricerangeText" : "$400-$499"
+			},
+		{
+			"title" : "Brand Model 2 - Click to Shop Model 2",
+			"img" : "suomy/01_407_l",
+			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
+			"weightScore" : "5",
+			"ventilationScore" : "4",
+			"buildScore" : "3",
+			"fitText" : "Runs small, intermediate oval",
+			"ratingsText" : "DOT and ECE 22.05",
+			"pricerangeText" : "$400-$499"
+			}
+		]
 }

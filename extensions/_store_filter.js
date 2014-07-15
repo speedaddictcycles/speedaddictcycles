@@ -29,6 +29,7 @@ var store_filter = function(_app) {
 	vars : {
 		templates : [
 			"filteredSearchTemplate",
+			"filteredSearchTemplateBrand"
 			],
 		filterLoadingComplete : false,
 		filterPages : [],
@@ -80,7 +81,7 @@ var store_filter = function(_app) {
 				_app.ext.store_filter.vars.filterPages = {push : queuePage}
 				
 				function showPage(routeObj){
-					routeObj.params.templateID = "filteredSearchTemplate";
+					routeObj.params.templateID = routeObj.params.templateID || "filteredSearchTemplate";
 					routeObj.params.dataset = $.extend(true, {}, _app.ext.store_filter.filterData[routeObj.params.id]);
 					
 					var optStrs = routeObj.params.dataset.optionList;
@@ -108,6 +109,20 @@ var store_filter = function(_app) {
 					}
 					
 				_app.router.addAlias('filter', function(routeObj){
+					if(_app.ext.store_filter.filterData[routeObj.params.id]){
+						showPage(routeObj);
+						}
+					else {
+						loadPage(
+							routeObj.params.id, 
+							function(){showPage(routeObj);}, 
+							function(){showContent('404');}
+							);
+						}
+					});
+				
+				_app.router.addAlias('brandFilter', function(routeObj){
+					routeObj.params.templateID = "filteredSearchTemplateBrand"
 					if(_app.ext.store_filter.filterData[routeObj.params.id]){
 						showPage(routeObj);
 						}

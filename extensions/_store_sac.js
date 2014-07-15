@@ -73,7 +73,7 @@ var store_sac = function(_app) {
 						}
 					});
 					
-				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
+				var filterComplete = function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
 					$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
 					$fc.addClass('active expand');
@@ -85,12 +85,18 @@ var store_sac = function(_app) {
 						clearTimeout($fc.data('hidetimer'));
 						$fc.off('mouseenter.sac');
 						});
-					});	
-				_app.templates.filteredSearchTemplate.on('depart.filter', function(event, $context, infoObj){
+					};
+				var filterDepart = function(event, $context, infoObj){
 					var $fc = $('#filterContainer');
 					$fc.removeClass('expand').removeClass('active');
 					$fc.off('mouseenter.sac');
-					});
+					};
+					
+				_app.templates.filteredSearchTemplate.on('complete.filter', filterComplete);	
+				_app.templates.filteredSearchTemplate.on('depart.filter', filterDepart);
+				
+				//Brand filters don't need filter complete, as they will show the filterContainer after a user selects a model
+				_app.templates.filteredSearchTemplateBrand.on('depart.filter', filterDepart);
 				
 				_app.router.appendHash({'type':'exact','route':'motorcycle-helmets/', 'callback':function(routeObj){
 					showContent('static',{'templateID':'helmetsTemplate'});
@@ -153,7 +159,7 @@ var store_sac = function(_app) {
 					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
 					}
 				
-				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter'});
+				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
 				var brandsPages = [
 					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
 					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
