@@ -159,7 +159,8 @@ var store_sac = function(_app) {
 					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
 					}
 				
-				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'brandFilter' /*use brandFilter later*/});
+				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
+				_app.router.appendHash({'type':'match','route':'test/brands/{{id}}/*','callback':'brandFilter'});
 				var brandsPages = [
 					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
 					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
