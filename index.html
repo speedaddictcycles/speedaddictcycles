@@ -792,7 +792,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
 </div>
 
-<div id="filteredSearchTemplateBrand" data-tlc="store_sac#filterform;" data-filter="parent"class="brandFilterPage" >
+<div id="filteredSearchTemplateBrand" data-tlc="store_sac#filterform;" data-filter="parent" class="brandFilterPage" >
 	<span class="displayNone" data-tlc="bind $title '.title'; apply --attrib='data-seo-title';"></span>
 	<span class="displayNone" data-tlc="bind $desc '.description'; apply --attrib='data-seo-desc';"></span>
 	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
@@ -800,39 +800,47 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<div class="defaultContent">
 		<ul data-tlc="bind $models '.models'; if(is $models --notblank;){{controller#loop --templateid='brandModelTemplate'; apply --append;}};" class="listStyleNone noPadOrMargin"></ul>
 	</div>
-	<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList displayNone"></ul>
+	<div class="clear"></div>
+	<div class="selectedContent displayNone">
+		<h5 class="pointer" data-app-click="store_sac|deselectBrandModel">Click here to shop for a different model</h5>
+		<ul data-filter="resultsList" class="listStyleNone fluidList noPadOrMargin productList"></ul>
+	</div>
 </div>
 
 <ul>
-	<li id="brandModelTemplate" class="clear brandModelTemplate">
+	<li id="brandModelTemplate" class="clear brandModelTemplate pointer" data-tlc="bind $var '.model'; apply --attrib='data-brand-model';" data-app-click="store_sac|selectBrandModel">
 		<h2 data-tlc="bind $var '.title'; apply --append;"></h2>
-		<div>
+		<div class="modelContainer">
 			<img src="blank.gif" data-tlc="bind $src '.img'; store_sac#imageurl --name=$src --w='200' --h='200'; apply --attrib='src';" class="floatLeft"/>
 			<div>
 				<p data-tlc="bind $var '.description'; apply --append"></p>
-				<div class="modelStats">
-					<span class="title alignRight">Weight:</span>
-					<span data-tlc="bind $var '.weightScore'; apply --append"></span>
+				<div>
+					<div class="modelStats">
+						<span class="title alignRight">Weight:</span>
+						<span data-tlc="bind $var '.weightScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
+					</div>
+					<div class="modelStats">
+						<span class="title alignRight">Ventilation:</span>
+						<span data-tlc="bind $var '.ventilationScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
+					</div>
+					<div class="modelStats">
+						<span class="title alignRight">Build Quality:</span>
+						<span data-tlc="bind $var '.buildScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
+					</div>
 				</div>
-				<div class="modelStats">
-					<span class="title alignRight">Ventilation:</span>
-					<span data-tlc="bind $var '.ventilationScore'; apply --append"></span>
-				</div>
-				<div class="modelStats">
-					<span class="title alignRight">Build Quality:</span>
-					<span data-tlc="bind $var '.buildScore'; apply --append"></span>
-				</div>
-				<div class="modelStats">
-					<span class="title alignRight">Fit:</span>
-					<span data-tlc="bind $var '.fitText'; apply --append"></span>
-				</div>
-				<div class="modelStats">
-					<span class="title alignRight">Ratings:</span>
-					<span data-tlc="bind $var '.ratingsText'; apply --append"></span>
-				</div>
-				<div class="modelStats">
-					<span class="title alignRight">Price Range:</span>
-					<span data-tlc="bind $var '.pricerangeText'; apply --append"></span>
+				<div class="clear">
+					<div class="modelStats">
+						<span class="title alignRight">Fit:</span>
+						<span data-tlc="bind $var '.fitText'; apply --append"></span>
+					</div>
+					<div class="modelStats">
+						<span class="title alignRight">Ratings:</span>
+						<span data-tlc="bind $var '.ratingsText'; apply --append"></span>
+					</div>
+					<div class="modelStats">
+						<span class="title alignRight">Price Range:</span>
+						<span data-tlc="bind $var '.pricerangeText'; apply --append"></span>
+					</div>
 				</div>
 				
 			</div>

@@ -159,7 +159,7 @@ var store_sac = function(_app) {
 					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
 					}
 				
-				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
+				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'brandFilter' /*use brandFilter later*/});
 				var brandsPages = [
 					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
 					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
@@ -255,11 +255,12 @@ var store_sac = function(_app) {
 				var $fl = $('#filterList', $fc);
 				$fl.removeData().empty();
 				
-				
+				$fl.data('dataset',data.value);
 				$fl.tlc({'dataset':data.value, 'templateid':'filterListTemplate'});
 				$('button', $fl).button();
 				
 				$('form',$fl).data('jqContext',$context);
+				
 				//$('form', $fl).trigger('submit');
 				}
 			},
@@ -523,6 +524,47 @@ var store_sac = function(_app) {
 				$ele.closest("[data-template-role='cart']").trigger('fetch',{'Q':'immutable'});
 				$ele.closest("[data-app-role='cartTemplateShippingContainer']").find("input[name='ship/postal']").val('');
 				_app.model.dispatchThis('immutable');
+				},
+			selectBrandModel : function($ele, p){
+				var $fc = $('#filterContainer');
+				$('input[name="'+$ele.attr('data-brand-model')+'"]', $fc).prop('checked',true);
+				
+				//Essentially the same as arriving on a filter page the first time
+				//$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
+				$('form', $fc).trigger('submit');
+				$fc.addClass('active expand');
+				var timer = setTimeout(function(){
+					$fc.removeClass('expand');
+					}, 4000);
+				$fc.data('hidetimer', timer);
+				$fc.on('mouseenter.sac', function(){
+					clearTimeout($fc.data('hidetimer'));
+					$fc.off('mouseenter.sac');
+					});
+					
+				//Show the list
+				var $context = $ele.closest('[data-filter="parent"]')
+				$('.defaultContent', $context).hide();
+				$('.selectedContent', $context).show();
+				
+				},
+			deselectBrandModel : function($ele, p){
+				
+				var $fc = $('#filterContainer');
+				$fc.removeClass('active expand');
+				var $fl = $('#filterList', $fc);
+				var dataset = $fl.data('dataset');
+				$fl.removeData().empty();
+				$fl.data('dataset', dataset);
+				$fl.tlc({'dataset':dataset, 'templateid':'filterListTemplate'});
+				$('button', $fl).button();
+				
+				
+				var $context = $ele.closest('[data-filter="parent"]')
+				$('.defaultContent', $context).show();
+				$('.selectedContent', $context).hide();
+				
+				$('form',$fl).data('jqContext',$context);
 				},
 			productAdd2Cart : function($form, p){
 				p.preventDefault();

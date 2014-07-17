@@ -251,8 +251,12 @@ CATEGORY PAGE STYLES
 BRAND PAGE STYLES
 
 *********************************************************/
+.brandFilterPage{overflow:hidden;}
 .brandFilterPage .defaultContent {color: #7c7c7c;}
-
+.modelContainer {border: 3px solid #7c7c7c;}
+.brandModelTemplate {margin: 15px;}
+.modelStats {font-weight:bold; font-size: 1.25em;}
+.modelStats .title { display:inline-block; width: 200px; margin-right: 10px;}
 /*********************************************************
 
 PRODUCT PAGE STYLES

@@ -276,6 +276,7 @@ var store_filter = function(_app) {
 				var $page = $form.data('jqContext');
 				p.preventDefault();
 				var $resultsContainer = $page.closest('[data-filter=parent]').find('[data-filter=resultsList]');
+				dump($form.attr('data-filter-base'));
 				var filterBase = JSON.parse($form.attr('data-filter-base'));
 				var elasticsearch = {
 					"filter" : {

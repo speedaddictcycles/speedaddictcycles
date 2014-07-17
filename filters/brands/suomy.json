@@ -10,22 +10,24 @@
 	"models" : [
 		{
 			"title" : "Brand Model 1 - Click to Shop Model 1",
+			"model" : "3logy",
 			"img" : "suomy/01_402_l",
 			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
-			"weightScore" : "5",
+			"weightScore" : "10",
 			"ventilationScore" : "5",
-			"buildScore" : "5",
+			"buildScore" : "8",
 			"fitText" : "Runs small, intermediate oval",
 			"ratingsText" : "DOT and ECE 22.05",
 			"pricerangeText" : "$400-$499"
 			},
 		{
 			"title" : "Brand Model 2 - Click to Shop Model 2",
+			"model" : "apex",
 			"img" : "suomy/01_407_l",
 			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
-			"weightScore" : "5",
-			"ventilationScore" : "4",
-			"buildScore" : "3",
+			"weightScore" : "7",
+			"ventilationScore" : "8",
+			"buildScore" : "6",
 			"fitText" : "Runs small, intermediate oval",
 			"ratingsText" : "DOT and ECE 22.05",
 			"pricerangeText" : "$400-$499"
