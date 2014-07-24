@@ -2264,12 +2264,21 @@ effects the display of the nav buttons only. should be run just after the handle
 					}
 				else if (infoObj.KEYWORDS) {
 					elasticsearch = _app.ext.store_search.u.buildElasticRaw({
-					   "filter":{
-						  "and" : [
-							 {"query":{"query_string":{"query":decodeURIComponent(infoObj.KEYWORDS), "fields":["prod_name^5","pid","prod_desc"]}}},
-							 {"has_child":{"type":"sku","query": {"range":{"available":{"gte":1}}}}} //only return item w/ inventory
-							 ]
-						  }});
+						"query":{
+							"function_score" : {										
+								"query" : {
+									"query_string":{"query":decodeURIComponent(infoObj.KEYWORDS), "fields":["prod_name","pid","prod_desc"]}	
+									},
+								"functions" : [
+									{
+										"filter" : {"query" : {"query_string":{"query":'"'+decodeURIComponent(infoObj.KEYWORDS)+'"', "fields":["prod_name","pid","prod_desc"]}}},
+										"script_score" : {"script":"10"}
+										}
+									],
+								"boost_mode" : "sum",
+								}
+							}
+						});
 					}
 				else	{
 					

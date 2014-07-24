@@ -798,6 +798,9 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<h2 data-tlc="bind $title '.title'; apply --append;"></h2>
 	<div data-tlc="bind $desc '.description'; apply --append;"></div>
 	<div class="defaultContent">
+		<div class="alignCenter">
+			<img src="blank.gif" data-tlc="bind $src '.brandBanner'; store_sac#imageurl --name=$src --h='150'; apply --attrib='src';" class=""/>
+		</div>
 		<ul data-tlc="bind $models '.models'; if(is $models --notblank;){{controller#loop --templateid='brandModelTemplate'; apply --append;}};" class="listStyleNone noPadOrMargin"></ul>
 	</div>
 	<div class="clear"></div>
@@ -810,44 +813,29 @@ don't modify the 'data-templateid' unless you are changing template names and up
 <ul>
 	<li id="brandModelTemplate" class="clear brandModelTemplate pointer" data-tlc="bind $var '.model'; apply --attrib='data-brand-model';" data-app-click="store_sac|selectBrandModel">
 		<h2 data-tlc="bind $var '.title'; apply --append;"></h2>
-		<div class="modelContainer">
-			<img src="blank.gif" data-tlc="bind $src '.img'; store_sac#imageurl --name=$src --w='200' --h='200'; apply --attrib='src';" class="floatLeft"/>
-			<div>
-				<p data-tlc="bind $var '.description'; apply --append"></p>
+		<div class="displayTableRow">
+			<div class="modelContainer displayTableCell">
+				<img src="blank.gif" data-tlc="bind $src '.img'; store_sac#imageurl --name=$src --w='200' --h='200'; apply --attrib='src';" class="floatLeft"/>
 				<div>
-					<div class="modelStats">
-						<span class="title alignRight">Weight:</span>
-						<span data-tlc="bind $var '.weightScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
-					</div>
-					<div class="modelStats">
-						<span class="title alignRight">Ventilation:</span>
-						<span data-tlc="bind $var '.ventilationScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
-					</div>
-					<div class="modelStats">
-						<span class="title alignRight">Build Quality:</span>
-						<span data-tlc="bind $var '.buildScore'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
-					</div>
+					<p data-tlc="bind $var '.description'; apply --append"></p>
+					<div data-tlc="bind $var '.scores'; controller#loop --templateid='brandScoreTemplate'; apply --append;"></div>
+					<div class="clear" data-tlc="bind $var '.tags'; controller#loop --templateid='brandTagTemplate'; apply --append;"></div>
 				</div>
-				<div class="clear">
-					<div class="modelStats">
-						<span class="title alignRight">Fit:</span>
-						<span data-tlc="bind $var '.fitText'; apply --append"></span>
-					</div>
-					<div class="modelStats">
-						<span class="title alignRight">Ratings:</span>
-						<span data-tlc="bind $var '.ratingsText'; apply --append"></span>
-					</div>
-					<div class="modelStats">
-						<span class="title alignRight">Price Range:</span>
-						<span data-tlc="bind $var '.pricerangeText'; apply --append"></span>
-					</div>
-				</div>
-				
 			</div>
+			<img src="blank.gif" data-tlc="bind $src '.promoBanner'; if(is $src --notblank;){{apply --show --tag; store_sac#imageurl --name=$src --w='100'; apply --attrib='src';}};" class="displayNone displayTableCell"/>
 		</div>
 		
 	</li>
 </ul>
+
+<div id="brandScoreTemplate" class="modelStats">
+	<span class="title alignRight" data-tlc="bind $var '.p'; format --append=':'; apply --append;"></span>
+	<span data-tlc="bind $var '.v'; format --prepend='review_'; apply --add --class='reviewSprite'; apply --add --class=$var"></span>
+</div>
+<div id="brandTagTemplate" class="modelStats">
+	<span class="title alignRight" data-tlc="bind $var '.p'; format --append=':'; apply --append;"></span>
+	<span data-tlc="bind $var '.v'; apply --append"></span>
+</div>
 
 <form id="filterListTemplate" onSubmit="return false;" data-app-submit="store_filter|execFilteredSearch" data-tlc="bind $bf '.baseFilter'; stringify; apply --attrib='data-filter-base';">
 	<input data-tlc="bind $var '.base'; store_sac#assigndata  --attribute='filter-base' --legacy;" data-sac="filterBase" type="hidden">

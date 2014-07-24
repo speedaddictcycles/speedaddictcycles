@@ -21,6 +21,10 @@ body {
 .highlightText{color:#d05626;}
 .extraHighlightText{color:#ed194b;}
 
+.displayTable {display: table;}
+.displayTableRow {display: table-row;}
+.displayTableCell {display: table-cell;}
+
 .headerGradientBG {
 	background: #ffe2b0; /* Old browsers */
 	background: -moz-linear-gradient(bottom,  #ffffff 10px, #ffe2b0 30px); /* FF3.6+ */
