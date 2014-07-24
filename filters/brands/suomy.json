@@ -6,8 +6,8 @@
 		"user:suomy_model",
 		"user:finish",
 		"user:primary_color"
-	],
-	"brandBanner" : "suomy/01_402_l",
+	]
+	"brandBanner" : "",
 	"models" : [
 		{
 			"title" : "Brand Model 1 - Click to Shop Model 1",
@@ -24,7 +24,7 @@
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
 				{"p" : "Price Range", "v" : "$400-$499", "highlight" : "1"}
 			],
-			"promoBanner" : "suomy/01_402_l"
+			"promoBanner" : "banner/suomy_visor_promo"
 		},
 		{
 			"title" : "Brand Model 2 - Click to Shop Model 2",
