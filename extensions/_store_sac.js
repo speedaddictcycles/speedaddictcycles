@@ -160,7 +160,7 @@ var store_sac = function(_app) {
 					}
 				
 				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
-				_app.router.appendHash({'type':'match','route':'test/brands/{{id}}/*','callback':'brandFilter'});
+				_app.router.appendHash({'type':'match','route':'brand-feature-reviews/{{id}}/*','callback':'brandFilter'});
 				var brandsPages = [
 					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
 					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
