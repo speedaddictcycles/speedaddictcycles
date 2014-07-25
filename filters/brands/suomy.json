@@ -6,18 +6,18 @@
 		"user:suomy_model",
 		"user:finish",
 		"user:primary_color"
-	]
+	],
 	"brandBanner" : "",
 	"models" : [
 		{
-			"title" : "Brand Model 1 - Click to Shop Model 1",
-			"model" : "3logy",
-			"img" : "suomy/01_402_l",
-			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
+			"title" : "Suomy SR Sport - Click to Shop",
+			"model" : "sr_sport",
+			"img" : "suomy/01_419_l",
+			"description" : "Suomy's newest and highest performance full face helmet.",
 			"scores" : [
-				{"p":"Weight", "v" : "10"},
-				{"p":"Ventilation", "v" : "5"},
-				{"p":"Build Quality", "v" : "8"}
+				{"p":"Weight", "v" : "8"},
+				{"p":"Ventilation", "v" : "8"},
+				{"p":"Build Quality", "v" : "9"}
 			],
 			"tags" : [
 				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
@@ -27,20 +27,54 @@
 			"promoBanner" : "banner/suomy_visor_promo"
 		},
 		{
-			"title" : "Brand Model 2 - Click to Shop Model 2",
+			"title" : "Suomy Apex - Click to Shop",
 			"model" : "apex",
-			"img" : "suomy/01_407_l",
-			"description" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam imperdiet dapibus risus, eu imperdiet neque lobortis a. Nunc sodales elit et ipsum condimentum, ut cursus velit hendrerit. Phasellus ultricies tortor quam, a egestas ante egestas non. Nam suscipit malesuada consectetur. Aliquam bibendum pharetra sollicitudin. Duis congue facilisis turpis, in commodo.",
+			"img" : "suomy/ktap0019_sac",
+			"description" : "The Apex is Suomy's lightest full face helmet EVER! Thanks to extensive wind tunnel testing it's also among quietest and best ventilating.",
 			"scores" : [
-				{"p":"Weight", "v" : "7"},
+				{"p":"Weight", "v" : "9"},
+				{"p":"Ventilation", "v" : "7"},
+				{"p":"Build Quality", "v" : "7"}
+			],
+			"tags" : [
+				{"p" : "Fit", "v" : "Runs very small, intermediate oval"},
+				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
+				{"p" : "Price Range", "v" : "$239-$346", "highlight" : "1"}
+			],
+			"promoBanner" : "banner/suomy_visor_promo"
+		},
+		{
+			"title" : "Suomy MX Tour - Click to Shop",
+			"model" : "mx_tour",
+			"img" : "suomy/01_511_l",
+			"description" : "Retractable light smoke colored internal sun shade fights glare and keeps your eyes on the road. Ultra lightweight kevlar-composite weave shell reduces neck strain on long rides. Advanced ventilation system consisting of 3 air intake points, 4 exhaust vents, and integrated channeled EVS foam.",
+			"scores" : [
+				{"p":"Weight", "v" : "9"},
 				{"p":"Ventilation", "v" : "8"},
-				{"p":"Build Quality", "v" : "6"}
+				{"p":"Build Quality", "v" : "7"}
 			],
 			"tags" : [
 				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
-				{"p" : "Price Range", "v" : "$400-$499", "highlight" : "1"}
+				{"p" : "Price Range", "v" : "$349-$374", "highlight" : "1"}
 			]
+		},
+		{
+			"title" : "Suomy Mr Jump (MX) - Click to Shop",
+			"model" : "mr_jump",
+			"img" : "suomy/suomy_mr_jump_jackpot_white_left",
+			"description" : "Coming in at just under 2.5 lbs (size LG) Suomy's Mr Jump MX is truly one of the lightest helmets on the market today.  Hand made in Italy, customizable fit, and killer graphics make this lid tough to beat.  We're even throwing in a set of ProGrip goggles with every purchase!",
+			"scores" : [
+				{"p":"Weight", "v" : "10"},
+				{"p":"Ventilation", "v" : "9"},
+				{"p":"Build Quality", "v" : "7"}
+			],
+			"tags" : [
+				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
+				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
+				{"p" : "Price Range", "v" : "$274-$359", "highlight" : "1"}
+			],
+			"promoBanner" : "banner/progrip_3303_carbon_promo"
 		}
 	]
 }
