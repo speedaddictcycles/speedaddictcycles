@@ -152,7 +152,8 @@ var store_sac = function(_app) {
 					{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
 					{id:'tools',jsonPath:'filters/apparel/tools.json'},
 					{id:'security',jsonPath:'filters/apparel/security.json'},
-					{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'}
+					{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'},
+					{id:'hitcase',jsonPath:'filters/apparel/hitcase.json'}
 					];
 				for(var i in apparelPages){	
 					_app.ext.store_filter.vars.filterPages.push(apparelPages[i]);
