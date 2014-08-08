@@ -13,14 +13,14 @@
 			"title" : "Suomy SR Sport - Click to Shop",
 			"model" : "sr_sport",
 			"img" : "suomy/01_419_l",
-			"description" : "Suomy's newest and highest performance full face helmet.",
+			"description" : "Suomy's top tier full face street helmet.  Now part of Suomy's return to MotoGP on top of Andrew Dovizioso, the SR Sport is the real deal.  Still very much a light, high performance sport helmet, the SR Sport has a few creature comforts it's predecessors did not.  Included in that list an integrated chin curtain, more posh interior, and pod-less shield changes.  It was a long wait, but the Italian's did not disappoint.",
 			"scores" : [
 				{"p":"Weight", "v" : "8"},
 				{"p":"Ventilation", "v" : "8"},
 				{"p":"Build Quality", "v" : "9"}
 			],
 			"tags" : [
-				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
+				{"p" : "Fit", "v" : "Runs Snug, Intermediate Oval"},
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
 				{"p" : "Price Range", "v" : "$400-$499", "highlight" : "1"}
 			],
@@ -30,14 +30,14 @@
 			"title" : "Suomy Apex - Click to Shop",
 			"model" : "apex",
 			"img" : "suomy/ktap0019_sac",
-			"description" : "The Apex is Suomy's lightest full face helmet EVER! Thanks to extensive wind tunnel testing it's also among quietest and best ventilating.",
+			"description" : "Coming in one to two ounces lighter than the SR Sport, the Apex is amazingly light and little easier on the pocket book.  A round shape and three shell sizes make for a very snug fit, most street riders move up one size when fitting an Apex.  Do note the Apex is structurally identical to the Spec 1R; meaning it fits the same and uses the same visors.  The finish and graphics are not on the same level as the SR Sport, but for under $400 this helmet can't be beat.",
 			"scores" : [
 				{"p":"Weight", "v" : "9"},
 				{"p":"Ventilation", "v" : "7"},
 				{"p":"Build Quality", "v" : "7"}
 			],
 			"tags" : [
-				{"p" : "Fit", "v" : "Runs very small, intermediate oval"},
+				{"p" : "Fit", "v" : "Runs Small, Round"},
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
 				{"p" : "Price Range", "v" : "$239-$346", "highlight" : "1"}
 			],
@@ -47,14 +47,14 @@
 			"title" : "Suomy MX Tour - Click to Shop",
 			"model" : "mx_tour",
 			"img" : "suomy/01_511_l",
-			"description" : "Retractable light smoke colored internal sun shade fights glare and keeps your eyes on the road. Ultra lightweight kevlar-composite weave shell reduces neck strain on long rides. Advanced ventilation system consisting of 3 air intake points, 4 exhaust vents, and integrated channeled EVS foam.",
+			"description" : "Dual sport helmets have a reputation for being jack of all trades and master of none.  We can tell you the Suomy MX Tour is an exception.  For starters you can hit freeways speeds and not worry about the visor jerking your head around.  This is  the number one complaint with dual sport lids.  Additionally Suomy was able to include a killer internal sun shield (very smooth action) and keep the weight down.  This is the lightest dual sport helmet we've tested to date.  Expect the MX Tour to fit snug, especially in the face.",
 			"scores" : [
 				{"p":"Weight", "v" : "9"},
 				{"p":"Ventilation", "v" : "8"},
 				{"p":"Build Quality", "v" : "7"}
 			],
 			"tags" : [
-				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
+				{"p" : "Fit", "v" : "Runs Snug, Intermediate oval"},
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
 				{"p" : "Price Range", "v" : "$349-$374", "highlight" : "1"}
 			]
@@ -63,14 +63,14 @@
 			"title" : "Suomy Mr Jump (MX) - Click to Shop",
 			"model" : "mr_jump",
 			"img" : "suomy/suomy_mr_jump_jackpot_white_left",
-			"description" : "Coming in at just under 2.5 lbs (size LG) Suomy's Mr Jump MX is truly one of the lightest helmets on the market today.  Hand made in Italy, customizable fit, and killer graphics make this lid tough to beat.  We're even throwing in a set of ProGrip goggles with every purchase!",
+			"description" : "Just under 2.5 lbs (size LG) Suomy's Mr Jump MX is truly one of the lightest helmets on the market today.  We also love the Airoh Aviator, BUT the Suomy is 2-3 ounces lighter and $200 less.  Throw in killer graphics, huge eye-port, removable washable liner, and extremely solid ventilation for under $400!?  No wonder we can barely keep them in stock.",
 			"scores" : [
 				{"p":"Weight", "v" : "10"},
 				{"p":"Ventilation", "v" : "9"},
 				{"p":"Build Quality", "v" : "7"}
 			],
 			"tags" : [
-				{"p" : "Fit", "v" : "Runs small, intermediate oval"},
+				{"p" : "Fit", "v" : "Runs Snug, Intermediate oval"},
 				{"p" : "Ratings", "v" : "DOT and ECE 22.05"},
 				{"p" : "Price Range", "v" : "$274-$359", "highlight" : "1"}
 			],
