@@ -138,6 +138,7 @@ var store_sac = function(_app) {
 					{id:'suspension',jsonPath:'filters/parts/suspension.json'},
 					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
 					{id:'controls',jsonPath:'filters/parts/controls.json'},
+					{id:'repair-manual',jsonPath:'filters/parts/repair-manual.json'},
 					{id:'chain',jsonPath:'filters/parts/chain.json'}
 					];
 				for(var i in partsPages){	
