@@ -902,11 +902,11 @@ don't modify the 'data-templateid' unless you are changing template names and up
 				bind $cbl '.options.user:progressive_model.options'; 
 				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
-	<div data-tlc="bind $var '.options.user:make_key'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+	<div data-tlc="bind $var '.options.user:single_make'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
 		<h5 class="highlightBG_2">Fits:</h5>
 		<div class="filterCheckboxList" 
-			data-tlc="bind $index '.options.user:make_key.index';
-				bind $cbl '.options.user:make_key.options'; 
+			data-tlc="bind $index '.options.user:single_make.index';
+				bind $cbl '.options.user:single_make.options'; 
 				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>
 	<div data-tlc="bind $var '.options.user:apparel_accessories'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">

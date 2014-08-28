@@ -3,7 +3,6 @@
 	"baseFilter" : {"term" : {"app_brand" : "progressive"}},
 	"optionList" : [
 		"user:progressive_model",
-		"user:make_key",
 		"user:measures",
 		"user:finish"
 	]

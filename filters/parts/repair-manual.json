@@ -1,8 +1,8 @@
 {
 	"title" : "Repair Manuals - Motorcycle Parts",
-	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"manual"}}]},
+	"baseFilter" : {"term" : {"app_brand" : "clymer"}},
 	"optionList" : [
-		"user:make_key",
+		"user:single_make",
 		"user:riding_style"
 	]
 }

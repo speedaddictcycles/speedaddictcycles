@@ -3,6 +3,6 @@
 	"baseFilter" : {"term" : {"app_brand" : "bmc"}},
 	"optionList" : [
 		"user:part_helper",
-		"user:make_key"
+		"user:single_make"
 	]
 }

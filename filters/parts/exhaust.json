@@ -2,7 +2,7 @@
 	"title" : "Exhaust - Motorcycle Parts",
 	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"exhaust"}}]},
 	"optionList" : [
-		"user:make_key",
+		"user:single_make",
 		"user:app_brand",
 		"user:exhaust_type",
 		"user:finish"
