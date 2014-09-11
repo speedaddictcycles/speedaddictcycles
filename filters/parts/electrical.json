@@ -2,6 +2,7 @@
 	"title" : "Electrical - Motorcycle Parts",
 	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"electrical"}}]},
 	"optionList" : [
+		"user:app_brand",
 		"user:part_sub_type"
 	]
 }
