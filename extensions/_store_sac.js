@@ -192,6 +192,16 @@ var store_sac = function(_app) {
 					_app.ext.seo_robots.vars.pages.push("#!brands/"+brandsPages[i].id+"/");
 					}
 				_app.ext.store_search.vars.universalFilters.push({"term":{"showtime":"1"}});
+				
+				
+				
+				_app.templates.productTemplate.on('complete.childcheck', function(event, $context, infoObj){
+					var pid = infoObj.pid;
+					var data = _app.data["appProductGet|"+pid];
+					if(data["%attribs"]["zoovy:grp_parent"]){
+						window.location.hash = "#!product/"+data["%attribs"]["zoovy:grp_parent"]+"/"
+						}
+					});
 				},
 			onError : function(){
 				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');
