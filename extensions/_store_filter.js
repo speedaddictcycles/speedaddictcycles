@@ -266,7 +266,7 @@ var store_filter = function(_app) {
 		e : {
 			execFilteredSearch : function($form, p){
 				var loadFullList = $form.data('loadFullList');
-				// dump("Executing Filtered Search");
+				dump("Executing Filtered Search");
 				if(loadFullList){
 					_app.ext.store_filter.vars.filterLoadingComplete = false;
 					}

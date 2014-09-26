@@ -284,12 +284,13 @@ else	{
 							}
 						}
 					}
-			
-				if(_app.data[_rtag.datapointer].hits.total <= EQ.size)	{
-					$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
-					_app.ext.store_filter.vars.filterLoadingComplete = true;
-					} //do nothing. fewer than 1 page worth of items.
-				else if(currPage >= totalPages)	{
+				
+				// if(_app.data[_rtag.datapointer].hits.total <= EQ.size)	{
+					// $tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
+					// _app.ext.store_swc.vars.filterLoadingComplete = true;
+					// } //do nothing. fewer than 1 page worth of items.
+				// else 
+				if(currPage >= totalPages)	{
 				//reached the last 'page'. disable infinitescroll.
 					$(window).off('scroll.infiniteScroll');
 					$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();

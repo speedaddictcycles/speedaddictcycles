@@ -1062,7 +1062,7 @@ don't modify the 'data-templateid' unless you are changing template names and up
 	<select data-bind="var:filter(options); index:primary_color; format:filterSelect; extension:store_sac;"></select>
 	<select data-bind="var:filter(options); index:accent_color; format:filterSelect; extension:store_sac;"></select>
 	-->
-	<button onClick="$(this).closest('form').trigger('submit');">Go!</button>
+	<button onClick="$(this).closest('form').trigger('submit'); return false;">Go!</button>
 </form>
 
 <select>

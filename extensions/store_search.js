@@ -328,6 +328,7 @@ _app.u.dump(" -> pageInFocus: "+pageInFocus);
 				},
 
 			changePage : function($list,newPage,_tag)	{
+				dump("changing page!"); dump(newPage);
 				if($list && newPage)	{
 					var EQ = $list.data('elastic-query'); //Elastic Query
 //					_app.u.dump(" -> newPage: " + newPage);
