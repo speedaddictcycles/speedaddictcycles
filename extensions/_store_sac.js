@@ -178,6 +178,7 @@ var store_sac = function(_app) {
 					{id:'olympia',jsonPath:'filters/brands/olympia.json'},
 					{id:'onguard',jsonPath:'filters/brands/onguard.json'},
 					{id:'progressive',jsonPath:'filters/brands/progressive.json'},
+					{id:'progrip',jsonPath:'filters/brands/progrip.json'},
 					{id:'racepro',jsonPath:'filters/brands/racepro.json'},
 					{id:'rk',jsonPath:'filters/brands/rk.json'},
 					{id:'shoei',jsonPath:'filters/brands/shoei.json'},

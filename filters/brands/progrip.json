@@ -1,0 +1,7 @@
+{
+	"title" : "ProGrip Motocross Gear",
+	"baseFilter" : {"term" : {"app_brand" : "pro_grip"}},
+	"optionList" : [
+		"user:apparel_accessories"
+	]
+}
