@@ -149,6 +149,7 @@ var store_sac = function(_app) {
 				_app.router.appendHash({'type':'match','route':'apparel/{{id}}/*','callback':'filter'});
 				var apparelPages = [
 					{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
+					{id:'goggles',jsonPath:'filters/apparel/goggles.json'},
 					{id:'grips',jsonPath:'filters/apparel/grips.json'},
 					{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
 					{id:'tools',jsonPath:'filters/apparel/tools.json'},
