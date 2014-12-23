@@ -1,0 +1,8 @@
+{
+	"title" : "Tires - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"tire"}}]},
+	"optionList" : [
+		"user:riding_style",
+		"user:app_brand"
+	]
+}

@@ -139,7 +139,8 @@ var store_sac = function(_app) {
 					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
 					{id:'controls',jsonPath:'filters/parts/controls.json'},
 					{id:'repair-manual',jsonPath:'filters/parts/repair-manual.json'},
-					{id:'chain',jsonPath:'filters/parts/chain.json'}
+					{id:'chain',jsonPath:'filters/parts/chain.json'},
+					{id:'tires',jsonPath:'filters/parts/tires.json'}
 					];
 				for(var i in partsPages){	
 					_app.ext.store_filter.vars.filterPages.push(partsPages[i]);
