@@ -55,7 +55,7 @@ var admin_task = function(_app) {
 			onSuccess : function()	{
 				var r = true; //return false if extension won't load for some reason (account config, dependencies, etc).
 
-				_app.model.fetchNLoadTemplates(_app.vars.baseURL+'extensions/admin/task.html',theseTemplates);
+				// _app.model.fetchNLoadTemplates(_app.vars.baseURL+'extensions/admin/task.html',theseTemplates);
 
 //used for the add new modal.
 $('body').append("<div id='createTaskModal' class='displayNone' title='Create a new task'></div>");
@@ -101,7 +101,9 @@ $('#createTaskModal').dialog({'autoOpen':false,'modal':true,'width':500});
 						} //don't include tasks completed more than a few days ago
 					else	{
 						//tasks completed in the last 3 days do not count against the 100 task max. so the user gets 100 active tasks.
-						if(Number(tasks[i].completed_gmt) > 0)	{}
+						if(Number(tasks[i].completed_gmt) > 0)	{
+							// don't show completed tasks
+							}
 						else	{
 							inc++;
 							}
@@ -142,7 +144,7 @@ $('#createTaskModal').dialog({'autoOpen':false,'modal':true,'width':500});
 					'controls' : "<button data-app-click='admin|checkAllCheckboxesExec' class='applyButton marginRight'>Select All<\/button><span class='applyButtonset smallButton'>Modify Selected:	<button data-app-click='admin_task|adminTaskCompletedBulkExec'>Tag as Completed</button><button data-app-click='admin_task|adminTaskRemoveBulkConfirm'>Deleted</button><\/span>",
 					'cmdVars' : {
 						'_cmd' : 'adminTaskList',
-						'limit' : '50', //not supported for every call yet.
+						'limit' : '100', //not supported for every call yet.
 						'_tag' : {
 							'datapointer':'adminTaskList',
 							'extension' : 'admin_task',
@@ -262,7 +264,7 @@ $('#createTaskModal').dialog({'autoOpen':false,'modal':true,'width':500});
 				
 						_app.model.addDispatchToQ({
 							'_cmd' : 'adminTaskList',
-							'limit' : '50', //not supported for every call yet.
+							'limit' : '100', //not supported for every call yet.
 							'_tag' : {
 								'datapointer':'adminTaskList',
 								'extension' : 'admin_task',
@@ -290,7 +292,7 @@ $('#createTaskModal').dialog({'autoOpen':false,'modal':true,'width':500});
 						});
 					_app.model.addDispatchToQ({
 						'_cmd' : 'adminTaskList',
-						'limit' : '50', //not supported for every call yet.
+						'limit' : '100', //not supported for every call yet.
 						'_tag' : {
 							'datapointer':'adminTaskList',
 							'extension' : 'admin_task',

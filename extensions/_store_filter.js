@@ -90,8 +90,8 @@ var store_filter = function(_app) {
 						var o = optStrs[i];
 						if(_app.ext.store_filter.vars.elasticFields[o]){
 							routeObj.params.dataset.options[o] = $.extend(true, {}, _app.ext.store_filter.vars.elasticFields[o]);
-							if(routeObj.hashParams[o]){
-								var values = routeObj.hashParams[o].split('|');
+							if(routeObj.searchParams && routeObj.searchParams[o]){
+								var values = routeObj.searchParams[o].split('|');
 								for(var i in routeObj.params.dataset.options[o].options){
 									var option = routeObj.params.dataset.options[o].options[i];
 									if($.inArray(option.v, values) >= 0){
@@ -104,8 +104,11 @@ var store_filter = function(_app) {
 							dump("Unrecognized option "+o+" on filter page "+routeObj.params.id);
 							}
 						}
-					routeObj.params.loadFullList = _app.ext.seo_robots.u.isRobotPresent();
-					showContent('static',routeObj.params);
+					// routeObj.params.loadFullList = _app.ext.seo_robots.u.isRobotPresent();
+					routeObj.params.loadFullList = false;
+					routeObj.params.pageType = 'static';
+					routeObj.params.require = ['store_search','prodlist_infinite'];
+					_app.ext.quickstart.a.showContent(routeObj.value,routeObj.params);
 					}
 					
 				_app.router.addAlias('filter', function(routeObj){
@@ -116,7 +119,7 @@ var store_filter = function(_app) {
 						loadPage(
 							routeObj.params.id, 
 							function(){showPage(routeObj);}, 
-							function(){showContent('404');}
+							function(){_app.router.handleURIString('/404');}
 							);
 						}
 					});
@@ -130,7 +133,7 @@ var store_filter = function(_app) {
 						loadPage(
 							routeObj.params.id, 
 							function(){showPage(routeObj);}, 
-							function(){showContent('404');}
+							function(){_app.router.handleURIString('/404');}
 							);
 						}
 					});
@@ -146,16 +149,6 @@ var store_filter = function(_app) {
 //errors will get reported for this callback as part of the extensions loading.  This is here for extra error handling purposes.
 //you may or may not need it.
 				_app.u.dump('BEGIN store_filter.callbacks.init.onError');
-				}
-			},
-		attachEventHandlers : {
-			onSuccess : function(){
-				_app.templates.filteredSearchTemplate.on('complete.filter', function(event, $context, infoObj){
-					//$('form[data-filter=filterList]', $context).trigger('submit');
-					});
-				},
-			onError : function(){
-				_app.u.dump('BEGIN store_filter.callbacks.attachEventHandlers.onError');
 				}
 			},
 		handleElasticFields : {
@@ -403,7 +396,12 @@ var store_filter = function(_app) {
 				_app.model.dispatchThis();
 				
 				}
-			} //e [app Events]
+			}, //e [app Events]
+		couplers : {
+			addPage : function(args){
+				_app.ext.store_filter.vars.filterPageLoadQueue[args.id] = args;
+				}
+			}
 		} //r object.
 	return r;
 	}

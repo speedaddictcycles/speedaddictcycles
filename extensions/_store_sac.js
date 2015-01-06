@@ -45,170 +45,6 @@ var store_sac = function(_app) {
 			onError : function()	{
 				_app.u.dump('BEGIN store_sac.callbacks.init.onError');
 				}
-			},
-			
-		attachEventHandlers : {
-			onSuccess : function(){
-				dump('attaching custom handlers');
-				_app.templates.homepageTemplate.on('complete.sac',function(event, $context, infoObj){
-					_app.ext.store_sac.u.startHomepageSlideshow();
-					
-					var $carousel = $('[data-sac=carousel]',$context);
-					if($carousel.hasClass('carouselRendered')){
-						//already rendered
-						}
-					else {
-						$carousel.addClass('carouselRendered')
-						setTimeout(function(){
-							$carousel.carouFredSel({
-								"responsive":true,
-								"width":200,
-								"height":"auto",
-								"auto" : { "play" : false },
-								"items" : { "visible" : 3},
-								"prev" : { "button" : $('#homepageFeaturesCarouselPrev') },
-								"next" : { "button" : $('#homepageFeaturesCarouselNext') }
-								},{"debug" : false});
-							},1000);
-						}
-					});
-					
-				var filterComplete = function(event, $context, infoObj){
-					var $fc = $('#filterContainer');
-					$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
-					$fc.addClass('active expand');
-					var timer = setTimeout(function(){
-						$fc.removeClass('expand');
-						}, 4000);
-					$fc.data('hidetimer', timer);
-					$fc.on('mouseenter.sac', function(){
-						clearTimeout($fc.data('hidetimer'));
-						$fc.off('mouseenter.sac');
-						});
-					};
-				var filterDepart = function(event, $context, infoObj){
-					var $fc = $('#filterContainer');
-					$fc.removeClass('expand').removeClass('active');
-					$fc.off('mouseenter.sac');
-					};
-					
-				_app.templates.filteredSearchTemplate.on('complete.filter', filterComplete);	
-				_app.templates.filteredSearchTemplate.on('depart.filter', filterDepart);
-				
-				//Brand filters don't need filter complete, as they will show the filterContainer after a user selects a model
-				_app.templates.filteredSearchTemplateBrand.on('depart.filter', filterDepart);
-				
-				_app.router.appendHash({'type':'exact','route':'motorcycle-helmets/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'helmetsTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'parts/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'partsTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'apparel/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'apparelTemplate'});
-					}});
-				_app.router.appendHash({'type':'exact','route':'brands/', 'callback':function(routeObj){
-					showContent('static',{'templateID':'brandsTemplate'});
-					}});
-				
-				//Adds the listener for the url.  The route needs to match the page pushed into robots below
-				_app.router.appendHash({'type':'match','route':'motorcycle-helmets/{{id}}/*','callback':'filter'});
-				//This is the list of helmet pages.  The ID is part of the URL- change this for SEO reasons- the jsonPath is the file where it loads the options from.  The jsonPath doesn't matter as long as it loads the file
-				var helmetPages = [
-					{id:'dirt-bike',jsonPath:'filters/helmets/dirt-bike.json'},
-					{id:'accessories',jsonPath:'filters/helmets/helmet-accessories.json'},
-					{id:'dual-sport',jsonPath:'filters/helmets/dual-sport.json'},
-					{id:'half-shell',jsonPath:'filters/helmets/half-shell.json'},
-					{id:'modular',jsonPath:'filters/helmets/modular.json'},
-					{id:'three-quarter',jsonPath:'filters/helmets/three-quarter.json'},
-					{id:'full-face',jsonPath:'filters/helmets/full-face.json'}
-					];
-				for(var i in helmetPages){	
-					_app.ext.store_filter.vars.filterPages.push(helmetPages[i]);
-					//this page needs to match the route above
-					_app.ext.seo_robots.vars.pages.push("#!motorcycle-helmets/"+helmetPages[i].id+"/");
-					}
-				
-				_app.router.appendHash({'type':'match','route':'parts/{{id}}/*','callback':'filter'});
-				var partsPages = [
-					{id:'chain-and-sprocket-kits',jsonPath:'filters/parts/chain-kits.json'},
-					{id:'electrical',jsonPath:'filters/parts/electrical.json'},
-					{id:'exhaust',jsonPath:'filters/parts/exhaust.json'},
-					{id:'intake',jsonPath:'filters/parts/intake.json'},
-					{id:'suspension',jsonPath:'filters/parts/suspension.json'},
-					{id:'brakes',jsonPath:'filters/parts/brakes.json'},
-					{id:'controls',jsonPath:'filters/parts/controls.json'},
-					{id:'repair-manual',jsonPath:'filters/parts/repair-manual.json'},
-					{id:'chain',jsonPath:'filters/parts/chain.json'},
-					{id:'tires',jsonPath:'filters/parts/tires.json'}
-					];
-				for(var i in partsPages){	
-					_app.ext.store_filter.vars.filterPages.push(partsPages[i]);
-					_app.ext.seo_robots.vars.pages.push("#!parts/"+partsPages[i].id+"/");
-					}
-				
-				_app.router.appendHash({'type':'match','route':'apparel/{{id}}/*','callback':'filter'});
-				var apparelPages = [
-					{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
-					{id:'goggles',jsonPath:'filters/apparel/goggles.json'},
-					{id:'grips',jsonPath:'filters/apparel/grips.json'},
-					{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
-					{id:'tools',jsonPath:'filters/apparel/tools.json'},
-					{id:'security',jsonPath:'filters/apparel/security.json'},
-					{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'},
-					{id:'hitcase',jsonPath:'filters/apparel/hitcase.json'}
-					];
-				for(var i in apparelPages){	
-					_app.ext.store_filter.vars.filterPages.push(apparelPages[i]);
-					_app.ext.seo_robots.vars.pages.push("#!apparel/"+apparelPages[i].id+"/");
-					}
-				
-				_app.router.appendHash({'type':'match','route':'brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
-				_app.router.appendHash({'type':'match','route':'brand-feature-reviews/{{id}}/*','callback':'brandFilter'});
-				var brandsPages = [
-					{id:'airoh',jsonPath:'filters/brands/airoh.json'},
-					{id:'ancra',jsonPath:'filters/brands/ancra.json'},
-					{id:'answer',jsonPath:'filters/brands/answer.json'},
-					{id:'arai',jsonPath:'filters/brands/arai.json'},
-					{id:'bmc',jsonPath:'filters/brands/bmc.json'},
-					{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
-					{id:'giant-loop',jsonPath:'filters/brands/giant-loop.json'},
-					{id:'hjc',jsonPath:'filters/brands/hjc.json'},
-					{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
-					{id:'leovince',jsonPath:'filters/brands/leovince.json'},
-					{id:'msr',jsonPath:'filters/brands/msr.json'},
-					{id:'olympia',jsonPath:'filters/brands/olympia.json'},
-					{id:'onguard',jsonPath:'filters/brands/onguard.json'},
-					{id:'progressive',jsonPath:'filters/brands/progressive.json'},
-					{id:'progrip',jsonPath:'filters/brands/progrip.json'},
-					{id:'racepro',jsonPath:'filters/brands/racepro.json'},
-					{id:'rk',jsonPath:'filters/brands/rk.json'},
-					{id:'shoei',jsonPath:'filters/brands/shoei.json'},
-					{id:'skid-lid',jsonPath:'filters/brands/skid-lid.json'},
-					{id:'speed-and-strength',jsonPath:'filters/brands/speed-and-strength.json'},
-					{id:'suomy',jsonPath:'filters/brands/suomy.json'},
-					{id:'thh',jsonPath:'filters/brands/thh.json'},
-					{id:'yuasa',jsonPath:'filters/brands/yuasa.json'}
-					];
-				for(var i in brandsPages){	
-					_app.ext.store_filter.vars.filterPages.push(brandsPages[i]);
-					_app.ext.seo_robots.vars.pages.push("#!brands/"+brandsPages[i].id+"/");
-					}
-				_app.ext.store_search.vars.universalFilters.push({"term":{"showtime":"1"}});
-				
-				
-				
-				_app.templates.productTemplate.on('complete.childcheck', function(event, $context, infoObj){
-					var pid = infoObj.pid;
-					var data = _app.data["appProductGet|"+pid];
-					if(data["%attribs"]["zoovy:grp_parent"]){
-						window.location.hash = "#!product/"+data["%attribs"]["zoovy:grp_parent"]+"/"
-						}
-					});
-				},
-			onError : function(){
-				dump('BEGIN store_sac.callbacks.attachEventHandlers.onError');
-				}
 			}
 		}, //callbacks
 
@@ -373,7 +209,7 @@ var store_sac = function(_app) {
 			startHomepageSlideshow : function(attempts){
 				attempts = attempts || 0;
 				if(_app.ext.store_sac.vars.bannerJSON){
-					var $slideshow = $('#homepageSlideshow');
+					var $slideshow = $('.homepageSlideshow');
 					if($slideshow.hasClass('slideshowRendered')){
 						dump('slideshow already here');
 						//already rendered, do nothing.
@@ -613,7 +449,7 @@ var store_sac = function(_app) {
 			searchFormSubmit : function($form, p){
 				p.preventDefault();
 				var json = $form.serializeJSON();
-				window.location.hash = "#!search/keywords/"+json.search+"/";
+				//window.location.hash = "#!search/keywords/"+json.search+"/";
 			}
 			}, //e [app Events]
 			

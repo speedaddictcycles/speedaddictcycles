@@ -34,49 +34,12 @@ var store_tracking = function(_app) {
 				var r = false; 
 				
 				r = true;
+				// _app.u.dump('store_tracking.init.onSuccess')
 
 				return r;
 				},
 			onError : function()	{
 				_app.u.dump('BEGIN store_tracking.callbacks.init.onError');
-				}
-			},
-		attachHandlers : {
-			onSuccess : function(){
-				_app.ext.order_create.checkoutCompletes.push(function(P){
-					if(P && P.datapointer && _app.data[P.datapointer] && _app.data[P.datapointer].order){
-						var order = _app.data[P.datapointer].order;
-						var plugins = zGlobals.plugins;
-						
-						//analytics tracking
-						ga('ecommerce:addTransaction', {
-							'id' : order.orderid,
-							'revenue' : order.sum.item_total,
-							'shipping' : order.sum.shp_total,
-							'tax' : order.sum.tax_total
-							});
-						for(var i in order['@ITEMS']){
-							var item = order['@ITEMS'][i];
-							ga('ecommerce:addItem', {
-								'id' : order.orderid,
-								'name' : item.prod_name,
-								'sku' : item.sku,
-								'price' : item.base_price,
-								'qty' : item.qty,
-								})
-							}
-						ga('ecommerce:send');
-						
-						for(var i in plugins){
-							if(_app.ext.store_tracking.trackers[i] && _app.ext.store_tracking.trackers[i].enable){
-								_app.ext.store_tracking.trackers[i](order, plugins[i]);
-								}
-							}
-						}
-					});
-				},
-			onError : function()	{
-				_app.u.dump('BEGIN store_tracking.callbacks.attachHandlers.onError');
 				}
 			}
 		}, //callbacks
@@ -91,7 +54,7 @@ var store_tracking = function(_app) {
 						google_conversion_format: "3",
 						google_conversion_color : "ffffff",
 						google_conversion_label : labels[i].replace(/^\s+|\s+$/g, ''), //trims label of whitespace
-						google_remarketing_only : "false",
+						google_remarketing_only : "false"
 						}
 					if(plugin.dynamic_value){
 						globals.google_conversion_value = order.sum.order_total;

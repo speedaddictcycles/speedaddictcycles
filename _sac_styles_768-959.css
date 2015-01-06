@@ -90,43 +90,43 @@
 HOMEPAGE STYLES
 
 *********************************************************/
-#homepageSlideshow { height: 321px; background: black; }
-#homepageSlideshow a img{ height: 321px; width:100%; }
+.homepageSlideshow { height: 321px; background: black; }
+.homepageSlideshow a img{ height: 321px; width:100%; }
 
-#homepageFeatures {height: 453px; background:url(images/homepage_features_background_768x453.jpg); padding: 0px 13px;}
+.homepageFeatures {height: 453px; background:url(images/homepage_features_background_768x453.jpg); padding: 0px 13px;}
 
-#homepageFeaturesTitle{height:45px; background:url(images/homepage_features_title_671x30.png) center center no-repeat;}
+.homepageFeaturesTitle{height:45px; background:url(images/homepage_features_title_671x30.png) center center no-repeat;}
 
-#homepageFeatures360s { height: 190px; width: 742px;  margin-bottom: 13px;}
-#homepageFeatures360s .imajizeContainer { width: 173px; height: 100%; padding: 0px 6px;}
-#homepageFeatures360s .imajizeContainer .title{ height:30px; line-height:30px;}
-#homepageFeatures360s .imajizeContainer .title,
-#homepageFeatures360s .imajizeContainer .price{ font-size: .9em; }
-#homepageFeatures360s .imajizeContainer iframe { width: 173px; height: 130px; }
+.homepageFeatures360s { height: 190px; width: 742px;  margin-bottom: 13px;}
+.homepageFeatures360s .imajizeContainer { width: 173px; height: 100%; padding: 0px 6px;}
+.homepageFeatures360s .imajizeContainer .title{ height:30px; line-height:30px;}
+.homepageFeatures360s .imajizeContainer .title,
+.homepageFeatures360s .imajizeContainer .price{ font-size: .9em; }
+.homepageFeatures360s .imajizeContainer iframe { width: 173px; height: 130px; }
 
-#homepageFeaturesCarousel{height: 190px;}
+.homepageFeaturesCarousel{height: 190px;}
 
-#homepageFeaturesCarouselNext { background: url(images/arrow_right_8x35.png) center center no-repeat, #cc4300;}
-#homepageFeaturesCarouselPrev { background: url(images/arrow_left_8x35.png) center center no-repeat, #cc4300;}
+.homepageFeaturesCarouselNext { background: url(images/arrow_right_8x35.png) center center no-repeat, #cc4300;}
+.homepageFeaturesCarouselPrev { background: url(images/arrow_left_8x35.png) center center no-repeat, #cc4300;}
 
-#homepageFeaturesCarouselPrev,
-#homepageFeaturesCarouselNext {width: 12px;}
+.homepageFeaturesCarouselPrev,
+.homepageFeaturesCarouselNext {width: 12px;}
 
-#homepageFeaturesCarouselPrev {border-top-left-radius: 8px;border-bottom-left-radius: 8px;}
-#homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
+.homepageFeaturesCarouselPrev {border-top-left-radius: 8px;border-bottom-left-radius: 8px;}
+.homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
 
-#homepageFeaturesCarouselBody {width: 400px; margin: 0px 2px;}
-#homepageFeaturesCarouselBody ul{width: 100%;}
-#homepageFeaturesCarouselBody .carouselHeader{ letter-spacing: 5px;}
+.homepageFeaturesCarouselBody {width: 400px; margin: 0px 2px;}
+.homepageFeaturesCarouselBody ul{width: 100%;}
+.homepageFeaturesCarouselBody .carouselHeader{ letter-spacing: 5px;}
 li.prodListItemCarousel { margin-top: 3px; }
 .prodListItemCarousel .prodThumbContainer {width:105px; height:105px; margin-bottom: 5px;}
 .prodListItemCarousel .name {height:30px;}
 .prodListItemCarousel .name, 
 .prodListItemCarousel .price {font-size: .8em;}
 
-#homepageFeaturesVideo {padding-top: 8px; margin-left: 12px;}
-#homepageFeaturesVideo > div {width: 296px; height: 167px;}
-#homepageFeaturesVideo > div > iframe{width: 296px; height: 167px;}
+.homepageFeaturesVideo {padding-top: 8px; margin-left: 12px;}
+.homepageFeaturesVideo > div {width: 296px; height: 167px;}
+.homepageFeaturesVideo > div > iframe{width: 296px; height: 167px;}
 
 /*********************************************************
 

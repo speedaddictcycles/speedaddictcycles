@@ -81,7 +81,7 @@ var admin_config = function(_app) {
 			onSuccess : function()	{
 				var r = false; //return false if extension won't load for some reason (account config, dependencies, etc).
 //the list of templates in theseTemplate intentionally has a lot of the templates left off.  This was done intentionally to keep the memory footprint low. They'll get loaded on the fly if/when they are needed.
-				_app.model.fetchNLoadTemplates(_app.vars.baseURL+'extensions/admin/config.html',theseTemplates);
+				// _app.model.fetchNLoadTemplates(_app.vars.baseURL+'extensions/admin/config.html',theseTemplates);
 				r = true;
 
 				return r;
@@ -112,7 +112,7 @@ var admin_config = function(_app) {
 				},
 
 
-			//shows the lists of all blast messages and the means to edit each one individually.
+			//shows the lists of all notifications and the means to edit each one individually.
 			showNotifications : function($target,params)	{
 				$target.showLoading({"message":"Fetching notifications"});
 				$target.tlc({'templateid':'notificationPageTemplate','verb':'template'});
@@ -278,13 +278,14 @@ var admin_config = function(_app) {
 				$target.showLoading({'message':'Fetching your payment method settings'});
 				_app.model.destroy('adminConfigDetail|payment|'+_app.vars.partition);
 				_app.u.addEventDelegation($target);
-				$target.anyform({'trackEdits':true});
 				_app.ext.admin.calls.adminConfigDetail.init({'payment':true},{
 					'callback' : 'anycontent',
 					'datapointer' : 'adminConfigDetail|payment|'+_app.vars.partition,
 					'templateID' : 'paymentManagerPageTemplate',
 					'onComplete' : function(){
 						$("li[data-tender='CC']",$target).trigger('click');
+						_app.u.handleCommonPlugins($target);
+						$target.anyform({'trackEdits':true});
 						},
 					jqObj : $target
 					},'mutable');
@@ -388,6 +389,7 @@ var admin_config = function(_app) {
 					'showLoadingMessage' : 'Fetching tax details'
 					}).anyform();
 				_app.u.addEventDelegation($target);
+				$("[data-app-role='taxTableExecForm']",$target).anyform({'trackEdits':true});
 				$("[name='expires']",$target).datepicker({
 					changeMonth: true,
 					changeYear: true,
@@ -897,7 +899,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 								var $updateTR = $(this);
 								if($updateTR.hasClass('rowTaggedForRemove'))	{} //ignore this row, it's being deleted.
 								else	{
-									newSfo['@updates'].push("NOTIFICATION/DATATABLE-INSERT?"+$.param(_app.u.getWhitelistedObject($updateTR.data(),['event','verb','url','email'])));
+									newSfo['@updates'].push("NOTIFICATION/DATATABLE-INSERT?"+$.param(_app.u.getWhitelistedObject($updateTR.data(),['event','verb','url','email','assignto'])));
 									}
 								});
 							
@@ -911,6 +913,11 @@ when an event type is changed, all the event types are dropped, then re-added.
 						}
 					});
 
+				newSfo['_tag'].onComplete = function(){
+					// refresh the data
+					navigateTo('/ext/admin_config/showNotifications');
+					};
+					
 				return newSfo;
 				},
 			
@@ -1032,7 +1039,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 						.find(".applyDatepicker").datetimepicker({
 							changeMonth: true,
 							dateFormat : 'yymmdd',
-							timeFormat: 'hhmmss',
+							timeFormat: 'HHmmss',
 							changeYear: true,
 							separator : '' //get rid of space between date and time.
 							})
@@ -1062,7 +1069,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 				$( ".applyDatepicker",$D).datetimepicker({
 						changeMonth: true,
 						dateFormat : 'yymmdd',
-						timeFormat: 'hhmmss',
+						timeFormat: 'HHmmss',
 						changeYear: true,
 						separator : '' //get rid of space between date and time.
 						});
@@ -1265,7 +1272,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 					
 					if($ele.data('mode') == 'insert')	{
 						callback = function(rd){
-							navigateTo("#!ext/admin_config/showShippingManager",{'provider':sfo.provider});
+							navigateTo("/ext/admin_config/showShippingManager",{'provider':sfo.provider});
 							}; //when a new method is added, the callback gets changed slightly to refect the update to the list of flex methods.
 						macros.push("SHIPMETHOD/INSERT?provider="+sfo.provider+"&handler="+$ele.data('handler'));
 						}
@@ -1379,13 +1386,13 @@ when an event type is changed, all the event types are dropped, then re-added.
 //requires the data-table-role syntax. 
 			dataTableAddUpdate : function($ele,P)	{
 				var r = false; //what is returned. will be true if data-table passes muster.
-				_app.u.dump("BEGIN admin_config.e.dataTableAddUpdate (Click!)");
+//				_app.u.dump("BEGIN admin_config.e.dataTableAddUpdate (Click!)");
 				var
 					$DTC = $ele.closest("[data-table-role='container']");// Data Table Container. This element should encompass the inputs AND the table itself.
 // SANITY -> 201352 changed this from $("[data-table-role='inputs']",$DTC) to closest. that requires that $ele is INSIDE the inputs. If this causes issues (required from shipping/coupons rules), then add a data attribute on $ele to allow for $ele to be outside and use $("[data-table-role='inputs']",$DTC).
 					$inputContainer = $ele.closest("[data-table-role='inputs']"), //likely a fieldset, but that's not a requirement. //$("[data-table-role='inputs']",$DTC)
 					$dataTbody = $("tbody[data-table-role='content']",$DTC);
-				dump(" -> $inputContainer instanceof jQuery: "+($inputContainer instanceof jQuery));
+//				dump(" -> $inputContainer instanceof jQuery: "+($inputContainer instanceof jQuery));
 				if($inputContainer.length && $dataTbody.length)	{
 //					_app.u.dump(" -> all necessary jquery objects found.");
 					if($dataTbody.data('bind'))	{
@@ -1423,6 +1430,11 @@ when an event type is changed, all the event types are dropped, then re-added.
 								$(':radio',$inputContainer).prop('checked',false);
 								$(':checkbox',$inputContainer).prop('checked',false);
 								}
+							
+							if($ele.attr('data-hide-inputs-onapply'))	{
+								$inputContainer.slideUp('fast');
+								}
+							
 							_app.ext.admin.u.handleSaveButtonByEditedClass($ele.closest('form'));
 
 							r = true;
@@ -1491,17 +1503,17 @@ when an event type is changed, all the event types are dropped, then re-added.
 
 //build an array of the form input names for a whitelist.
 //need a whitelist because the tr.data() may have a lot of extra kvp in it
-				var whitelist = new Array('type','enable','state','citys','city','zipstart','zipend','zip4','country','ipcountry','ipstate','izcountry','izzip','rate','shipping','handling','insurance','special','zone','expires','group','guid');
+//201404 -> enable is intentionally NOT in the whitelist. It's added to the update through a checkbox.
+				var whitelist = new Array('type','state','citys','city','zipstart','zipend','zip4','country','ipcountry','ipstate','izcountry','izzip','rate','shipping','handling','insurance','special','zone','expires','group','guid');
 
 				$ele.closest('form').find('tbody tr').each(function(index){ //tbody needs to be in the selector so that tr in thead isn't included.
 					var $tr = $(this);
 					if($tr.hasClass('rowTaggedForRemove'))	{} //row tagged for delete. do not insert.
 					else	{
 						if(!$tr.data('guid'))	{$tr.data('guid',index)} //a newly added rule
-						macros.push("TAXRULES/INSERT?"+$.param(_app.u.getWhitelistedObject($tr.data(),whitelist)));
+						macros.push("TAXRULES/INSERT?enable="+($("input[name='enable']",$tr).is(':checked') ? 1 : 0)+"&"+$.param(_app.u.getWhitelistedObject($tr.data(),whitelist)));
 						}
 					});
-
 				_app.ext.admin.calls.adminConfigMacro.init(macros,{'callback':'showMessaging','message':'Your rules have been saved.','removeFromDOMItemsTaggedForDelete':true,'restoreInputsFromTrackingState':true,'jqObj':$container},'immutable');
 				_app.model.dispatchThis('immutable');
 
@@ -1667,7 +1679,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 				if(_app.u.validateForm($form))	{
 					$form.showLoading({'message':'Saving Changes'});
 					var sfo = $form.serializeJSON({'cb':true}), updates = new Array();
-					if($form.data('scope') == 'HOST')	{
+					if(sfo.scope == 'HOST')	{
 						$("[data-app-role='pluginHostsList']",$form).find('tr').each(function(){
 							var $tr = $(this);
 							if($tr.hasClass('rowTaggedForRemove'))	{
@@ -1681,7 +1693,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 							});
 						}
 					else	{
-						updates.push("PLUGIN/SET-"+($form.data('scope') || 'PRT')+"?"+_app.u.hash2kvp(sfo));
+						updates.push("PLUGIN/SET-"+(sfo.scope || 'PRT')+"?"+_app.u.hash2kvp(sfo));
 						}
 
 					_app.model.addDispatchToQ({
@@ -1690,7 +1702,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 						'_tag':	{
 							'callback':($form.data('verb')) == 'create' ? 'navigateTo' : 'showMessaging',
 							'extension':($form.data('verb')) == 'create' ? 'admin' : '',
-							'path' : '#!ext/admin_config/showPluginManager?plugin='+sfo.plugin, //used when new plugins are added.
+							'path' : '/ext/admin_config/showPluginManager?plugin='+sfo.plugin, //used when new plugins are added.
 							//the following are used w/ showMessaging.
 							'restoreInputsFromTrackingState' : true,
 							'message' : "Your changes have been saved.",
@@ -1735,7 +1747,7 @@ when an event type is changed, all the event types are dropped, then re-added.
 											else	{
 												//sample action. success would go here.
 												$chooser.closest('.ui-dialog-content').dialog('close');
-												navigateTo('#!ext/admin_config/showPluginManager?plugin='+plugin)
+												navigateTo('/ext/admin_config/showPluginManager?plugin='+plugin)
 												}
 											}
 										}
@@ -1874,13 +1886,13 @@ when an event type is changed, all the event types are dropped, then re-added.
 			notificationUpdateShow : function($ele,p)	{
 				p.preventDefault();
 				var $target = $ele.closest("[data-app-role='notificationsContainer']").find("[data-app-role='slimLeftContentContainer']");
-				
+												
 				if($ele.data('event') && _app.u.thisNestedExists("data.adminConfigDetail|"+_app.vars.partition+"|notifications.@NOTIFICATIONS",_app))	{
 					var dataset = _app.ext.admin.u.getValueByKeyFromArray(_app.data['adminConfigDetail|'+_app.vars.partition+'|notifications']['@NOTIFICATIONS'],'event',$ele.data('event'));
 					$target.empty().anycontent({"templateID":"notificationUpdateTemplate","data":dataset});
+					$target.find("[data-app-role='addNotificationContainer']").empty().anycontent({"templateID":"appendNotificationFieldset","data":{}});
 					_app.u.handleButtons($target);
 					$('form',$target).anyform();
-					$("[data-app-role='verb_"+($ele.data('event').split('.')[0])+"']",$target).show();
 					}
 				else if(!$ele.data('event'))	{
 					$target.anymessage({"message":"In admin_config.e.notificationsUpdateShow, data-event not set on trigger element.","gMessage":true});
@@ -1888,10 +1900,26 @@ when an event type is changed, all the event types are dropped, then re-added.
 				else	{
 					$target.anymessage({"message":"In admin_config.e.notificationsUpdateShow, adminConfigDetail|"+_app.vars.partition+"|notifications is not in memory.","gMessage":true});
 					}
+
+			
+				$('form',$target).find("input[name='event']").val($ele.data('event'));				
+				return false;
+				},
+
+			notificationAddNew : function($ele,p)	{
+				// the Add new Notification container
+				p.preventDefault();
+				var $target = $ele.closest("[data-app-role='notificationsContainer']").find("[data-app-role='slimLeftContentContainer']");
+				$target.empty().anycontent({"templateID":"notificationAddNewTemplate","data":{}});
+				$target.find("[data-app-role='addNotificationContainer']").empty().anycontent({"templateID":"appendNotificationFieldset","data":{}});
+				
+				_app.u.handleButtons($target);
+				_app.u.addEventDelegation($target);
+				$('form',$target).anyform();
+				//$("[data-app-role='verb_"+($ele.data('event').split('.')[0])+"']",$target).show();
 				
 				return false;
 				}
-
 
 			} //e [app Events]
 		} //r object.

@@ -93,42 +93,42 @@
 HOMEPAGE STYLES
 
 *********************************************************/
-#homepageSlideshow { height: 267px; background: black; }
-#homepageSlideshow a img{ height: 267px; width:100%; }
+.homepageSlideshow { height: 267px; background: black; }
+.homepageSlideshow a img{ height: 267px; width:100%; }
 
-#homepageFeatures {height: 377px; background:url(images/homepage_features_background_640x377.jpg); padding: 0px 10px;}
+.homepageFeatures {height: 377px; background:url(images/homepage_features_background_640x377.jpg); padding: 0px 10px;}
 
-#homepageFeaturesTitle{height:38px; background:url(images/homepage_features_title_560x27.png) center center no-repeat;}
+.homepageFeaturesTitle{height:38px; background:url(images/homepage_features_title_560x27.png) center center no-repeat;}
 
-#homepageFeatures360s { height: 158px; width: 620px; margin-bottom:10px;}
-#homepageFeatures360s .imajizeContainer { width: 144px; height: 100%; padding: 0px 5px;}
-#homepageFeatures360s .imajizeContainer .title{ height:25px; line-height:25px;}
-#homepageFeatures360s .imajizeContainer .title,
-#homepageFeatures360s .imajizeContainer .price{ font-size: .8em; }
-#homepageFeatures360s .imajizeContainer iframe { width: 144px; height: 108px; }
+.homepageFeatures360s { height: 158px; width: 620px; margin-bottom:10px;}
+.homepageFeatures360s .imajizeContainer { width: 144px; height: 100%; padding: 0px 5px;}
+.homepageFeatures360s .imajizeContainer .title{ height:25px; line-height:25px;}
+.homepageFeatures360s .imajizeContainer .title,
+.homepageFeatures360s .imajizeContainer .price{ font-size: .8em; }
+.homepageFeatures360s .imajizeContainer iframe { width: 144px; height: 108px; }
 
-#homepageFeaturesCarousel{height: 160px;}
+.homepageFeaturesCarousel{height: 160px;}
 
-#homepageFeaturesCarouselNext { background: url(images/arrow_right_7x29.png) center center no-repeat, #cc4300;}
-#homepageFeaturesCarouselPrev { background: url(images/arrow_left_7x29.png) center center no-repeat, #cc4300;}
+.homepageFeaturesCarouselNext { background: url(images/arrow_right_7x29.png) center center no-repeat, #cc4300;}
+.homepageFeaturesCarouselPrev { background: url(images/arrow_left_7x29.png) center center no-repeat, #cc4300;}
 
-#homepageFeaturesCarouselPrev,
-#homepageFeaturesCarouselNext {width: 12px;}
+.homepageFeaturesCarouselPrev,
+.homepageFeaturesCarouselNext {width: 12px;}
 
-#homepageFeaturesCarouselPrev {border-top-left-radius: 8px;border-bottom-left-radius: 8px;}
-#homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
+.homepageFeaturesCarouselPrev {border-top-left-radius: 8px;border-bottom-left-radius: 8px;}
+.homepageFeaturesCarouselNext {border-top-right-radius: 8px;border-bottom-right-radius: 8px;}
 
-#homepageFeaturesCarouselBody {width: 332px; margin: 0px 2px;}
-#homepageFeaturesCarouselBody ul{width: 100%;}
-#homepageFeaturesCarouselBody .carouselHeader{ letter-spacing: 5px; font-size: .9em;}
+.homepageFeaturesCarouselBody {width: 332px; margin: 0px 2px;}
+.homepageFeaturesCarouselBody ul{width: 100%;}
+.homepageFeaturesCarouselBody .carouselHeader{ letter-spacing: 5px; font-size: .9em;}
 li.prodListItemCarousel { margin: 3px; }
 .prodListItemCarousel .prodThumbContainer {width:87px; height:87px; margin-bottom: 3px;margin-left: auto; margin-right: auto;}
 .prodListItemCarousel .name {height:28px; font-size: .7em; }
 .prodListItemCarousel .price {font-size: .8em;}
 
-#homepageFeaturesVideo {padding-top: 8px; margin-left: 8px;}
-#homepageFeaturesVideo > div {width: 246px; height: 138px;}
-#homepageFeaturesVideo > div > iframe{width: 246px; height: 138px;}
+.homepageFeaturesVideo {padding-top: 8px; margin-left: 8px;}
+.homepageFeaturesVideo > div {width: 246px; height: 138px;}
+.homepageFeaturesVideo > div > iframe{width: 246px; height: 138px;}
 
 /*********************************************************
 
@@ -166,20 +166,20 @@ COMPANY PAGE STYLES
 *********************************************************/
 .companyPage { padding: 20px; position: relative;}
 .companyPage .article iframe{width:600px; height: 338px;}
-.companyPage .sideline { 
+.companyPage nav { 
 	width: 0px;
 	position: absolute;
 	right: 0px;
 	overflow: hidden;
 }
-.companyPage .sideline button {
+.companyPage nav button {
 	position: absolute;
 	right: 5px;
 	top: 5px;
 	width: 20px;
 	height: 20px;
 }
-.companyPage .sideline.responsiveShow{
+.companyPage nav.responsiveShow{
 	background: #ffe2b0; /* Old browsers */
 	background: -moz-linear-gradient(top,  #ffe2b0 10px, #ffffff 300px); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left top, color-stop(10px,#ffe2b0), color-stop(300px,#ffffff)); /* Chrome,Safari4+ */

@@ -209,32 +209,32 @@ HOMEPAGE STYLES
 
 *********************************************************/
 
-#homepageSlideshow {overflow:hidden; position:relative; z-index:50;}
-#homepageSlideshow a {width:100%;}
-#homepageSlideshow .pager{position:absolute; bottom:10px; left:10px; z-index:101; border-radius:5px; background: rgba(45,45,45,.65);}
-#homepageSlideshow .pagerSpan{overflow:hidden; width: 35px; height:35px; border-radius:2px; border: 1px solid grey; margin: 10px; display:block; float: left;}
+.homepageSlideshow {overflow:hidden; position:relative; z-index:50;}
+.homepageSlideshow a {width:100%;}
+.homepageSlideshow .pager{position:absolute; bottom:10px; left:10px; z-index:101; border-radius:5px; background: rgba(45,45,45,.65);}
+.homepageSlideshow .pagerSpan{overflow:hidden; width: 35px; height:35px; border-radius:2px; border: 1px solid grey; margin: 10px; display:block; float: left;}
 
-#homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4);}
-#homepageFeatures360s .imajizeContainer .title{ color: #ffff00;}
-#homepageFeatures360s .imajizeContainer .price{ color: white;}
-#homepageFeatures360s .imajizeContainer iframe { border: none; }
+.homepageFeatures360s { background: #cc4300; box-shadow:0px 3px 5px rgba(0,0,0,.4);}
+.homepageFeatures360s .imajizeContainer .title{ color: #ffff00;}
+.homepageFeatures360s .imajizeContainer .price{ color: white;}
+.homepageFeatures360s .imajizeContainer iframe { border: none; }
 
 .imajizeContainer a
 
-#homepageFeaturesCarouselPrev,
-#homepageFeaturesCarouselNext { background: #cc4300;}
-#homepageFeaturesCarouselBody{ background:#ffe2b0;}
-#homepageFeaturesCarouselBody .carouselHeader{ color:#cc4300;}
+.homepageFeaturesCarouselPrev,
+.homepageFeaturesCarouselNext { background: #cc4300;}
+.homepageFeaturesCarouselBody{ background:#ffe2b0;}
+.homepageFeaturesCarouselBody .carouselHeader{ color:#cc4300;}
 
 .prodListItemCarousel .prodThumbContainer {border: 1px solid #cc4300;}
 .prodListItemCarousel .name{ color: #565656; }
 .prodListItemCarousel .price{ color: #cc4300; }
 
-#homepageFeaturesVideo > div {box-shadow:0px 3px 5px rgba(0,0,0,.4); background: white; border-radius: 3px; padding: 3px;}
+.homepageFeaturesVideo > div {box-shadow:0px 3px 5px rgba(0,0,0,.4); background: white; border-radius: 3px; padding: 3px;}
 
-#homepageFeaturesCarouselPrev,
-#homepageFeaturesCarouselNext,
-#homepageFeaturesCarouselBody {height:100%; float: left;}
+.homepageFeaturesCarouselPrev,
+.homepageFeaturesCarouselNext,
+.homepageFeaturesCarouselBody {height:100%; float: left;}
 
 /*********************************************************
 

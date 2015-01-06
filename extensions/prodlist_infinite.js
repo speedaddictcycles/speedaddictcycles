@@ -72,14 +72,19 @@ var prodlist_infinite = function(_app) {
 				var $list = _rtag.list;
 				var EQ = $list.data('elastic-query');
 				if($list && $list.length)	{
-					$list.data('total-page-count', Math.ceil( _app.data[_rtag.datapointer].hits.total / EQ.size));
+					var totalPages = Math.ceil( _app.data[_rtag.datapointer].hits.total / EQ.size);
+					// dump(totalPages);
+					$list.data('total-page-count', totalPages);
+					// dump($list.attr('data-total-page-count'));
+					// dump(_app.data[_rtag.datapointer].hits.total);
+					// dump(EQ.size);
+					// dump(Math.ceil( _app.data[_rtag.datapointer].hits.total / EQ.size));
 					if(_rtag.emptyList){
 						$list.intervaledEmpty();
 						}
 					$list.removeClass('loadingBG');
 					if(L == 0)	{
-						$list.append("Your query returned zero results.");
-						_app.ext.store_filter.vars.filterLoadingComplete = true;
+						//$list.append("Your query returned zero results.");
 						}
 					else	{
 						$list.append(_app.ext.store_search.u.getElasticResultsAsJQObject(_rtag)); //prioritize w/ getting product in front of buyer
@@ -94,6 +99,7 @@ var prodlist_infinite = function(_app) {
 //this gets run whether there are results or not. It is the events responsibility to make sure results were returned. 
 // That way, it can handle a no-results action.
 				$list.trigger('listcomplete');
+				if(_rtag.deferred){_rtag.deferred.resolve();}
 				},
 			onError : function(){
 				
@@ -111,7 +117,22 @@ var prodlist_infinite = function(_app) {
 						////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
-
+	tlcFormats : {
+		infiniteproductlist : function(data, thisTLC){
+			var bindData = thisTLC.args2obj(data.command.args, data.globals);
+			bindData.csv = data.globals.binds[data.globals.focusBind];
+			if(bindData.csv && bindData.csv.length){
+				console.log(bindData.csv);
+				var $tag = data.globals.tags[data.globals.focusTag];
+				$tag.data('bindData',bindData);
+				_app.ext.prodlist_infinite.u.buildInfiniteProductList($tag);
+				return true;
+				}
+			else{
+				return false;
+				}
+			}
+		},
 
 
 	renderFormats : {
@@ -155,7 +176,6 @@ It is run once, executed by the renderFormat.
 			buildInfiniteProductList : function($tag)	{
 //				_app.u.dump("BEGIN store_prodlist.u.buildInfiniteProductList()");
 //				_app.u.dump(" -> obj: "); _app.u.dump(obj);
-
 				var bindData = $tag.data('bindData');
 //tag is likely an li or a table.  add a loading graphic after it.
 				$tag.parent().append($("<div \/>").addClass('loadingBG').attr('data-app-role','infiniteProdlistLoadIndicator'));
@@ -190,7 +210,7 @@ It is run once, executed by the renderFormat.
 
 				function handleProd(pid,$templateCopy)	{
 					$templateCopy.attr('data-pid',pid);
-					return _app.calls.appProductGet.init({"pid":pid,"withVariations":plObj.withVariations,"withInventory":plObj.withInventory},{'callback':'tlc',jqObj:$templateCopy,'verb':'translate'},'mutable');
+					return _app.calls.appProductGet.init({"pid":pid,"withVariations":plObj.withVariations,"withInventory":plObj.withInventory},{'callback':'translateTemplate','extension':'store_prodlist',jqObj:$templateCopy,'verb':'translate'},'mutable');
 					}
 //Go get ALL the data and render it at the end. Less optimal from a 'we have it in memory already' point of view, but solves a plethora of other problems.
 				for(var i = 0; i < L; i += 1)	{
@@ -208,14 +228,20 @@ It is run once, executed by the renderFormat.
 						}
 					else	{
 						_app.ext.prodlist_infinite.u.handleScroll($tag);
-						}				
+						}
+					if(rd.deferred){rd.deferred.resolve();}
 					}
-
+				var _tag = {
+					'callback' : infiniteCallback
+					}
+				if(plObj.deferred){
+					_tag.deferred = plObj.deferred;
+					}
 				if(numRequests == 0)	{
-					infiniteCallback({})
+					infiniteCallback(_tag)
 					}
 				else	{
-					_app.calls.ping.init({'callback':infiniteCallback},'mutable');
+					_app.calls.ping.init(_tag,'mutable');
 					_app.model.dispatchThis();
 					}
 
@@ -269,12 +295,23 @@ else	{
 
 				},
 			handleElasticScroll : function(_rtag, $tag){
+				dump('handleElasticScroll');
+				//dump(_rtag);
 				var EQ = $tag.data('elastic-query');
 				var currPage = $tag.data('page-in-focus');
+				// dump('CURRPAGE: '+currPage);
 				var totalPages = $tag.data('total-page-count');
-				
+				// dump('TOTAL: '+totalPages);
+				// dump(currPage >= totalPages);
 				var onScroll = function(override){
 					//will load data when two rows from bottom.
+					// dump('onScroll');
+					// dump(override);
+					// dump($(window).scrollTop());
+					// dump($(document).height());
+					// dump($(window).height());
+					// dump($tag.children().first().height());
+					// dump(override || $(window).scrollTop() >= ( $(document).height() - $(window).height() - ($tag.children().first().height() * 2) ) );
 					if(override || $(window).scrollTop() >= ( $(document).height() - $(window).height() - ($tag.children().first().height() * 2) ) )	{
 						$(window).off('scroll.infiniteScroll');
 						if($tag.data('isDispatching') == true)	{}
@@ -285,16 +322,10 @@ else	{
 						}
 					}
 				
-				// if(_app.data[_rtag.datapointer].hits.total <= EQ.size)	{
-					// $tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
-					// _app.ext.store_swc.vars.filterLoadingComplete = true;
-					// } //do nothing. fewer than 1 page worth of items.
-				// else 
 				if(currPage >= totalPages)	{
-				//reached the last 'page'. disable infinitescroll.
+					//dump("Reached last page, stopping scroll");
 					$(window).off('scroll.infiniteScroll');
 					$tag.parent().find("[data-app-role='infiniteProdlistLoadIndicator']").hide();
-					_app.ext.store_filter.vars.filterLoadingComplete = true;
 					}
 				else	{
 					if(_rtag.loadFullList){

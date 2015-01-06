@@ -407,7 +407,9 @@ left them be to provide guidance later.
 							'onComplete' : function(r){
 								P.state = 'complete';
 								_app.renderFunctions.handleTemplateEvents(r.jqObj,$.extend(true,{},P,event));
+								if(r.deferred){r.deferred.resolve();}
 								},
+							'deferred' : vars.deferred,
 							'templateID' : $c.data('templateid'),
 							'jqObj' : $c
 							},P.Q);
@@ -587,8 +589,11 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 */
 			nukePayPalEC : function(_tag) {
 //				_app.u.dump("BEGIN cco.u.nukePayPalEC");
-				_app.ext.order_create.vars['payment-pt'] = null;
-				_app.ext.order_create.vars['payment-pi'] = null;
+				if(_app.ext.order_create){
+					//Doesn't require a _require, since if it's not loaded, it's already "nuked"
+					_app.ext.order_create.vars['payment-pt'] = null;
+					_app.ext.order_create.vars['payment-pi'] = null;
+					}
 				return this.modifyPaymentQbyTender('PAYPALEC',function(PQI){
 					//the delete cmd will reset want/payby to blank.
 					_app.ext.cco.calls.cartPaymentQ.init({'cmd':'delete','ID':PQI.ID},_tag || {'callback':'suppressErrors'}); //This kill process should be silent.
@@ -825,6 +830,7 @@ note - dispatch isn't IN the function to give more control to developer. (you ma
 
 //run this just prior to creating an order.
 //will clean up cart object.
+			//NOT INCLUDING A _REQUIRE SINCE THIS IS ONLY CALLED FROM ORDER_CREATE
 			sanitizeAndUpdateCart : function($form,_tag)	{
 //				dump("BEGIN cco.u.sanitizeAndUpdateCart");
 				if($form instanceof jQuery)	{
@@ -1258,7 +1264,7 @@ in a reorder, that data needs to be converted to the variations format required 
 						}
 					}
 				else if(zGlobals.checkoutSettings.googleCheckoutMerchantId)	{
-					_app.u.dump("zGlobals.checkoutSettings.googleCheckoutMerchantId is set, but _gaq is not defined (google analytics not loaded but required)",'warn');
+					_app.u.dump("zGlobals.checkoutSettings.googleCheckoutMerchantId is set, but ga is not defined (google analytics not loaded but required)",'warn');
 					}
 				else	{
 					$tag.addClass('displayNone');

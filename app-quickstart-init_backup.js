@@ -1,3 +1,87 @@
+<<<<<<< HEAD
+
+myApp.rq.push(['script',0,(document.location.protocol == 'file:') ? myApp.vars.testURL+'jsonapi/config.js' : myApp.vars.baseURL+'jsonapi/config.js',function(){
+//in some cases, such as the zoovy UI, zglobals may not be defined. If that's the case, certain vars, such as jqurl, must be passed in via P in initialize:
+//	myApp.u.dump(" ->>>>>>>>>>>>>>>>>>>>>>>>>>>>> zGlobals is an object");
+	myApp.vars.username = zGlobals.appSettings.username.toLowerCase(); //used w/ image URL's.
+//need to make sure the secureURL ends in a / always. doesn't seem to always come in that way via zGlobals
+	myApp.vars.secureURL = zGlobals.appSettings.https_app_url;
+	myApp.vars.domain = zGlobals.appSettings.sdomain; //passed in ajax requests.
+	myApp.vars.jqurl = (document.location.protocol === 'file:') ? myApp.vars.testURL+'jsonapi/' : '/jsonapi/';
+	}]); //The config.js is dynamically generated.
+	
+myApp.rq.push(['extension',0,'order_create','extensions/checkout/extension.js']);
+myApp.rq.push(['extension',0,'cco','extensions/cart_checkout_order.js']);
+
+myApp.rq.push(['extension',0,'store_routing','extensions/store_routing.js', 'attachEventHandlers']);
+myApp.rq.push(['extension',0,'store_seo','extensions/store_seo.js', 'attachHandlers']);
+myApp.rq.push(['extension',0,'store_tracking','extensions/store_tracking.js', 'attachHandlers']);
+myApp.rq.push(['extension',0,'seo_robots','extensions/seo_robots.js']);
+
+myApp.rq.push(['extension',0,'store_prodlist','extensions/store_prodlist.js']);
+myApp.rq.push(['extension',0,'store_navcats','extensions/store_navcats.js']);
+myApp.rq.push(['extension',0,'store_search','extensions/store_search.js']);
+myApp.rq.push(['extension',0,'store_product','extensions/store_product.js']);
+myApp.rq.push(['extension',0,'cart_message','extensions/cart_message/extension.js']);
+myApp.rq.push(['extension',0,'store_crm','extensions/store_crm.js']);
+myApp.rq.push(['extension',0,'store_tracking','extensions/store_tracking.js']);
+myApp.rq.push(['extension',0,'quickstart','app-quickstart.js','startMyProgram']);
+
+//myApp.rq.push(['extension',0,'entomologist','extensions/entomologist/extension.js']);
+//myApp.rq.push(['extension',0,'tools_animation','extensions/tools_animation.js']);
+
+// 201405 - Deprecated for Universal Analytics
+//myApp.rq.push(['extension',1,'google_analytics','extensions/partner_google_analytics.js','startExtension']);
+
+//myApp.rq.push(['extension',1,'tools_ab_testing','extensions/tools_ab_testing.js']);
+//myApp.rq.push(['extension',0,'partner_addthis','extensions/partner_addthis.js']);
+//myApp.rq.push(['extension',1,'resellerratings_survey','extensions/partner_buysafe_guarantee.js','startExtension']); /// !!! needs testing.
+//myApp.rq.push(['extension',1,'buysafe_guarantee','extensions/partner_buysafe_guarantee.js','startExtension']);
+//myApp.rq.push(['extension',1,'powerReviews_reviews','extensions/partner_powerreviews_reviews.js','startExtension']);
+//myApp.rq.push(['extension',0,'magicToolBox_mzp','extensions/partner_magictoolbox_mzp.js','startExtension']); // (not working yet - ticket in to MTB)
+
+myApp.rq.push(['extension',0,'store_sac','extensions/_store_sac.js', 'attachEventHandlers']);
+myApp.rq.push(['extension',0,'store_filter','extensions/_store_filter.js', 'attachEventHandlers']);
+myApp.rq.push(['extension',0,'prodlist_infinite','extensions/prodlist_infinite.js']);
+myApp.rq.push(['script',0,'jquery-cycle2/jquery.cycle2.min.js']); 
+myApp.rq.push(['script',0,'srcset-polyfill/srcset.min.js']); 
+myApp.rq.push(['extension',0,'tools_lightbox','extensions/tools_lightbox/extension.js']);
+
+myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/jquery.showloading-v1.0.jt.js']); //used pretty early in process..
+myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/jquery.ui.anyplugins.js']); //in zero pass in case product page is first page.
+myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/tlc.js']); //in zero pass in case product page is first page.
+myApp.rq.push(['css',1,myApp.vars.baseURL+'resources/anyplugins.css']);
+
+myApp.rq.push(['script',0,myApp.vars.baseURL+'resources/jsonpath.0.8.0.js']); //used pretty early in process..
+
+//once peg is loaded, need to retrieve the grammar file. Order is important there. This will validate the file too.
+myApp.u.loadScript(myApp.vars.baseURL+'resources/peg-0.8.0.js',function(){
+	myApp.model.getGrammar(myApp.vars.baseURL+"resources/pegjs-grammar-20140203.pegjs");
+	}); // ### TODO -> callback on RQ.push wasn't getting executed. investigate.
+
+//Cart Messaging Responses.
+
+myApp.cmr.push(['chat.join',function(message){
+//	dump(" -> message: "); dump(message);
+	var $ui = myApp.ext.quickstart.a.showBuyerCMUI();
+	$("[data-app-role='messageInput']",$ui).show();
+	$("[data-app-role='messageHistory']",$ui).append("<p class='chat_join'>"+message.FROM+" has joined the chat.<\/p>");
+	$('.show4ActiveChat',$ui).show();
+	$('.hide4ActiveChat',$ui).hide();
+	}]);
+
+myApp.cmr.push(['goto',function(message,$context){
+	var $history = $("[data-app-role='messageHistory']",$context);
+	$P = $("<P>")
+		.addClass('chat_post')
+		.append("<span class='from'>"+message.FROM+"<\/span> has sent over a "+(message.vars.pageType || "")+" link for you within this store. <span class='lookLikeLink'>Click here<\/span> to view.")
+		.on('click',function(){
+			showContent(myApp.ext.quickstart.u.whatAmIFor(message.vars),message.vars);
+			});
+	$history.append($P);
+	$history.parent().scrollTop($history.height());
+	}]);
+=======
 (function(_app){
 var configURI = (document.location.protocol == 'file:') ? _app.vars.testURL+'jsonapi/config.js' : _app.vars.baseURL+'jsonapi/config.js';
 
@@ -9,8 +93,8 @@ _app.u.loadScript(configURI,function(){
 	_app.vars.secureURL = zGlobals.appSettings.https_app_url;
 	_app.vars.domain = zGlobals.appSettings.sdomain; //passed in ajax requests.
 	_app.vars.jqurl = (document.location.protocol === 'file:') ? _app.vars.testURL+'jsonapi/' : '/jsonapi/';
-
-	var startupRequires = ['quickstart', 'store_sac', 'store_filter'];
+	
+	var startupRequires = ['quickstart'];
 	
 	_app.require(startupRequires, function(){
 		setTimeout(function(){$('#appView').removeClass('initFooter');}, 1200);
@@ -55,6 +139,7 @@ _app.extend({
 	"namespace" : "order_create",
 	"filename" : "extensions/checkout/extension.js"
 	});
+>>>>>>> upstream/201411
 
 _app.couple('quickstart','addPageHandler',{
 	"pageType" : "checkout",
@@ -83,6 +168,91 @@ _app.extend({
 	"filename" : "extensions/cart_checkout_order.js"
 	});
 
+<<<<<<< HEAD
+//gets executed from app-admin.html as part of controller init process.
+//progress is an object that will get updated as the resources load.
+/*
+'passZeroResourcesLength' : [INT],
+'passZeroResourcesLoaded' : [INT],
+'passZeroTimeout' : null //the timeout instance running within loadResources that updates this object. it will run indef unless clearTimeout run here OR all resources are loaded.
+
+*/
+myApp.u.showProgress = function(progress)	{
+	function showProgress(attempt)	{
+		if(progress.passZeroResourcesLength == progress.passZeroResourcesLoaded)	{
+			//All pass zero resources have loaded.
+			//the app will handle hiding the loading screen.
+			myApp.u.appInitComplete();
+			}
+		else if(attempt > 150)	{
+			//hhhhmmm.... something must have gone wrong.
+			clearTimeout(progress.passZeroTimeout); //end the resource loading timeout.
+			$('.appMessaging','#appPreView').anymessage({'message':'Init failed to load all the resources within a reasonable number of attempts.','gMessage':true,'persistent':true});
+			}
+		else	{
+			var percentPerInclude = (100 / progress.passZeroResourcesLength);
+			var percentComplete = Math.round(progress.passZeroResourcesLength * percentPerInclude); //used to sum how many includes have successfully loaded.
+//			dump(" -> percentPerInclude: "+percentPerInclude+" and percentComplete: "+percentComplete);
+			$('#appPreViewProgressBar').val(percentComplete);
+			$('#appPreViewProgressText').empty().append(percentComplete+"% Complete");
+			attempt++;
+			setTimeout(function(){showProgress(attempt);},250);
+			}
+		}
+	showProgress(0)
+	}
+
+
+//Any code that needs to be executed after the app init has occured can go here.
+//will pass in the page info object. (pageType, templateID, pid/navcat/show and more)
+myApp.u.appInitComplete = function()	{
+//	myApp.u.dump("Executing myAppIsLoaded code...");
+	
+	myApp.ext.order_create.checkoutCompletes.push(function(vars,$checkout){
+		dump(" -> begin checkoutCOmpletes code: "); dump(vars);
+		
+		var cartContentsAsLinks = encodeURIComponent(myApp.ext.cco.u.cartContentsAsLinks(myApp.data[vars.datapointer].order));
+	
+//append this to 
+		$("[data-app-role='thirdPartyContainer']",$checkout).append("<h2>What next?</h2><div class='ocm ocmFacebookComment pointer zlink marginBottom checkoutSprite  '></div><div class='ocm ocmTwitterComment pointer zlink marginBottom checkoutSprit ' ></div><div class='ocm ocmContinue pointer zlink marginBottom checkoutSprite'></div>");
+		$('.ocmTwitterComment',$checkout).click(function(){
+			window.open('http://twitter.com/home?status='+cartContentsAsLinks,'twitter');
+			window[myApp.vars.analyticsPointer]('send', 'event','Checkout','User Event','Tweeted about order');
+			});
+		//the fb code only works if an appID is set, so don't show banner if not present.				
+		if(myApp.u.thisNestedExists("zGlobals.thirdParty.facebook.appId") && typeof FB == 'object')	{
+			$('.ocmFacebookComment',$checkout).click(function(){
+				myApp.ext.quickstart.thirdParty.fb.postToWall(cartContentsAsLinks);
+				_gaq.push(['_trackEvent','Checkout','User Event','FB message about order']);
+				window[myApp.vars.analyticsPointer]('send', 'event','Checkout','User Event','FB message about order');
+				});
+			}
+		else	{$('.ocmFacebookComment').hide()}
+		});
+	
+	//Cart Messaging Responses.
+	myApp.cmr.push(['chat.join',function(message){
+		if(message.FROM == 'ADMIN')	{
+			var $ui = myApp.ext.quickstart.a.showBuyerCMUI();
+			$("[data-app-role='messageInput']",$ui).show();
+			$("[data-app-role='messageHistory']",$ui).append("<p class='chat_join'>"+message.FROM+" has joined the chat.<\/p>");
+			$('.show4ActiveChat',$ui).show();
+			$('.hide4ActiveChat',$ui).hide();
+			}
+		}]);
+
+	myApp.cmr.push(['goto',function(message,$context){
+		var $history = $("[data-app-role='messageHistory']",$context);
+		$P = $("<P>")
+			.addClass('chat_post')
+			.append("<span class='from'>"+message.FROM+"<\/span> has sent over a "+(message.vars.pageType || "")+" link for you within this store. <span class='lookLikeLink'>Click here<\/span> to view.")
+			.on('click',function(){
+				showContent(myApp.ext.quickstart.u.whatAmIFor(message.vars),message.vars);
+				});
+		$history.append($P);
+		$history.parent().scrollTop($history.height());
+		}]);
+=======
 _app.couple('quickstart','addPageHandler',{
 	"pageType" : "cart",
 	"require" : ['cco','order_create','templates.html'],
@@ -179,7 +349,7 @@ _app.router.appendHash({'type':'exact','route':'/contact_us/','callback':functio
 	$.extend(routeObj.params,{
 		'pageType':'static',
 		'templateID':'contactUsTemplate',
-		'require':['templates.html','store_crm']
+		'require':['templates.html']
 		});
 	_app.ext.quickstart.a.showContent(routeObj.value,routeObj.params);
 	}});
@@ -187,7 +357,7 @@ _app.router.appendHash({'type':'exact','route':'/frequently_asked_questions/','c
 	$.extend(routeObj.params,{
 		'pageType':'static',
 		'templateID':'faqTemplate',
-		'require':['templates.html','store_crm']
+		'require':['templates.html']
 		});
 	dump(routeObj.params);
 	routeObj.params.deferred = $.Deferred();
@@ -383,9 +553,9 @@ _app.couple('order_create','addOrderCompleteHandler',{
 
 //Generate meta information
 _app.u.bindTemplateEvent(function(){return true;}, 'complete.metainformation',function(event, $context, infoObj){
-	var defaultTitle = "The Hottest Cycling Gear";
+	var defaultTitle = "Chicago Cubs Apparel & Merchandise";
 	var titlePrefix = "";
-	var titlePostfix = " | SpeedAddictCycles.com";
+	var titlePostfix = " | SportsWorldChicago.com";
 	
 	var baseTitle = $('[data-seo-title]', $context).attr('data-seo-title') || defaultTitle;
 	var desc = $('[data-seo-desc]', $context).attr('data-seo-desc') || '';
@@ -450,7 +620,7 @@ _app.extend({
 	
 _app.couple('quickstart','addPageHandler',{
 	"pageType" : "homepage",
-	"require" : ['store_navcats','templates.html','store_routing', 'store_prodlist'],
+	"require" : ['store_navcats','templates.html','store_routing'],
 	"handler" : function($container, infoObj, require){
 		infoObj.deferred = $.Deferred();
 		infoObj.defPipeline.addDeferred(infoObj.deferred);
@@ -517,8 +687,11 @@ _app.extend({
 	"namespace" : "store_product",
 	"filename" : "extensions/store_product.js"
 	});
+>>>>>>> upstream/201411
 
 
+<<<<<<< HEAD
+=======
 _app.couple('quickstart','addPageHandler',{
 	"pageType" : "product",
 	"require" : ['store_product','store_navcats', 'store_routing', 'store_search', 'store_crm', 'templates.html'],
@@ -575,177 +748,7 @@ _app.extend({
 		// _app.ext.partner_addthis.u.toolbox($toolbox, infoObj);
 		// }
 	// });
-
-_app.extend({
-	"namespace" : "store_sac",
-	"filename" : "extensions/_store_sac.js"
-	});
-_app.couple('store_search','addUniversalFilter',{
-	'filter' : {"term":{"showtime":"1"}}
-	});
-_app.u.bindTemplateEvent('homepageTemplate', 'complete.sac', function(event, $context, infoObj){
-	_app.ext.store_sac.u.startHomepageSlideshow();
-	var $carousel = $('[data-sac=carousel]',$context);
-	if($carousel.hasClass('carouselRendered')){
-		//already rendered
-		}
-	else {
-		$carousel.addClass('carouselRendered')
-		setTimeout(function(){
-			$carousel.carouFredSel({
-				"responsive":true,
-				"width":200,
-				"height":"auto",
-				"auto" : { "play" : false },
-				"items" : { "visible" : 3},
-				"prev" : { "button" : $('.homepageFeaturesCarouselPrev', $context) },
-				"next" : { "button" : $('.homepageFeaturesCarouselNext', $context) }
-				},{"debug" : false});
-			},1000);
-		}
-	});
 	
-_app.u.bindTemplateEvent('productTemplate', 'complete.childcheck', function(event, $context, infoObj){
-	var data = _app.data["appProductGet|"+infoObj.pid];
-	if(data["%attribs"]["zoovy:grp_parent"]){
-		_app.router.handleURIString("/product/"+data["%attribs"]["zoovy:grp_parent"]+"/");
-		}
-	});
-_app.extend({
-	"namespace" : "store_filter",
-	"filename" : "extensions/_store_filter.js"
-	});
-var filterComplete = function(event, $context, infoObj){
-	var $fc = $('#filterContainer');
-	$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
-	$fc.addClass('active expand');
-	var timer = setTimeout(function(){
-		$fc.removeClass('expand');
-		}, 4000);
-	$fc.data('hidetimer', timer);
-	$fc.on('mouseenter.sac', function(){
-		clearTimeout($fc.data('hidetimer'));
-		$fc.off('mouseenter.sac');
-		});
-	};
-var filterDepart = function(event, $context, infoObj){
-	var $fc = $('#filterContainer');
-	$fc.removeClass('expand').removeClass('active');
-	$fc.off('mouseenter.sac');
-	};
-_app.u.bindTemplateEvent('filteredSearchTemplate', 'complete.sac', filterComplete);
-_app.u.bindTemplateEvent('filteredSearchTemplate', 'depart.sac', filterDepart);
-_app.u.bindTemplateEvent('filteredSearchTemplateBrand', 'complete.sac', filterComplete);
-
-_app.router.appendHash({'type':'exact','route':'/motorcycle-helmets/', 'callback':function(routeObj){
-	_app.ext.quickstart.a.showContent(routeObj.value,{
-		'pageType' : 'static',
-		'require' : ['templates.html'],
-		'templateID':'helmetsTemplate'
-		});
-	}});
-_app.router.appendHash({'type':'exact','route':'/parts/', 'callback':function(routeObj){
-	_app.ext.quickstart.a.showContent(routeObj.value,{
-		'pageType' : 'static',
-		'require' : ['templates.html'],
-		'templateID':'partsTemplate'
-		});
-	}});
-_app.router.appendHash({'type':'exact','route':'/apparel/', 'callback':function(routeObj){
-	_app.ext.quickstart.a.showContent(routeObj.value,{
-		'pageType' : 'static',
-		'require' : ['templates.html'],
-		'templateID':'apparelTemplate'
-		});
-	}});
-_app.router.appendHash({'type':'exact','route':'/brands/', 'callback':function(routeObj){
-	_app.ext.quickstart.a.showContent(routeObj.value,{
-		'pageType' : 'static',
-		'require' : ['templates.html'],
-		'templateID':'brandsTemplate'
-		});
-	}});
-
-//Adds the listener for the url.  The route needs to match the page pushed into robots below
-_app.router.appendHash({'type':'match','route':'/motorcycle-helmets/{{id}}/*','callback':'filter'});
-//This is the list of helmet pages.  The ID is part of the URL- change this for SEO reasons- the jsonPath is the file where it loads the options from.  The jsonPath doesn't matter as long as it loads the file
-var helmetPages = [
-	{id:'dirt-bike',jsonPath:'filters/helmets/dirt-bike.json'},
-	{id:'accessories',jsonPath:'filters/helmets/helmet-accessories.json'},
-	{id:'dual-sport',jsonPath:'filters/helmets/dual-sport.json'},
-	{id:'half-shell',jsonPath:'filters/helmets/half-shell.json'},
-	{id:'modular',jsonPath:'filters/helmets/modular.json'},
-	{id:'three-quarter',jsonPath:'filters/helmets/three-quarter.json'},
-	{id:'full-face',jsonPath:'filters/helmets/full-face.json'}
-	];
-for(var i in helmetPages){	
-	_app.couple('store_filter','addPage',helmetPages[i]);
-	}
-
-_app.router.appendHash({'type':'match','route':'/parts/{{id}}/*','callback':'filter'});
-var partsPages = [
-	{id:'chain-and-sprocket-kits',jsonPath:'filters/parts/chain-kits.json'},
-	{id:'electrical',jsonPath:'filters/parts/electrical.json'},
-	{id:'exhaust',jsonPath:'filters/parts/exhaust.json'},
-	{id:'intake',jsonPath:'filters/parts/intake.json'},
-	{id:'suspension',jsonPath:'filters/parts/suspension.json'},
-	{id:'brakes',jsonPath:'filters/parts/brakes.json'},
-	{id:'controls',jsonPath:'filters/parts/controls.json'},
-	{id:'repair-manual',jsonPath:'filters/parts/repair-manual.json'},
-	{id:'chain',jsonPath:'filters/parts/chain.json'},
-	{id:'tires',jsonPath:'filters/parts/tires.json'}
-	];
-for(var i in partsPages){	
-	_app.couple('store_filter','addPage',partsPages[i]);
-	}
-
-_app.router.appendHash({'type':'match','route':'/apparel/{{id}}/*','callback':'filter'});
-var apparelPages = [
-	{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
-	{id:'goggles',jsonPath:'filters/apparel/goggles.json'},
-	{id:'grips',jsonPath:'filters/apparel/grips.json'},
-	{id:'luggage',jsonPath:'filters/apparel/luggage.json'},
-	{id:'tools',jsonPath:'filters/apparel/tools.json'},
-	{id:'security',jsonPath:'filters/apparel/security.json'},
-	{id:'tank-pads',jsonPath:'filters/apparel/tank-pads.json'},
-	{id:'hitcase',jsonPath:'filters/apparel/hitcase.json'}
-	];
-for(var i in apparelPages){	
-	_app.couple('store_filter','addPage',apparelPages[i]);
-	}
-
-_app.router.appendHash({'type':'match','route':'/brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
-_app.router.appendHash({'type':'match','route':'/brand-feature-reviews/{{id}}/*','callback':'brandFilter'});
-var brandsPages = [
-	{id:'airoh',jsonPath:'filters/brands/airoh.json'},
-	{id:'ancra',jsonPath:'filters/brands/ancra.json'},
-	{id:'answer',jsonPath:'filters/brands/answer.json'},
-	{id:'arai',jsonPath:'filters/brands/arai.json'},
-	{id:'bmc',jsonPath:'filters/brands/bmc.json'},
-	{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
-	{id:'giant-loop',jsonPath:'filters/brands/giant-loop.json'},
-	{id:'hjc',jsonPath:'filters/brands/hjc.json'},
-	{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
-	{id:'leovince',jsonPath:'filters/brands/leovince.json'},
-	{id:'msr',jsonPath:'filters/brands/msr.json'},
-	{id:'olympia',jsonPath:'filters/brands/olympia.json'},
-	{id:'onguard',jsonPath:'filters/brands/onguard.json'},
-	{id:'progressive',jsonPath:'filters/brands/progressive.json'},
-	{id:'progrip',jsonPath:'filters/brands/progrip.json'},
-	{id:'racepro',jsonPath:'filters/brands/racepro.json'},
-	{id:'rk',jsonPath:'filters/brands/rk.json'},
-	{id:'shoei',jsonPath:'filters/brands/shoei.json'},
-	{id:'skid-lid',jsonPath:'filters/brands/skid-lid.json'},
-	{id:'speed-and-strength',jsonPath:'filters/brands/speed-and-strength.json'},
-	{id:'suomy',jsonPath:'filters/brands/suomy.json'},
-	{id:'thh',jsonPath:'filters/brands/thh.json'},
-	{id:'yuasa',jsonPath:'filters/brands/yuasa.json'}
-	];
-for(var i in brandsPages){	
-	_app.couple('store_filter','addPage',brandsPages[i]);
-	}
-
-
 _app.rq.push(['script',0,'lightbox/js/lightbox-2.6.min.js']);
 
 _app.model.getGrammar("pegjs");
@@ -802,11 +805,49 @@ _app.u.appInitComplete = function()	{
 		$history.append($P);
 		$history.parent().scrollTop($history.height());
 		}]);
+>>>>>>> upstream/201411
 
 	}
 
 
 
+<<<<<<< HEAD
+//this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
+//it'll also handle the old 'meta' uri params.
+//this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
+//it'll also handle the old 'meta' uri params.
+myApp.router.appendInit({
+	'type':'function',
+	'route': function(v){
+		return {'init':true} //returning anything but false triggers a match.
+		},
+	'callback':function(f,g){
+		dump(" -> triggered callback for appendInit");
+		g = g || {};
+		if(g.uriParams.seoRequest){
+			showContent(g.uriParams.pageType, g.uriParams);
+			}
+		else if (g.uriParams.marketplace){
+			showContent("product",{"pid":g.uriParams.product});
+			}
+		else if(document.location.hash)	{	
+			myApp.u.dump('triggering handleHash');
+			myApp.router.handleHashChange();
+			}
+		else	{
+			//IE8 didn't like the shortcut to showContent here.
+			myApp.ext.quickstart.a.showContent('homepage');
+			}
+		if(g.uriParams && g.uriParams.meta)	{
+			myApp.ext.cco.calls.cartSet.init({'want/refer':infoObj.uriParams.meta,'cartID':_app.model.fetchCartID()},{},'passive');
+			}
+		if(g.uriParams && g.uriParams.meta_src)	{
+			myApp.ext.cco.calls.cartSet.init({'want/refer_src':infoObj.uriParams.meta_src,'cartID':_app.model.fetchCartID()},{},'passive');
+			}
+		}
+	});
+=======
+>>>>>>> upstream/201411
 
 
 //this will trigger the content to load on app init. so if you push refresh, you don't get a blank page.
@@ -880,6 +921,9 @@ _app.router.appendInit({
 	});
 
 
+<<<<<<< HEAD
+=======
 
 
 })(myApp);
+>>>>>>> upstream/201411
