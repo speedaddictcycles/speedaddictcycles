@@ -422,25 +422,27 @@ var store_sac = function(_app) {
 				p.preventDefault();
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
-					var cartObj = {"_cartid":_app.model.fetchCartID(),"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()};
-					if($childSelect.val()){
-						_app.ext.cco.calls.cartItemAppend.init(cartObj,{},'immutable');
-						_app.model.destroy('cartDetail|'+cartObj._cartid);
-						_app.calls.cartDetail.init(cartObj._cartid,{'callback':function(rd){
-							if(_app.model.responseHasErrors(rd)){
-								$('#globalMessaging').anymessage({'message':rd});
-								}
-							else	{
-								_app.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'});
-								dump(" ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-								cartMessagePush(cartObj._cartid,'cart.itemAppend',_app.u.getWhitelistedObject(cartObj,['sku','pid','qty','quantity','%variations']));
-								}
-							}},'immutable');
-						_app.model.dispatchThis('immutable');
-						}
-					else {
-						$form.anymessage(_app.u.errMsgObject("You must select an option"));
-						}
+					_app.require('cco',function(){
+						var cartObj = {"_cartid":_app.model.fetchCartID(),"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()};
+						if($childSelect.val()){
+							_app.ext.cco.calls.cartItemAppend.init(cartObj,{},'immutable');
+							_app.model.destroy('cartDetail|'+cartObj._cartid);
+							_app.calls.cartDetail.init(cartObj._cartid,{'callback':function(rd){
+								if(_app.model.responseHasErrors(rd)){
+									$('#globalMessaging').anymessage({'message':rd});
+									}
+								else	{
+									_app.ext.quickstart.u.showCartInModal({'templateID':'cartTemplate'});
+									dump(" ->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+									cartMessagePush(cartObj._cartid,'cart.itemAppend',_app.u.getWhitelistedObject(cartObj,['sku','pid','qty','quantity','%variations']));
+									}
+								}},'immutable');
+							_app.model.dispatchThis('immutable');
+							}
+						else {
+							$form.anymessage(_app.u.errMsgObject("You must select an option"));
+							}
+						});
 					}
 				else {
 					_app.ext.quickstart.e.productAdd2Cart($form, p);
