@@ -107,7 +107,7 @@ var store_filter = function(_app) {
 					// routeObj.params.loadFullList = _app.ext.seo_robots.u.isRobotPresent();
 					routeObj.params.loadFullList = false;
 					routeObj.params.pageType = 'static';
-					routeObj.params.require = ['store_search','prodlist_infinite'];
+					routeObj.params.require = ['templates.html','store_search','prodlist_infinite'];
 					_app.ext.quickstart.a.showContent(routeObj.value,routeObj.params);
 					}
 					
