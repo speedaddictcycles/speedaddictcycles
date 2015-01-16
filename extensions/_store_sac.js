@@ -452,6 +452,7 @@ var store_sac = function(_app) {
 				p.preventDefault();
 				var json = $form.serializeJSON();
 				//window.location.hash = "#!search/keywords/"+json.search+"/";
+				_app.router.handleURIString('/search/keywords/'+json.search+'/');
 			}
 			}, //e [app Events]
 			
