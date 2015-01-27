@@ -608,7 +608,7 @@ _app.u.bindTemplateEvent('homepageTemplate', 'complete.sac', function(event, $co
 _app.u.bindTemplateEvent('productTemplate', 'complete.childcheck', function(event, $context, infoObj){
 	var data = _app.data["appProductGet|"+infoObj.pid];
 	if(data["%attribs"]["zoovy:grp_parent"]){
-		_app.router.handleURIString("/product/"+data["%attribs"]["zoovy:grp_parent"]+"/");
+		setTimeout(function(){_app.router.handleURIString("/product/"+data["%attribs"]["zoovy:grp_parent"]+"/");}, 200);
 		}
 	});
 _app.extend({
