@@ -101,19 +101,10 @@ var store_sac = function(_app) {
 				return true;
 				},
 			filterform : function(data, thisTLC){
-				var $context = data.globals.tags[data.globals.focusTag];
-				
-				var $fc = $('#filterContainer');
-				var $fl = $('#filterList', $fc);
-				$fl.removeData().empty();
-				
-				$fl.data('dataset',data.value);
-				$fl.tlc({'dataset':data.value, 'templateid':'filterListTemplate'});
-				$('button', $fl).button();
-				
-				$('form',$fl).data('jqContext',$context);
-				
-				//$('form', $fl).trigger('submit');
+				var $tag = data.globals.tags[data.globals.focusTag];
+				$tag.data('fl-dataset', data.value);
+				$tag.data('fl-templateid','filterListTemplate');
+				_app.u.dump($tag);
 				}
 			},
 		
@@ -285,27 +276,6 @@ var store_sac = function(_app) {
 					}
 				*/
 				return $banner;
-				},
-			initFilteredSearch : function($context, infoObj){
-				var $fc = $('#filterContainer');
-				var $fl = $('#filterList', $fc);
-				var timer = $fc.data('filter-list-clear-timer');
-				if(timer){
-					clearTimeout(timer);
-					$fl.removeData().empty();
-					$fc.removeData('filter-list-clear-timer');
-				}
-				
-				$fl.data('jqContext',$context);
-				$fl.data('navcat',infoObj.navcat);
-				$fl.data('filters',_app.ext.store_sac.filters[infoObj.navcat]);
-				
-				$fl.tlc({'dataset':_app.ext.store_sac.filters[infoObj.navcat], 'templateid':'filterListTemplate'});
-				$('button', $fl).button();
-				$fc.addClass('active');
-				_app.ext.store_sac.u.sendFilteredSearch();
-				//TODO
-				//$fc.addClass('expand');
 				},
 			sendFilteredSearch : function(){
 				var $context = $('#filterList').data('jqContext');

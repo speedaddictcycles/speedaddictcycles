@@ -267,6 +267,7 @@ var store_filter = function(_app) {
 					_app.ext.store_filter.vars.filterLoadingComplete = true;
 					}
 				var $page = $form.data('jqContext');
+				dump($page);
 				p.preventDefault();
 				var $resultsContainer = $page.closest('[data-filter=parent]').find('[data-filter=resultsList]');
 				dump($form.attr('data-filter-base'));
@@ -347,7 +348,7 @@ var store_filter = function(_app) {
 					es.size = 30;
 					}
 				$resultsContainer.empty();
-				
+				$resultsContainer.append('<div class="loader alignCenter"><img src="loading.gif" /></div>');
 				_app.ext.store_search.u.updateDataOnListElement($resultsContainer,_app.u.getBlacklistedObject(es, ["facets"]),1);
 				//dump(es);
 				_app.model.dispatchThis();
@@ -356,6 +357,7 @@ var store_filter = function(_app) {
 						_app.u.throwMessage(rd);
 						}
 					else {
+						$('.loader', rd.list).empty().remove();
 						_app.ext.prodlist_infinite.callbacks.handleInfiniteElasticResults.onSuccess(rd);
 						if(_app.data[rd.datapointer].facets){
 							$('[data-filter-type=checkboxList]',rd.filterList).each(function(){

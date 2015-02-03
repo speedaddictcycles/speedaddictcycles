@@ -617,16 +617,26 @@ _app.extend({
 	});
 var filterComplete = function(event, $context, infoObj){
 	var $fc = $('#filterContainer');
-	$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
-	$fc.addClass('active expand');
-	var timer = setTimeout(function(){
-		$fc.removeClass('expand');
-		}, 4000);
-	$fc.data('hidetimer', timer);
-	$fc.on('mouseenter.sac', function(){
-		clearTimeout($fc.data('hidetimer'));
-		$fc.off('mouseenter.sac');
-		});
+	var $fl = $('#filterList', $fc);
+	$fl.removeData().empty();		
+	var dataset = $context.data('fl-dataset');
+	var templateid = $context.data('fl-templateid');
+	$fl.data('dataset',dataset);
+	$fl.tlc({'dataset':dataset, 'templateid':templateid});
+	$('form',$fl).data('jqContext',$context);
+	$('button', $fl).button();
+	if($context.data('templateid') != 'filteredSearchTemplateBrand'){		
+		$fc.addClass('active expand');
+		var timer = setTimeout(function(){
+			$fc.removeClass('expand');
+			}, 4000);
+		$fc.data('hidetimer', timer);
+		$fc.on('mouseenter.sac', function(){
+			clearTimeout($fc.data('hidetimer'));
+			$fc.off('mouseenter.sac');
+			});
+		$('form', $fc).data('loadFullList', infoObj.loadFullList).trigger('submit');
+		}
 	};
 var filterDepart = function(event, $context, infoObj){
 	var $fc = $('#filterContainer');
@@ -636,6 +646,7 @@ var filterDepart = function(event, $context, infoObj){
 _app.u.bindTemplateEvent('filteredSearchTemplate', 'complete.sac', filterComplete);
 _app.u.bindTemplateEvent('filteredSearchTemplate', 'depart.sac', filterDepart);
 _app.u.bindTemplateEvent('filteredSearchTemplateBrand', 'complete.sac', filterComplete);
+_app.u.bindTemplateEvent('filteredSearchTemplateBrand', 'depart.sac', filterDepart);
 
 _app.router.appendHash({'type':'exact','route':'/motorcycle-helmets/', 'callback':function(routeObj){
 	_app.ext.quickstart.a.showContent(routeObj.value,{
