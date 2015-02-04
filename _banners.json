@@ -7,34 +7,34 @@
 			"b":"000000",
 			"alt": "",
 			"title": "",
-			"href": "#!motorcycle-helmets/full-face/?user:app_brand=suomy"
+			"href": "motorcycle-helmets/full-face/?user:app_brand=suomy"
 		},
 		{
-			"name": "banner/hitcase_pro5_motor.jpg",
+			"name": "banner/100_percent_goggles.jpg",
 			"w":"960",
 			"h":"403",
 			"b":"000000",
 			"alt": "",
 			"title": "",
-			"href": "#!apparel/hitcase/"
+			"href": "apparel/goggles/?user:app_brand=100"
 		},
 		{
-			"name": "banner/suomy_mr_jump_1249.jpg",
+			"name": "banner/suomy_mr_jump_helmets.jpg",
 			"w":"960",
 			"h":"403",
 			"b":"000000",
 			"alt": "",
 			"title": "",
-			"href": "#!motorcycle-helmets/dirt-bike/?user:app_brand=suomy"
+			"href": "brands/suomy/?user:suomy_model=mr_jump"
 		},
 		{
-			"name": "banner/slideshow_test900x403.jpg",
+			"name": "banner/clymer_repair_manuals.jpg",
 			"w":"960",
 			"h":"403",
 			"b":"000000",
 			"alt": "",
 			"title": "",
-			"href": "#!motorcycle-helmets/dirt-bike/?user:app_brand=airoh"
+			"href": "parts/repair-manual/"
 		},
 		{
 			"name": "banner/kiva_banner_save.jpg",
@@ -43,7 +43,7 @@
 			"b":"000000",
 			"alt": "",
 			"title": "",
-			"href": "#!company/payment/"
+			"href": "company/payment/"
 		}
 	],
 	"pagerHTML": "<div class='pager'></div>",

@@ -2,6 +2,7 @@
 	"title" : "Goggles - Motorcycle Apparel & Accessories",
 	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"goggles"}}]},
 	"optionList" : [
+		"user:app_brand",
 		"user:primary_color"
 	]
 }
