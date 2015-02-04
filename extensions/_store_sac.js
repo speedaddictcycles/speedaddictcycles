@@ -392,7 +392,7 @@ var store_sac = function(_app) {
 				p.preventDefault();
 				var $childSelect = $('.prodChildren.active select', $form);
 				if($childSelect.length > 0){
-					_app.require('cco',function(){
+					_app.require(['store_product','cco','order_create','templates.html'],function(){
 						var cartObj = {"_cartid":_app.model.fetchCartID(),"sku":$childSelect.val(), "qty":$('input[name=qty]',$form).val()};
 						if($childSelect.val()){
 							_app.ext.cco.calls.cartItemAppend.init(cartObj,{},'immutable');
