@@ -1944,7 +1944,7 @@ either templateID needs to be set OR showloading must be true. TemplateID will t
  can't think of a reason not to use the default parentID, but just in case, it can be set.
 */
 			showCartInModal : function(P)	{
-				_app.require('cco',function(){
+				_app.require(['store_product','cco','order_create','templates.html'],function(){
 					if(typeof P == 'object' && (P.templateID || P.showLoading === true)){
 						P.state = 'init';
 						var $modal = $('#modalCart');
