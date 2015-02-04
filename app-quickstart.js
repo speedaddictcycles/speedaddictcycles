@@ -297,19 +297,26 @@ document.write = function(v){
 //				dump(tagObj);
 				var tmp = _app.data[tagObj.datapointer];
 				var pid = _app.data[tagObj.datapointer].pid;
-				tmp.session = _app.ext.quickstart.vars.session;
-				if(typeof _app.data['appReviewsList|'+pid] == 'object')	{
-					tmp['reviews'] = _app.ext.store_product.u.summarizeReviews(pid); //generates a summary object (total, average)
-					tmp['reviews']['@reviews'] = _app.data['appReviewsList|'+pid]['@reviews']
-					}
-//				dump("Rendering product template for: "+pid);
-				tagObj.jqObj.tlc({'verb':'translate','dataset':tmp});
-				tagObj.pid = pid;
-				//build queries will validate the namespaces used AND also fetch the parent product if this item is a child.
-				_app.ext.quickstart.u.buildQueriesFromTemplate(tagObj);
-				_app.model.dispatchThis();
 				
-// SANITY - handleTemplateEvents does not get called here. It'll get executed as part of showPageContent callback, which is executed in buildQueriesFromTemplate.
+				if(tmp["%attribs"]["zoovy:grp_parent"]){
+					tagObj.jqObj.closest('[data-app-uri]').empty().remove();
+					_app.router.handleURIString("/product/"+tmp["%attribs"]["zoovy:grp_parent"]+"/","replace");
+					}
+				else {
+					tmp.session = _app.ext.quickstart.vars.session;
+					if(typeof _app.data['appReviewsList|'+pid] == 'object')	{
+						tmp['reviews'] = _app.ext.store_product.u.summarizeReviews(pid); //generates a summary object (total, average)
+						tmp['reviews']['@reviews'] = _app.data['appReviewsList|'+pid]['@reviews']
+						}
+	//				dump("Rendering product template for: "+pid);
+					tagObj.jqObj.tlc({'verb':'translate','dataset':tmp});
+					tagObj.pid = pid;
+					//build queries will validate the namespaces used AND also fetch the parent product if this item is a child.
+					_app.ext.quickstart.u.buildQueriesFromTemplate(tagObj);
+					_app.model.dispatchThis();
+					
+	// SANITY - handleTemplateEvents does not get called here. It'll get executed as part of showPageContent callback, which is executed in buildQueriesFromTemplate.
+					}
 				},
 			onError : function(responseData,uuid)	{
 //				dump(responseData);
