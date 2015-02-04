@@ -2430,7 +2430,7 @@ else	{
 
 			productAdd2Cart : function($ele,p)	{
 				p.preventDefault();
-				_app.require(['store_product','cco','templates.html'],function(){
+				_app.require(['store_product','cco','order_create','templates.html'],function(){
 					var cartObj = _app.ext.store_product.u.buildCartItemAppendObj($ele);
 					if(cartObj)	{
 						cartObj["_cartid"] = _app.model.fetchCartID();
