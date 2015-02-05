@@ -1,0 +1,8 @@
+{
+	"title" : "Nolan Helmets",
+	"baseFilter" : {"and" : [{"term" : {"app_brand" : "nolan"}},{"term" : {"prod_is_general":"helmet"}}]},
+	"optionList" : [
+		"user:helmet_type",
+		"user:primary_color"
+	]
+}
