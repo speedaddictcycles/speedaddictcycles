@@ -739,6 +739,7 @@ var brandsPages = [
 	{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
 	{id:'leovince',jsonPath:'filters/brands/leovince.json'},
 	{id:'msr',jsonPath:'filters/brands/msr.json'},
+	{id:'nolan',jsonPath:'filters/brands/nolan.json'},
 	{id:'olympia',jsonPath:'filters/brands/olympia.json'},
 	{id:'onguard',jsonPath:'filters/brands/onguard.json'},
 	{id:'progressive',jsonPath:'filters/brands/progressive.json'},
