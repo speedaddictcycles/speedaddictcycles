@@ -383,7 +383,7 @@ _app.couple('order_create','addOrderCompleteHandler',{
 
 //Generate meta information
 _app.u.bindTemplateEvent(function(){return true;}, 'complete.metainformation',function(event, $context, infoObj){
-	var defaultTitle = "The Hottest Cycling Gear";
+	var defaultTitle = "Motorcycle Helmets, Parts, and Apparel";
 	var titlePrefix = "";
 	var titlePostfix = " | SpeedAddictCycles.com";
 	
