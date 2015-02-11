@@ -383,9 +383,9 @@ _app.couple('order_create','addOrderCompleteHandler',{
 
 //Generate meta information
 _app.u.bindTemplateEvent(function(){return true;}, 'complete.metainformation',function(event, $context, infoObj){
-	var defaultTitle = "Motorcycle Helmets, Parts, and Apparel";
+	var defaultTitle = "Motorcycle Helmets, Gear, and Parts";
 	var titlePrefix = "";
-	var titlePostfix = " | SpeedAddictCycles.com";
+	var titlePostfix = " - Speed Addict Cycles";
 	
 	var baseTitle = $('[data-seo-title]', $context).attr('data-seo-title') || defaultTitle;
 	var desc = $('[data-seo-desc]', $context).attr('data-seo-desc') || '';
