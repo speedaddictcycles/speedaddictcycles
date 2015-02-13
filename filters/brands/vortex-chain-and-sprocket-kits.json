@@ -1,0 +1,10 @@
+{
+	"title" : "Chain and Sprocket Kits - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"chain_kits"}}]},
+	"optionList" : [
+		"user:single_make",
+		"user:chain_kit_gearing",
+		"user:chain_kit_rearsprocket",
+		"user:chain_color"
+	]
+}

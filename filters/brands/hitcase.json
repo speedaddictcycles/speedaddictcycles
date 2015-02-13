@@ -1,7 +1,0 @@
-{
-	"title" : "Hitcase",
-	"baseFilter" : {"term" : {"app_brand" : "hitcase"}},
-	"optionList" : [
-		"user:part_sub_type"
-	]
-}

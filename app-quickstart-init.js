@@ -728,30 +728,30 @@ for(var i in apparelPages){
 _app.router.appendHash({'type':'match','route':'/brands/{{id}}/*','callback':'filter' /*use brandFilter later*/});
 _app.router.appendHash({'type':'match','route':'/brand-feature-reviews/{{id}}/*','callback':'brandFilter'});
 var brandsPages = [
-	{id:'airoh',jsonPath:'filters/brands/airoh.json'},
-	{id:'ancra',jsonPath:'filters/brands/ancra.json'},
+	{id:'airoh-helmets',jsonPath:'filters/brands/airoh-helmets.json'},
+	{id:'ancra-tie-downs',jsonPath:'filters/brands/ancra-tie-downs.json'},
 	{id:'answer',jsonPath:'filters/brands/answer.json'},
-	{id:'arai',jsonPath:'filters/brands/arai.json'},
-	{id:'bmc',jsonPath:'filters/brands/bmc.json'},
+	{id:'arai-helmets',jsonPath:'filters/brands/arai-helmets.json'},
+	{id:'bmc-air-filters',jsonPath:'filters/brands/bmc-air-filters.json'},
 	{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
-	{id:'giant-loop',jsonPath:'filters/brands/giant-loop.json'},
-	{id:'hjc',jsonPath:'filters/brands/hjc.json'},
+	{id:'giant-loop-luggage',jsonPath:'filters/brands/giant-loop-luggage.json'},
+	{id:'hjc-helmets',jsonPath:'filters/brands/hjc-helmets.json'},
 	{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
-	{id:'leovince',jsonPath:'filters/brands/leovince.json'},
 	{id:'msr',jsonPath:'filters/brands/msr.json'},
-	{id:'nolan',jsonPath:'filters/brands/nolan.json'},
-	{id:'olympia',jsonPath:'filters/brands/olympia.json'},
-	{id:'onguard',jsonPath:'filters/brands/onguard.json'},
-	{id:'progressive',jsonPath:'filters/brands/progressive.json'},
-	{id:'progrip',jsonPath:'filters/brands/progrip.json'},
+	{id:'nolan-helmets',jsonPath:'filters/brands/nolan-helmets.json'},
+	{id:'olympia-gloves',jsonPath:'filters/brands/olympia-gloves.json'},
+	{id:'onguard-locks',jsonPath:'filters/brands/onguard-locks.json'},
+	{id:'progressive-suspension',jsonPath:'filters/brands/progressive-suspension.json'},
+	{id:'progrip-grips',jsonPath:'filters/brands/progrip-grips.json'},
 	{id:'racepro',jsonPath:'filters/brands/racepro.json'},
-	{id:'rk',jsonPath:'filters/brands/rk.json'},
-	{id:'shoei',jsonPath:'filters/brands/shoei.json'},
-	{id:'skid-lid',jsonPath:'filters/brands/skid-lid.json'},
+	{id:'rk-motorcycle-chain',jsonPath:'filters/brands/rk-motorcycle-chain.json'},
+	{id:'vortex-chain-and-sprocket-kits',jsonPath:'filters/brands/vortex-chain-and-sprocket-kits.json'},
+	{id:'shoei-helmets',jsonPath:'filters/brands/shoei-helmets.json'},
+	{id:'skidlid-helmets',jsonPath:'filters/brands/skidlid-helmets.json'},
 	{id:'speed-and-strength',jsonPath:'filters/brands/speed-and-strength.json'},
-	{id:'suomy',jsonPath:'filters/brands/suomy.json'},
-	{id:'thh',jsonPath:'filters/brands/thh.json'},
-	{id:'yuasa',jsonPath:'filters/brands/yuasa.json'}
+	{id:'suomy-helmets',jsonPath:'filters/brands/suomy-helmets.json'},
+	{id:'thh-helmets',jsonPath:'filters/brands/thh-helmets.json'},
+	{id:'yuasa-batteries',jsonPath:'filters/brands/yuasa-batteries.json'}
 	];
 for(var i in brandsPages){	
 	_app.couple('store_filter','addPage',brandsPages[i]);

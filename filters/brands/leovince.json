@@ -1,9 +1,0 @@
-{
-	"title" : "Leo Vince Exhaust",
-	"baseFilter" : {"term" : {"app_brand" : "leo_vince"}},
-	"optionList" : [
-		"user:make_key",
-		"user:exhaust_type",
-		"user:finish"
-	]
-}
