@@ -9,12 +9,19 @@ _app.u.loadScript(configURI,function(){
 	_app.vars.secureURL = zGlobals.appSettings.https_app_url;
 	_app.vars.domain = zGlobals.appSettings.sdomain; //passed in ajax requests.
 	_app.vars.jqurl = (document.location.protocol === 'file:') ? _app.vars.testURL+'jsonapi/' : '/jsonapi/';
-
-	var startupRequires = ['quickstart', 'store_sac', 'store_filter'];
+	
+	var startupRequires = ['quickstart', 'store_sac', 'store_filter', 'gts.html'];
 	
 	_app.require(startupRequires, function(){
 		setTimeout(function(){$('#appView').removeClass('initFooter');}, 1200);
 		_app.ext.quickstart.callbacks.startMyProgram.onSuccess();
+		
+		if(window.location.pathname.indexOf('/invoice') == 0){
+			
+			}
+		else {
+			_app.ext.store_sac.u.applyGTS();
+			}
 		});
 	}); //The config.js is dynamically generated.
 	
@@ -78,6 +85,16 @@ _app.u.bindTemplateEvent('checkoutTemplate','depart.destroy',function(event, $co
 		$page.empty().remove();
 		}
 	});
+_app.couple('quickstart','addPageHandler',{
+	"pageType" : "invoice",
+	"require" : ['order_create', 'store_crm','extensions/checkout/active.html'],
+	"handler" : function($container, infoObj, require){
+		_app.require(require, function(){
+			_app.ext.order_create.a.showInvoice($container, infoObj.cartid);
+			});
+		}
+	});
+	
 _app.extend({
 	"namespace" : "cco",
 	"filename" : "extensions/cart_checkout_order.js"
@@ -153,6 +170,15 @@ _app.router.appendHash({'type':'match','route':'/search/keywords/{{KEYWORDS}}*',
 _app.router.addAlias('checkout',	function(routeObj){_app.ext.quickstart.a.showContent(routeObj.value,	$.extend({'pageType':'checkout', 'requireSecure':true}, routeObj.params));});
 _app.router.appendHash({'type':'exact','route':'/checkout','callback':'checkout'});
 _app.router.appendHash({'type':'exact','route':'/checkout/','callback':'checkout'});
+
+_app.router.addAlias('invoice',		function(routeObj){
+	var infoObj = $.extend({'pageType' : 'invoice','requireSecure' : true}, routeObj.params, _app.u.getWhitelistedObject(routeObj.searchParams, ['cartid']));
+	console.log(routeObj.searchParams);
+	console.log(infoObj);
+	_app.ext.quickstart.a.showContent(routeObj.value, infoObj);
+	});
+_app.router.appendHash({'type':'exact','route':'/invoice','callback':'invoice'});
+_app.router.appendHash({'type':'exact','route':'/invoice/','callback':'invoice'});
 
 _app.router.addAlias('cart',	function(routeObj){_app.ext.quickstart.a.showContent(routeObj.value,	$.extend({'pageType':'cart'}, routeObj.params));});
 _app.router.appendHash({'type':'exact','route':'/cart','callback':'cart'});
@@ -858,7 +884,7 @@ _app.router.appendInit({
 			if(pathStr.indexOf('?') >= 0){
 				var arr = pathStr.split('?');
 				pathStr = arr[0];
-				search = arr[1];
+				search = '?'+arr[1];
 				}
 			_app.router.handleURIChange("/"+pathStr, search, false, 'replace');
 			}
@@ -891,7 +917,16 @@ _app.router.appendInit({
 		}
 	});
 
-
+_app.u.bindTemplateEvent(function(){return true;},'complete.analyticssetup',function(event, $context, infoObj){
+	if(!_app.vars.analyticsFirstPageSent){
+		_app.vars.analyticsFirstPageSent = true;
+		}
+	else{
+		var url = $context.closest('[data-app-uri]').attr('data-app-uri');
+		if(url)	{window[_app.vars.analyticsPointer]('send','pageview', url);}
+		else	{window[_app.vars.analyticsPointer]('send','pageview');}
+		}
+	});
 
 
 })(myApp);

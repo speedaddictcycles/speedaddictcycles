@@ -197,6 +197,11 @@ var store_sac = function(_app) {
 ////////////////////////////////////   UTIL [u]   \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 		u : {
+			applyGTS : function(){
+				$('#gts-o-domain').html(window.location.hostname);
+				//postscribe('#appView', '<script type="text/javascript">'+_app.templates.gtsscript.html()+'</script>');
+				
+				},
 			startHomepageSlideshow : function(attempts){
 				attempts = attempts || 0;
 				if(_app.ext.store_sac.vars.bannerJSON){
