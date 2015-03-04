@@ -75,6 +75,27 @@ var store_sac = function(_app) {
 ////////////////////////////////////   RENDERFORMATS    \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 		
 		tlcFormats : {
+			formatrecentlyviewed : function(data,thisTLC){
+				if(typeof data.globals.binds[data.globals.focusBind] === 'object' && typeof data.globals.binds[data.globals.focusBind].slice === 'function'){
+					var args = thisTLC.args2obj(data.command.args, data.globals);
+					var r = data.globals.binds[data.globals.focusBind].slice();
+					if(args.pid){
+						for(var i in r){
+							if(r[i] == args.pid){
+								r.splice(i,1);
+								}
+							}
+						}
+					if(args.length){
+						r = r.slice(0,args.length);
+						}
+					data.globals.binds[data.globals.focusBind] = r;
+					return true;
+					}
+				else{
+					return false;
+					}
+				},
 			countrylist : function(data, thisTLC){
 				var _tag = {
 					callback : function(rd){
@@ -94,6 +115,7 @@ var store_sac = function(_app) {
 					}
 				_app.ext.cco.calls.appCheckoutDestinations.init(_app.model.fetchCartID(),_tag,'mutable');
 				_app.model.dispatchThis('mutable');
+				return true;
 				},
 			imageurl : function(data,thisTLC){
 				var args = thisTLC.args2obj(data.command.args, data.globals);
@@ -105,6 +127,7 @@ var store_sac = function(_app) {
 				$tag.data('fl-dataset', data.value);
 				$tag.data('fl-templateid','filterListTemplate');
 				_app.u.dump($tag);
+				return true;
 				}
 			},
 		

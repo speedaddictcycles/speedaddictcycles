@@ -848,7 +848,12 @@ Additionally, the cross selling features also have hard coded id's, though they'
 
 this will likely become more flexible in the future. ###
 -->
-
+<ul id="recentlyViewedTemplate" class="listStyleNone noPadOrMargin" data-tlc="
+	bind $pid '.pid';
+	bind $rv '.session.recentlyViewedItems';
+	store_sac#formatrecentlyviewed --pid=$pid --length='5';
+	store_prodlist#productlist  --withInventory='1' --withVariations='1' --templateid='productListTemplateCarousel'  --legacy;
+	"></ul>
 
 <div data-tlc="bind $var '.pid'; apply --attrib='data-pid';" id="productTemplate" class="productPage">
 	<span class="displayNone" data-tlc="store_routing#seoanchor --seo; apply --attrib='data-canonical';"></span>
@@ -866,8 +871,11 @@ this will likely become more flexible in the future. ###
 			<img src="blank.gif" data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{store_sac#imageurl --name=$var --w='235' --b='ffffff'; apply --attrib='src';}};"/>
 		</div>
 	<!-- Schad turned off, need to configure banners
-		<div>Recently Viewed Items</div>
 		-->
+		<div>
+			<h4>Recently Viewed Items</h4>
+			<div class="recentlyViewed"><!-- populated by complete event --></div>
+		</div>
 	</div>
 	<div class="prodViewerContainer">
 		<div class="prodImageContainer floatLeft lowlightText">

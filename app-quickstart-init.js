@@ -642,6 +642,9 @@ _app.u.bindTemplateEvent('productTemplate', 'complete.childcheck', function(even
 		//setTimeout(function(){_app.router.handleURIString("/product/"+data["%attribs"]["zoovy:grp_parent"]+"/");}, 200);
 		}
 	});
+_app.u.bindTemplateEvent('productTemplate', 'complete.recentlyviewed', function(event, $context, infoObj){
+	$('.recentlyViewed',$context).empty().tlc({templateid:"recentlyViewedTemplate",dataset:{session:_app.ext.quickstart.vars.session,pid:infoObj.pid}});
+	});
 _app.extend({
 	"namespace" : "store_filter",
 	"filename" : "extensions/_store_filter.js"

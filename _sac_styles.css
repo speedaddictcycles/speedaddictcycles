@@ -227,6 +227,7 @@ HOMEPAGE STYLES
 .homepageFeaturesCarouselBody .carouselHeader{ color:#cc4300;}
 
 .prodListItemCarousel .prodThumbContainer {border: 1px solid #cc4300;}
+.prodThumbContainer {margin:0px auto;}
 .prodListItemCarousel .name{ color: #565656; }
 .prodListItemCarousel .price{ color: #cc4300; }
 
