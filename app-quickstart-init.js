@@ -22,6 +22,11 @@ _app.u.loadScript(configURI,function(){
 		else {
 			_app.ext.store_sac.u.applyGTS();
 			}
+		setTimeout(function(){
+			_app.require('templates.html',function(){
+				postscribe('#provideSupport', '<script type="text/javascript">'+_app.templates.provideSupportScript.html()+'</script>');
+				}),
+			1500});
 		});
 	}); //The config.js is dynamically generated.
 	
