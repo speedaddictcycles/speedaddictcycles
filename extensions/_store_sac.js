@@ -222,7 +222,7 @@ var store_sac = function(_app) {
 		u : {
 			applyGTS : function(){
 				$('#gts-o-domain').html(window.location.hostname);
-				//postscribe('#appView', '<script type="text/javascript">'+_app.templates.gtsscript.html()+'</script>');
+				postscribe('#appView', '<script type="text/javascript">'+_app.templates.gtsscript.html()+'</script>');
 				
 				},
 			startHomepageSlideshow : function(attempts){
