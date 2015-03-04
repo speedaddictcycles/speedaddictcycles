@@ -939,15 +939,54 @@ this will likely become more flexible in the future. ###
 						}};" class="prodThumb displayNone" href="#">
 						<img data-tlc="bind $var '.%attribs.zoovy:prod_image4'; store_sac#imageurl --name=$var --w='54' --h='40' --b='ffffff'; apply --attrib='src';" src="blank.gif">
 					</a>
-					<!-- <a data-tlc="tools_lightbox#lightboxlink --hrefattr='%attribs.zoovy:prod_image2' --groupingattr='pid' --groupingprefix='prodPage_' --legacy;" class="prodThumb" href="#">
-						<img data-tlc="bind $var '.%attribs.zoovy:prod_image2'; store_sac#imagesrcset  --dims='479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40' --legacy;" src="blank.gif">
+					<a data-tlc="
+						bind $href '.%attribs.zoovy:prod_image5'; 
+						if(is $href --notblank;) {{
+							store_sac#imageurl --name=$href --b='ffffff'; 
+							apply --attrib='href';
+							bind $pid '.pid';
+							format --prepend='prodPage_';
+							apply --attrib='data-lightbox';
+							apply --show --tag;
+						}};" class="prodThumb displayNone" href="#">
+						<img data-tlc="bind $var '.%attribs.zoovy:prod_image5'; store_sac#imageurl --name=$var --w='54' --h='40' --b='ffffff'; apply --attrib='src';" src="blank.gif">
 					</a>
-					<a data-tlc="tools_lightbox#lightboxlink  --hrefattr='%attribs.zoovy:prod_image3' --groupingattr='pid' --groupingprefix='prodPage_' --legacy;" class="prodThumb" href="#">
-						<img data-tlc="bind $var '.%attribs.zoovy:prod_image3'; store_sac#imagesrcset  --dims='479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40' --legacy;" src="blank.gif">
+					<a data-tlc="
+						bind $href '.%attribs.zoovy:prod_image6'; 
+						if(is $href --notblank;) {{
+							store_sac#imageurl --name=$href --b='ffffff'; 
+							apply --attrib='href';
+							bind $pid '.pid';
+							format --prepend='prodPage_';
+							apply --attrib='data-lightbox';
+							apply --show --tag;
+						}};" class="prodThumb displayNone" href="#">
+						<img data-tlc="bind $var '.%attribs.zoovy:prod_image6'; store_sac#imageurl --name=$var --w='54' --h='40' --b='ffffff'; apply --attrib='src';" src="blank.gif">
 					</a>
-					<a data-tlc="tools_lightbox#lightboxlink  --hrefattr='%attribs.zoovy:prod_image4' --groupingattr='pid' --groupingprefix='prodPage_' --legacy;" class="prodThumb" href="#" >
-						<img data-tlc="bind $var '.%attribs.zoovy:prod_image4'; store_sac#imagesrcset  --dims='479w|36|26 639w|30|22 767w|44|32 959w|54|40 |54|40' --legacy;" src="blank.gif">
-					</a> -->
+					<a data-tlc="
+						bind $href '.%attribs.zoovy:prod_image7'; 
+						if(is $href --notblank;) {{
+							store_sac#imageurl --name=$href --b='ffffff'; 
+							apply --attrib='href';
+							bind $pid '.pid';
+							format --prepend='prodPage_';
+							apply --attrib='data-lightbox';
+							apply --show --tag;
+						}};" class="prodThumb displayNone" href="#">
+						<img data-tlc="bind $var '.%attribs.zoovy:prod_image7'; store_sac#imageurl --name=$var --w='54' --h='40' --b='ffffff'; apply --attrib='src';" src="blank.gif">
+					</a>
+					<a data-tlc="
+						bind $href '.%attribs.zoovy:prod_image8'; 
+						if(is $href --notblank;) {{
+							store_sac#imageurl --name=$href --b='ffffff'; 
+							apply --attrib='href';
+							bind $pid '.pid';
+							format --prepend='prodPage_';
+							apply --attrib='data-lightbox';
+							apply --show --tag;
+						}};" class="prodThumb displayNone" href="#">
+						<img data-tlc="bind $var '.%attribs.zoovy:prod_image8'; store_sac#imageurl --name=$var --w='54' --h='40' --b='ffffff'; apply --attrib='src';" src="blank.gif">
+					</a>
 				</div>
 			</div>
 			
