@@ -871,11 +871,11 @@ this will likely become more flexible in the future. ###
 			<img src="blank.gif" data-tlc="bind $var '.%attribs.user:app_special_offer'; if(is $var --notblank;){{store_sac#imageurl --name=$var --w='235' --b='ffffff'; apply --attrib='src';}};"/>
 		</div>
 	<!-- Schad turned off, need to configure banners
-		-->
 		<div>
 			<h4>Recently Viewed Items</h4>
-			<div class="recentlyViewed"><!-- populated by complete event --></div>
+			<div class="recentlyViewed"></div>
 		</div>
+		-->
 	</div>
 	<div class="prodViewerContainer">
 		<div class="prodImageContainer floatLeft lowlightText">
@@ -1049,6 +1049,7 @@ this will likely become more flexible in the future. ###
 			<div data-tlc="" class="latency marginBottom">
 			
 			</div>
+			<!-- 
 			<a href="#" data-tlc="bind $href '.%attribs.user:prod_sizechart';
 				if(is $href --notblank;){{
 					store_sac#imageurl --name=$href --b='ffffff';
@@ -1062,6 +1063,7 @@ this will likely become more flexible in the future. ###
 					}};">
 				<img src="images/sizechart.jpg"/>
 			</a>
+			-->
 			<div data-app-role="timeInTransit" class="displayNone"></div>
 
 			<form data-tlc="bind $var '.pid'; store_product#atcform  --legacy;" class="prodViewerAddToCartForm clearfix" action="#" onSubmit="return false;" data-app-submit="store_sac|productAdd2Cart">
