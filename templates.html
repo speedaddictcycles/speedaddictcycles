@@ -991,7 +991,30 @@ this will likely become more flexible in the future. ###
 			</table>
 			-->
 
-			<div data-tlc="bind $var '.%attribs.zoovy:ship_latency'; if (is $var --notblank;) {{format --prepend='Normally ships in '; format --append=' day(s)'; apply --append;}};" class="latency marginBottom"></div>
+			<!-- 
+				bind $var '.%attribs.zoovy:ship_latency'; 
+				if (is $var --notblank;) {{
+					format --prepend='Normally ships in '; 
+					format --append=' day(s)'; 
+					apply --append;
+					}};					
+				-->
+			<div data-tlc="" class="latency marginBottom">
+			
+			</div>
+			<a href="#" data-tlc="bind $href '.%attribs.user:prod_sizechart';
+				if(is $href --notblank;){{
+					store_sac#imageurl --name=$href --b='ffffff';
+					apply --attrib='href';
+					bind $pid '.pid';
+					format --prepend='sizechart_';
+					apply --attrib='data-lightbox';
+					}}
+				else{{
+					apply --remove --tag;
+					}};">
+				<img src="images/sizechart.jpg"/>
+			</a>
 			<div data-app-role="timeInTransit" class="displayNone"></div>
 
 			<form data-tlc="bind $var '.pid'; store_product#atcform  --legacy;" class="prodViewerAddToCartForm clearfix" action="#" onSubmit="return false;" data-app-submit="store_sac|productAdd2Cart">
