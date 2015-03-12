@@ -746,6 +746,10 @@ for(var i in partsPages){
 
 _app.router.appendHash({'type':'match','route':'/apparel/{{id}}/*','callback':'filter'});
 var apparelPages = [
+	{id:'motorcycle-jackets',jsonPath:'filters/apparel/motorcycle-jackets.json'},
+	{id:'motorcycle-pants',jsonPath:'filters/apparel/motorcycle-pants.json'},
+	{id:'motorcycle-race-suits',jsonPath:'filters/apparel/motorcycle-race-suits.json'},
+	{id:'motorcycle-boots',jsonPath:'filters/apparel/motorcycle-boots.json'},
 	{id:'gloves',jsonPath:'filters/apparel/gloves.json'},
 	{id:'goggles',jsonPath:'filters/apparel/goggles.json'},
 	{id:'grips',jsonPath:'filters/apparel/grips.json'},
@@ -767,9 +771,11 @@ var brandsPages = [
 	{id:'answer',jsonPath:'filters/brands/answer.json'},
 	{id:'arai-helmets',jsonPath:'filters/brands/arai-helmets.json'},
 	{id:'bmc-air-filters',jsonPath:'filters/brands/bmc-air-filters.json'},
+	{id:'cortech-riding-gear',jsonPath:'filters/brands/cortech.json'},
 	{id:'factory-racing',jsonPath:'filters/brands/factory-racing.json'},
 	{id:'giant-loop-luggage',jsonPath:'filters/brands/giant-loop-luggage.json'},
 	{id:'hjc-helmets',jsonPath:'filters/brands/hjc-helmets.json'},
+	{id:'joe-rocket-riding-gear',jsonPath:'filters/brands/joe-rocket.json'},
 	{id:'k-and-n',jsonPath:'filters/brands/k-and-n.json'},
 	{id:'msr',jsonPath:'filters/brands/msr.json'},
 	{id:'nolan-helmets',jsonPath:'filters/brands/nolan-helmets.json'},

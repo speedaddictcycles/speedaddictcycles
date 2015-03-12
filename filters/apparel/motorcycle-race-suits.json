@@ -1,0 +1,10 @@
+{
+	"title" : "Motorcycle Race Suits",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"suits"}}]},
+	"optionList" : [
+		"user:gender",
+		"user:primary_color",
+		"user:material",
+		"user:app_brand"
+	]
+}

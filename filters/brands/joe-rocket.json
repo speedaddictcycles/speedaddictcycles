@@ -1,0 +1,9 @@
+{
+	"title" : "Joe Rocket Riding Gear",
+	"baseFilter" : {"term" : {"app_brand" : "joe_rocket"}},
+	"optionList" : [
+		"user:apparel_accessories",
+		"user:primary_color",
+		"user:material"
+	]
+}

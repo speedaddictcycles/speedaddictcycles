@@ -1,5 +1,5 @@
 {
-	"title" : "Gloves - Motorcycle Apparel & Accessories",
+	"title" : "Motorcycle Gloves",
 	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"gloves"}}]},
 	"optionList" : [
 		"user:app_brand",

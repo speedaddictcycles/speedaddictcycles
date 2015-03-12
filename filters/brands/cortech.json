@@ -1,0 +1,9 @@
+{
+	"title" : "Cortech Riding Gear",
+	"baseFilter" : {"term" : {"app_brand" : "cortech"}},
+	"optionList" : [
+		"user:apparel_accessories",
+		"user:primary_color",
+		"user:material"
+	]
+}

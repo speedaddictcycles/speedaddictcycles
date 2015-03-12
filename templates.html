@@ -141,6 +141,24 @@
 				<img src="images/dropdown/goggles_progrip_64x64.jpg" class="floatLeft"/>
 				<h3 class="floatLeft">Goggles</h3>
 			</a>
+			<a href="/apparel/motorcycle-jackets/"  class="block clear">
+				<img src="images/dropdown/motorcycle_jackets_64x64.jpg" class="floatLeft"/>
+				<h3 class="floatLeft">Jackets</h3>
+			</a>
+			<a href="/apparel/motorcycle-pants/"  class="block clear">
+				<img src="images/dropdown/motorcycle_pants_64x64.jpg" class="floatLeft"/>
+				<h3 class="floatLeft">Pants</h3>
+			</a>
+			<a href="/apparel/motorcycle-race-suits/"  class="block clear">
+				<img src="images/dropdown/motorcycle_suits_64x64.jpg" class="floatLeft"/>
+				<h3 class="floatLeft">Suits</h3>
+			</a>
+			<a href="/apparel/motorcycle-boots/"  class="block clear">
+				<img src="images/dropdown/motorcycle_boots_64x64.jpg" class="floatLeft"/>
+				<h3 class="floatLeft">Boots</h3>
+			</a>
+		</div>
+		<div class="floatLeft">
 			<a href="/apparel/luggage/"  class="block clear">
 				<img src="images/dropdown/luggage_giantloop_64x64.jpg" class="floatLeft"/>
 				<h3 class="floatLeft">Luggage</h3>
@@ -149,8 +167,6 @@
 				<img src="images/dropdown/grips_progrip_64x64.jpg" class="floatLeft"/>
 				<h3 class="floatLeft">Grips</h3>
 			</a>
-		</div>
-		<div class="floatLeft">
 			<a href="/apparel/security/"  class="block clear">
 				<img src="images/dropdown/security_chain_64x64.jpg" class="floatLeft"/>
 				<h3 class="floatLeft">Security</h3>
@@ -166,17 +182,23 @@
 		</div>
 		<div class="featBrands floatRight">
 			<h2>Featured Brands:</h2>
-			<a href="/brands/olympia-gloves/"  class="block clear">
-				<img src="images/dropdown/brands/olympia_64x150.jpg" class="floatLeft"/>
+			<a href="/brands/cortech-riding-gear/"  class="block clear">
+				<img src="images/dropdown/brands/cortech_64x150.jpg" class="floatLeft"/>
 			</a>
 			<a href="/brands/giant-loop-luggage/"  class="block clear">
 				<img src="images/dropdown/brands/giantloop_64x150.jpg" class="floatLeft"/>
+			</a>
+			<a href="/brands/olympia-gloves/"  class="block clear">
+				<img src="images/dropdown/brands/olympia_64x150.jpg" class="floatLeft"/>
 			</a>
 			<a href="/brands/onguard-locks/"  class="block clear">
 				<img src="images/dropdown/brands/onguard_64x150.jpg" class="floatLeft"/>
 			</a>
 			<a href="/brands/progrip-grips/"  class="block clear">
 				<img src="images/dropdown/brands/progrip_64x150.jpg" class="floatLeft"/>
+			</a>
+			<a href="/brands/joe-rocket-riding-gear/"  class="block clear">
+				<img src="images/dropdown/brands/joe_rocket_64x150.jpg" class="floatLeft"/>
 			</a>
 		</div>
 	</div>
@@ -593,6 +615,20 @@ don't modify the 'data-templateid' unless you are changing template names and up
 		<div class="filterCheckboxList" 
 			data-tlc="bind $index '.options.user:helmet_parts.index';
 				bind $cbl '.options.user:helmet_parts.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
+	</div>	
+	<div data-tlc="bind $var '.options.user:gender'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Rider Gender:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:gender.index';
+				bind $cbl '.options.user:gender.options'; 
+				store_filter#filtercheckboxlist --index=$index;"></div>
+	</div>	
+	<div data-tlc="bind $var '.options.user:material'; if(is $var --blank){{apply --hide;}};" class="filterGroup marginBottom">
+		<h5 class="highlightBG_2">Gear Material:</h5>
+		<div class="filterCheckboxList" 
+			data-tlc="bind $index '.options.user:material.index';
+				bind $cbl '.options.user:material.options'; 
 				store_filter#filtercheckboxlist --index=$index;"></div>
 	</div>	
 	

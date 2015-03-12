@@ -1,0 +1,10 @@
+{
+	"title" : "Motorcycle Jackets",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "accessory_clothing"}},{"term" : {"apparel_accessories":"jackets"}}]},
+	"optionList" : [
+		"user:gender",
+		"user:primary_color",
+		"user:material",
+		"user:app_brand"
+	]
+}
