@@ -1052,9 +1052,9 @@ this will likely become more flexible in the future. ###
 			</hgroup>
 
 			<div class="priceContainer marginBottom" itemprop="offers"  itemscope itemtype="http://schema.org/Offer">
-				<h4>
+				<h3>
 					<span data-tlc="bind $var '.%attribs.zoovy:base_price'; if (is $var --notblank;) {{format --currency='USD'; apply --append;}};" class="basePrice extraHighlightText"></span>
-				</h4>
+				</h3>
 				<!--
 				
 				<span class='savings'>
@@ -1063,7 +1063,16 @@ this will likely become more flexible in the future. ###
 				</span>
 				-->
 			</div>
-
+			
+			<div class="sizeChartLink" data-tlc="bind $var '.%attribs.user:app_prod_sizechart'; if(is $var --blank;){{apply --tag --remove;}};">
+				<a data-tlc="
+					bind $var '.%attribs.user:app_prod_sizechart'; 
+					store_sac#imageurl --name=$var --b='ffffff';
+					apply --attrib='href';
+					bind $pid '.pid';
+					format --prepend='prodSizeChart_';
+					apply --attrib='data-lightbox'; ">Size Chart</a>
+			</div>
 
 			<!--
 			<table class='marginBottom fullWidth gridTable' data-app-role='childrenSiblingsContainer'>
