@@ -888,7 +888,7 @@ this will likely become more flexible in the future. ###
 	store_prodlist#productlist  --withInventory='1' --withVariations='1' --templateid='productListTemplateCarousel'  --legacy;
 	"></ul>
 
-<div data-tlc="bind $var '.pid'; apply --attrib='data-pid';" id="productTemplate" class="productPage">
+<div data-tlc="bind $var '.pid'; apply --attrib='data-pid';" id="productTemplate" class="productPage" itemscope="itemscope" itemtype="http://schema.org/Product">
 	<span class="displayNone" data-tlc="store_routing#seoanchor --seo; apply --attrib='data-canonical';"></span>
 	<span class="displayNone" data-tlc="bind $title '.%attribs.zoovy:prod_name'; apply --attrib='data-seo-title';"></span>
 	<span class="displayNone" data-tlc="bind $desc '.%attribs.zoovy:prod_desc'; apply --attrib='data-seo-desc';"></span>
@@ -1051,7 +1051,7 @@ this will likely become more flexible in the future. ###
 				</h5>
 			</hgroup>
 
-			<div class="priceContainer marginBottom">
+			<div class="priceContainer marginBottom" itemprop="offers"  itemscope itemtype="http://schema.org/Offer">
 				<h4>
 					<span data-tlc="bind $var '.%attribs.zoovy:base_price'; if (is $var --notblank;) {{format --currency='USD'; apply --append;}};" class="basePrice extraHighlightText"></span>
 				</h4>
