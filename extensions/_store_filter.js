@@ -326,7 +326,17 @@ var store_filter = function(_app) {
 				if(!elasticsearch.sort){
 					var tmp = {
 						"query" :{
-							"function_score" : {"filter":elasticsearch.filter}
+							"function_score" : {
+								"filter":elasticsearch.filter,
+								"functions" : [
+									{
+										"field_value_factor" : {
+											"field" : "booster"
+											}
+										}
+									],
+								"boost_mode" : "sum"
+								}
 							},
 						"facets" : elasticsearch.facets
 						}
