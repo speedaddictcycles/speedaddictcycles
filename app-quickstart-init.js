@@ -738,7 +738,8 @@ var partsPages = [
 	{id:'controls',jsonPath:'filters/parts/controls.json'},
 	{id:'repair-manual',jsonPath:'filters/parts/repair-manual.json'},
 	{id:'chain',jsonPath:'filters/parts/chain.json'},
-	{id:'tires',jsonPath:'filters/parts/tires.json'}
+	{id:'tires',jsonPath:'filters/parts/tires.json'},
+	{id:'grip-pads',jsonPath:'filters/parts/grip-pads.json'}
 	];
 for(var i in partsPages){	
 	_app.couple('store_filter','addPage',partsPages[i]);

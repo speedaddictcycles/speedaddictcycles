@@ -1,0 +1,8 @@
+{
+	"title" : "Grip Pads - Motorcycle Parts",
+	"baseFilter" : {"and" : [{"term" : {"prod_is_general" : "part"}},{"term" : {"part_type":"grip_pads"}}]},
+	"optionList" : [
+		"user:single_make",
+		"user:finish"
+	]
+}
